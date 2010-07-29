@@ -7,7 +7,7 @@ bucketizing to limit the number of files the Hadoop Namenode needs to track.
 
 = Requirements
 
-com.ning:metrics.serialization jar. See http://github.com/pierre/collector.
+com.ning:metrics.serialization jar. See http://github.com/pierre/serialization.
 
 
 = To build
@@ -75,7 +75,7 @@ You can test the HTTP endpoint using curl (events will end up in /tmp/collector/
     * Closing connection #0
 
 
-= License (See LICENSE-2.0.txt file for full license)
+= License (see LICENSE-2.0.txt file for full license)
 
 Copyright 2010 Ning
 
