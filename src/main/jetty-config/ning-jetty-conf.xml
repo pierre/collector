@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2010 Ning, Inc.
+  ~
+  ~ Ning licenses this file to you under the Apache License, version 2.0
+  ~ (the "License"); you may not use this file except in compliance with the
+  ~ License.  You may obtain a copy of the License at:
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  ~ License for the specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<Configure id="Server" class="org.mortbay.jetty.Server">
+
+    <Set name="ThreadPool">
+      <New class="org.mortbay.thread.QueuedThreadPool">
+        <Set name="minThreads"><SystemProperty name="xn.server.threads.min" default="10"/></Set>
+        <Set name="maxThreads"><SystemProperty name="xn.server.threads.max" default="200"/></Set>
+        <Set name="lowThreads"><SystemProperty name="xn.server.threads.low" default="50"/></Set>
+        <Set name="SpawnOrShrinkAt">2</Set>
+      </New>
+    </Set>
+
+    <Call name="addConnector">
+      <Arg>
+          <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+            <Set name="host"><SystemProperty name="xn.server.ip"/></Set>
+            <Set name="port"><SystemProperty name="xn.server.port" default="8080"/></Set>
+            <Set name="maxIdleTime">300000</Set>
+            <Set name="Acceptors">2</Set>
+            <Set name="statsOn">true</Set>
+            <Set name="confidentialPort"><SystemProperty name="xn.server.ssl.port" default="8443"/></Set>
+            <Set name="lowResourcesConnections">20000</Set>
+            <Set name="lowResourcesMaxIdleTime">5000</Set>
+          </New>
+      </Arg>
+    </Call>
+
+    <Set name="handler">
+      <New id="Handlers" class="org.mortbay.jetty.handler.HandlerCollection">
+        <Set name="handlers">
+         <Array type="org.mortbay.jetty.Handler">
+           <Item>
+             <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection"/>
+           </Item>
+           <Item>
+             <New id="DefaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
+           </Item>
+           <Item>
+             <New id="RequestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
+           </Item>
+         </Array>
+        </Set>
+      </New>
+    </Set>
+
+    <Call name="addLifeCycle">
+      <Arg>
+        <New class="org.mortbay.jetty.deployer.ContextDeployer">
+          <Set name="contexts"><Ref id="Contexts"/></Set>
+          <Set name="configurationDir">contexts</Set>
+          <Set name="scanInterval">1</Set>
+        </New>
+      </Arg>
+    </Call>
+
+    <Ref id="RequestLog">
+      <Set name="requestLog">
+        <New id="RequestLogImpl" class="ning.jetty6.logging.NingRequestLog">
+          <Set name="logDir"><SystemProperty name="xn.jetty.requestLog.logDir" default="logs"/></Set>
+          <Set name="turnedOnByDefault"><SystemProperty name="xn.jetty.requestLog.enabled" default="false"/></Set>
+        </New>
+      </Set>
+    </Ref>
+
+    <Call id="MBeanServer" class="java.lang.management.ManagementFactory" name="getPlatformMBeanServer"/>
+
+    <Get id="Container" name="container">
+      <Call name="addEventListener">
+        <Arg>
+          <New class="org.mortbay.management.MBeanContainer">
+            <Arg><Ref id="MBeanServer"/></Arg>
+            <Call name="start" />
+          </New>
+        </Arg>
+      </Call>
+    </Get>
+
+    <Set name="stopAtShutdown">true</Set>
+    <Set name="sendServerVersion">false</Set>
+    <Set name="sendDateHeader">false</Set>
+    <Set name="gracefulShutdown"><SystemProperty name="xn.jetty.gracefulShutdownTimeoutInMs" default="1000"/></Set>
+</Configure>

@@ -1,0 +1,91 @@
+h1. External API
+
+The event collector receives events encoded in the path to a GET request.  It returns a 202 (accepted) to indicate that a best effort will be made to get the event the hdfs (barring catastrophic failures such as flaming machines).  If the collector is overloaded, it can return a 503 (temporarily unavailable).
+
+h2. URL General format
+
+The primary concern with the url is to keep it <= 256 chars to avoid truncation by some browsers.
+
+{code}
+/1?v=<EventType>,<type1><value1>,<type2><value2>,...
+{code}
+
+notes
+- /1 => 'one' or version one of the api
+- each _type_ is exactly 1 character.  
+- empty values are permitted
+- empty type is not permitted even with empty value
+- the individual type + value will be URL encoded as well (escapes any ,)
+- the value of the event in the 'v' parameter is URL encoded
+
+h2. +Field Types+
+
+||  our type || thrift type || description || notes ||
+| b | bool | A boolean value (true or false) | we use 0 or 1 |
+| 1 | byte | An 8-bit signed integer | |
+| 2 | i16 | 16-bit signed integer | |
+| 4 | i32 | A 32-bit signed integer | |
+| 8 | i64 | A 64-bit signed integer | |
+| d | double | A 64-bit floating point number | |
+| s | string | A text string encoded using UTF-8 encoding | |
+| x | n/a | The value indicates an annotation to fill in that the event collector can compute at receipt of the event | |
+
+h2. Custom Type Functions
+
+In order to save space in the url, we have a custom type of 'x' which the event collector can fill in.  The valid values that may follow x include:
+
+|| annotation vales || meaning || notes ||
+| date |  current time (millis since epoch) | |
+| host | referrer host of the request to event collector (parsed from Referer header).  This will be the subdomain of the app from which the event was sent | |
+| path | referrer path of the request to event collector (parsed from Referer header).  This will be the path on the app from which the event was sent | |
+| ua | User-Agent header from request | |
+| ip | ip address parsed from X-Forwarded-For header in request (same as tracker does) | requires that we have a load balancer to add this header; else we need to modify RESTRequest to expose this |
+
+h2. Version 2 - Base64 Encode Numbers
+
+Version 2 of the collector's external API encodes numbers as in a custom base64 encoding.  The URL format and types are the same as version 1
+
+{code}
+/2?v=<EventType>,<type1><value1>,<type2><value2>,...
+{code}
+
+h4. Encoding schema
+
+We map 0 - 63 to the following chars:
+
+{code}
+-
+0-9
+A-Z
+_
+a-z 
+{code}
+So '-' is 0, 'z' is 63.
+
+Example:
+{code}
+/2?v=TestEvent,1-,20,4z,810
+{code}
+
+would result in an event:
+{noformat}
+type = EventType, byte: 0, short: 1, int: 63, long 128
+{noformat}
+
+h1. Internal API
+
+For the purposes of events that come from within ning and not from an external source, we have an alternative API.
+
+An event needs to be encoded in thrift (add link) and contain only the thrift primitives listed above.  Then, this is posted to a collector instance at
+
+{code}
+/rest/1.0/event?name=EventType
+{code}
+
+which returns 202 if the thrift event was properly formed.  It can also return 503 which means the collector is overloaded and the client should retry.
+
+Optionally you may add date= to the query parameters to set a date for the event other than when it is received by the collector (in ISO8601 format)
+
+{code}
+/rest/1.0/event?name=EventType&date=2009-01-02T03:04:05.006Z
+{code}

@@ -1,0 +1,8 @@
+target
+*.iml
+*.ipr
+*.iws
+classes/*
+test-output/*
+release.properties
+pom.xml.releaseBackup
