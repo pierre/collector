@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
@@ -37,13 +37,13 @@ import javax.ws.rs.core.Response;
  * Version 2 of the collector's external API encodes numbers as in a custom base64 encoding
  */
 @Path("/2")
-public class Base64ExternalEventEndPoint
+public class Base64CollectorResource
 {
     private final EventRequestHandler requestHandler;
     private final EventExtractorUtil extractorUtil;
 
     @Inject
-    public Base64ExternalEventEndPoint(
+    public Base64CollectorResource(
         @Base64ExternalEventRequestHandler EventRequestHandler requestHandler,
         EventExtractorUtil extractorUtil
     )

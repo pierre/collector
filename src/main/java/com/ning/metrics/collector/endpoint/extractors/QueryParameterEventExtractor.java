@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
@@ -25,15 +25,15 @@ import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 
 /**
- * External API, versions 1 and 2: query parameters-based API (via GET)
+ * API versions 1 and 2: query parameters-based API (via GET)
  */
-public class ExternalEventExtractor implements EventExtractor
+public class QueryParameterEventExtractor implements EventExtractor
 {
-    private static final Logger log = Logger.getLogger(ExternalEventExtractor.class);
+    private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
     private final EventParser thriftEventParser;
 
     @Inject
-    public ExternalEventExtractor(EventParser thriftEventParser)
+    public QueryParameterEventExtractor(EventParser thriftEventParser)
     {
         this.thriftEventParser = thriftEventParser;
     }

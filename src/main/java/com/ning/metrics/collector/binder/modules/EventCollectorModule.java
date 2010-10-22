@@ -43,9 +43,9 @@ import com.ning.metrics.collector.binder.annotations.InternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.EventRequestHandler;
-import com.ning.metrics.collector.endpoint.ExternalEventExtractor;
-import com.ning.metrics.collector.endpoint.InternalEventExtractor;
+import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
+import com.ning.metrics.collector.endpoint.extractors.QueryParameterEventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.BodyEventExtractor;
 import com.ning.metrics.collector.endpoint.filters.FieldExtractors;
 import com.ning.metrics.collector.endpoint.filters.OrFilter;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
@@ -192,7 +192,7 @@ public class EventCollectorModule implements Module
         binder.bind(EventRequestHandler.class)
             .annotatedWith(ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(
-                ExternalEventExtractor.class,
+                QueryParameterEventExtractor.class,
                 Names.named("base10"),
                 ExternalEventEndPointStats.class
             ))
@@ -203,7 +203,7 @@ public class EventCollectorModule implements Module
             .toProvider(new ThriftEnvelopeEventParserProvider(Base64NumberConverter.class))
             .in(Scopes.SINGLETON);
 
-        binder.bind(ExternalEventExtractor.class)
+        binder.bind(QueryParameterEventExtractor.class)
             .annotatedWith(Names.named("base64"))
             .toProvider(new ExternalEventExtractorProvider(Names.named("base64")))
             .in(Scopes.SINGLETON);
@@ -213,7 +213,7 @@ public class EventCollectorModule implements Module
             .toProvider(new ThriftEnvelopeEventParserProvider(DecimalNumberConverter.class))
             .in(Scopes.SINGLETON);
 
-        binder.bind(ExternalEventExtractor.class)
+        binder.bind(QueryParameterEventExtractor.class)
             .annotatedWith(Names.named("base10"))
             .toProvider(new ExternalEventExtractorProvider(Names.named("base10")))
             .in(Scopes.SINGLETON);
@@ -221,7 +221,7 @@ public class EventCollectorModule implements Module
         binder.bind(EventRequestHandler.class)
             .annotatedWith(Base64ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(
-                ExternalEventExtractor.class,
+                QueryParameterEventExtractor.class,
                 Names.named("base64"),
                 ExternalEventEndPointStats.class
             ))
@@ -230,7 +230,7 @@ public class EventCollectorModule implements Module
         binder.bind(EventRequestHandler.class)
             .annotatedWith(InternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(
-                InternalEventExtractor.class,
+                BodyEventExtractor.class,
                 InternalEventEndPointStats.class
             ))
             .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=InternalEventHandler"));

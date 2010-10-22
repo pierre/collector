@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
@@ -35,13 +35,13 @@ import javax.ws.rs.core.Response;
  * Version 1 of the collector's external API
  */
 @Path("/1")
-public class ExternalEventEndPoint
+public class CollectorResource
 {
     private final EventRequestHandler requestHandler;
     private final EventExtractorUtil extractorUtil;
 
     @Inject
-    public ExternalEventEndPoint(
+    public CollectorResource(
         @ExternalEventRequestHandler EventRequestHandler requestHandler,
         EventExtractorUtil extractorUtil
     )

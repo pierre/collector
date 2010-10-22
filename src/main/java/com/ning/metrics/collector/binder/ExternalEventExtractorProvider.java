@@ -20,12 +20,12 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
-import com.ning.metrics.collector.endpoint.ExternalEventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.QueryParameterEventExtractor;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 
 import java.lang.annotation.Annotation;
 
-public class ExternalEventExtractorProvider implements Provider<ExternalEventExtractor>
+public class ExternalEventExtractorProvider implements Provider<QueryParameterEventExtractor>
 {
     private Injector injector;
     private Key<ThriftEnvelopeEventParser> thriftEnvelopeEventParserKey;
@@ -47,8 +47,8 @@ public class ExternalEventExtractorProvider implements Provider<ExternalEventExt
     }
 
     @Override
-    public ExternalEventExtractor get()
+    public QueryParameterEventExtractor get()
     {
-        return new ExternalEventExtractor(injector.getInstance(thriftEnvelopeEventParserKey));
+        return new QueryParameterEventExtractor(injector.getInstance(thriftEnvelopeEventParserKey));
     }
 }

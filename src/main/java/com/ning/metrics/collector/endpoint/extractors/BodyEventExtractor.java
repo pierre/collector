@@ -14,8 +14,9 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.extractors;
 
+import com.ning.metrics.collector.endpoint.ThriftFieldListParser;
 import com.ning.serialization.ThriftEnvelope;
 import com.ning.serialization.ThriftField;
 import org.apache.log4j.Logger;
@@ -28,9 +29,9 @@ import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import java.io.IOException;
 import java.util.List;
 
-public class InternalEventExtractor implements EventExtractor
+public class BodyEventExtractor implements EventExtractor
 {
-    private static final Logger log = Logger.getLogger(InternalEventExtractor.class);
+    private static final Logger log = Logger.getLogger(BodyEventExtractor.class);
 
     @Override
     public Event extractEvent(String eventType, ExtractedAnnotation annotation) throws EventParsingException

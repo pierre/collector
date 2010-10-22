@@ -21,8 +21,8 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.EventExtractor;
-import com.ning.metrics.collector.endpoint.EventRequestHandler;
+import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
+import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.collector.events.processing.EventHandler;
 
 import java.lang.annotation.Annotation;

@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.servers;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -38,9 +38,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Singleton
-public class HttpEventServer
+public class JettyServer
 {
-    private final static Logger log = Logger.getLogger(HttpEventServer.class);
+    private final static Logger log = Logger.getLogger(JettyServer.class);
     private final String ip;
     private final int port;
     private final int sslPort;
@@ -50,14 +50,14 @@ public class HttpEventServer
 
     @Inject
     @SuppressWarnings("unused")
-    public HttpEventServer(
+    public JettyServer(
         CollectorConfig config
     )
     {
         this(config.getLocalIp(), config.getLocalPort(), config.isSSLEnabled(), config.getLocalSSLPort(), config.getSSLkeystoreLocation(), config.getSSLkeystorePassword());
     }
 
-    public HttpEventServer(
+    public JettyServer(
         String ip,
         int port,
         boolean sslEnabled,

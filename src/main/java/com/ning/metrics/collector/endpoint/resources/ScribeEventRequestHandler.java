@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;

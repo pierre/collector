@@ -14,8 +14,10 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
+import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
 import org.apache.log4j.Logger;
 
 import com.ning.metrics.collector.events.Event;

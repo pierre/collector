@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.parsing.EventParsingException;

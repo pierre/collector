@@ -22,7 +22,7 @@ import com.ning.metrics.collector.FixedManagedJmxExportScope;
 import com.ning.metrics.collector.binder.EventEndPointStatsProvider;
 import com.ning.metrics.collector.binder.annotations.ScribeStats;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.ScribeEventRequestHandler;
+import com.ning.metrics.collector.endpoint.resources.ScribeEventRequestHandler;
 import com.ning.metrics.collector.events.processing.ScribeEventHandler;
 import com.ning.metrics.collector.events.processing.ScribeEventHandlerImpl;
 import org.apache.log4j.Logger;

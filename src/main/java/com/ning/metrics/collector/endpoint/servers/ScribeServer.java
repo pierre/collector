@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.servers;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
@@ -32,17 +32,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-public class ScribeEventServer
+/**
+ * Thrift service. Contacted usually by Scribe client.
+ */
+public class ScribeServer
 {
     private final Iface eventRequestHandler;
     private final int port;
     private TNonblockingServer server = null;
 
-    private static final Logger log = Logger.getLogger(ScribeEventServer.class);
+    private static final Logger log = Logger.getLogger(ScribeServer.class);
 
     @SuppressWarnings("unused")
     @Inject
-    public ScribeEventServer(
+    public ScribeServer(
         Iface eventRequestHandler,
         CollectorConfig config
     ) throws TTransportException
@@ -50,7 +53,7 @@ public class ScribeEventServer
         this(eventRequestHandler, config.getScribePort());
     }
 
-    public ScribeEventServer(
+    public ScribeServer(
         Iface eventRequestHandler,
         int port
     ) throws TTransportException

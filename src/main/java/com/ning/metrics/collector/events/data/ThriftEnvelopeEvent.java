@@ -22,8 +22,6 @@ import com.ning.metrics.collector.util.GranularityPathMapper;
 import com.ning.serialization.ThriftEnvelope;
 import com.ning.serialization.ThriftEnvelopeDeserializer;
 import com.ning.serialization.ThriftEnvelopeSerializer;
-import org.apache.hadoop.io.serializer.Deserializer;
-import org.apache.hadoop.io.serializer.Serializer;
 import org.joda.time.DateTime;
 
 import java.io.ByteArrayInputStream;
@@ -39,8 +37,8 @@ public class ThriftEnvelopeEvent implements Event
     private ThriftEnvelope thriftEnvelope;
     private Granularity granularity;
     private transient byte[] serializedBytes;
-    private transient Serializer<ThriftEnvelope> serializer = new ThriftEnvelopeSerializer();
-    private transient Deserializer<ThriftEnvelope> deserializer = new ThriftEnvelopeDeserializer();
+    private transient ThriftEnvelopeSerializer serializer = new ThriftEnvelopeSerializer();
+    private transient ThriftEnvelopeDeserializer deserializer = new ThriftEnvelopeDeserializer();
 
     //required for deserialization
     @Deprecated

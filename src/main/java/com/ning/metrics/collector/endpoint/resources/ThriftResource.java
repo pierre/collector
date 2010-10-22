@@ -14,17 +14,15 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
-import org.joda.time.DateTime;
-
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.collector.util.Granularity;
+import org.joda.time.DateTime;
 
-import javax.servlet.http.HttpServlet;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -40,13 +38,13 @@ import java.io.ByteArrayInputStream;
  * Internal event API
  */
 @Path("/rest/1.0/event")
-public class InternalEventEndPoint extends HttpServlet
+public class ThriftResource
 {
     private final EventRequestHandler requestHandler;
     private final EventExtractorUtil extractorUtil;
 
     @Inject
-    public InternalEventEndPoint(
+    public ThriftResource(
         @InternalEventRequestHandler EventRequestHandler requestHandler,
         EventExtractorUtil extractorUtil
     )

@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.collector.endpoint.extractors.BodyEventExtractor;
 import com.ning.serialization.DataItemFactory;
 import com.ning.serialization.ThriftEnvelope;
 import com.ning.serialization.ThriftFieldImpl;
@@ -35,7 +36,7 @@ import java.io.ByteArrayInputStream;
 
 public class TestInternalEventExtractor
 {
-    private InternalEventExtractor extractor = null;
+    private BodyEventExtractor extractor = null;
     private ThriftFieldList data = null;
     private String eventType = null;
     private byte[] payload = null;
@@ -44,7 +45,7 @@ public class TestInternalEventExtractor
     @BeforeMethod(alwaysRun = true)
     void setup() throws TException, org.apache.thrift.TException
     {
-        extractor = new InternalEventExtractor();
+        extractor = new BodyEventExtractor();
         ThriftFieldListSerializer serializer = new ThriftFieldListSerializer();
 
         data = new ThriftFieldList();
