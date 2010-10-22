@@ -22,11 +22,8 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.serialization.ThriftEnvelopeSerialization;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocalFileSystem;
-import org.apache.hadoop.fs.RawLocalFileSystem;
 
 import java.io.IOException;
-import java.net.URI;
 
 public class FileSystemProvider implements Provider<FileSystem>
 {
@@ -36,25 +33,21 @@ public class FileSystemProvider implements Provider<FileSystem>
     public FileSystemProvider(CollectorConfig collectorConfig) throws IOException
     {
         String hfsHost = collectorConfig.getHfsHost();
-        if (!hfsHost.isEmpty()) {
-            Configuration hadoopConfig = new Configuration();
+        Configuration hadoopConfig = new Configuration();
 
-            hadoopConfig.set("fs.default.name", hfsHost);
-            hadoopConfig.setLong("dfs.block.size", collectorConfig.getHadoopBlockSize());
-            hadoopConfig.set("hadoop.job.ugi", collectorConfig.getHadoopUgi());
-            hadoopConfig.setStrings("io.serializations", ThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
-
-            fileSystem = FileSystem.get(hadoopConfig);
+        if (hfsHost.isEmpty()) {
+            // Local filesystem, for testing
+            hadoopConfig.set("fs.default.name", "file:///");
         }
         else {
-            // Useful for testing in isolated environments
-            FileSystem hadoopIsStupid = new RawLocalFileSystem();
-            Configuration hadoopConfig = new Configuration();
-            hadoopConfig.setStrings("io.serializations", ThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
-            hadoopIsStupid.initialize(URI.create("not://used"), hadoopConfig);
-
-            fileSystem = new LocalFileSystem(hadoopIsStupid);
+            hadoopConfig.set("fs.default.name", hfsHost);
         }
+
+        hadoopConfig.setLong("dfs.block.size", collectorConfig.getHadoopBlockSize());
+        hadoopConfig.set("hadoop.job.ugi", collectorConfig.getHadoopUgi());
+        hadoopConfig.setStrings("io.serializations", ThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
+
+        fileSystem = FileSystem.get(hadoopConfig);
     }
 
     public FileSystem get()
