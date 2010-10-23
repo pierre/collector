@@ -27,6 +27,7 @@ public class TaskQueueServiceImpl implements TaskQueueService
 
 	public TaskQueueServiceImpl()
 	{
+        //TODO: single threaded?
 		executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MILLISECONDS, taskQueue, new ThreadPoolExecutor.AbortPolicy());
 	}
 

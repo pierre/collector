@@ -31,7 +31,7 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
     private static final Logger logger = Logger.getLogger(ScribeEventHandlerImpl.class);
 
     private final EventCollector collector;
-    private volatile boolean collectionEnabled;
+    private volatile boolean scribeCollectionEnabled;
     private final EventEndPointStats stats;
 
     @Inject
@@ -50,7 +50,7 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
         EventEndPointStats stats)
     {
         this.collector = collector;
-        this.collectionEnabled = enabled;
+        this.scribeCollectionEnabled = enabled;
         this.stats = stats;
     }
 
@@ -62,7 +62,7 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
 
         stats.updateTotalEvents();
 
-        if (collectionEnabled) {
+        if (scribeCollectionEnabled) {
             logger.debug(String.format("Processing event of type [%s], collection enabled", event.getName()));
 
             success = collector.collectEvent(event);
@@ -92,14 +92,14 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
     }
 
     @Managed(description = "enable/disable collection of events")
-    public void setCollectionEnabled(boolean value)
+    public void setScribeCollectionEnabled(boolean value)
     {
-        collectionEnabled = value;
+        scribeCollectionEnabled = value;
     }
 
     @Managed(description = "event collection enabled?")
-    public boolean getCollectionEnabled()
+    public boolean getScribeCollectionEnabled()
     {
-        return collectionEnabled;
+        return scribeCollectionEnabled;
     }
 }

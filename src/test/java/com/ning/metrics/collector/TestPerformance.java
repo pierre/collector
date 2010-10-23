@@ -1,6 +1,7 @@
 package com.ning.metrics.collector;
 
 import com.ning.metrics.collector.endpoint.ThriftFieldList;
+import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.serialization.DataItemFactory;
 import com.ning.serialization.ThriftFieldImpl;
 import com.ning.serialization.ThriftFieldListSerializer;
@@ -23,11 +24,11 @@ import java.util.concurrent.TimeUnit;
 
 public class TestPerformance
 {
-    private final static int THREADPOOL_SIZE = 5;
-    private final static int NUMBER_OF_PAYLOADS = 200;
-    private final static int SCRIBE_PAYLOAD_LENGTH = 60;
+    private final static int THREADPOOL_SIZE = 10;
+    private final static int NUMBER_OF_SCRIBE_CLIENTS = 400;
+    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 100;
 
-    private static final ArrayList<LogEntry> messages = new ArrayList<LogEntry>(SCRIBE_PAYLOAD_LENGTH);
+    private static final ArrayList<LogEntry> messages = new ArrayList<LogEntry>(NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT);
     private static scribe.Client client;
     private final static Logger log = Logger.getLogger(TestPerformance.class);
 
@@ -77,10 +78,13 @@ public class TestPerformance
     public static void main(String[] args) throws Exception
     {
         System.setProperty("collector.activemq.enabled", "false");
+        //TODO
+        //System.setProperty("collector.spool.synctype", "SYNC");
         System.setProperty("xn.hadoop.host", "file:///127.0.0.1:9000/tmp");
 
         StandaloneCollectorServer.main();
 
+        Thread.sleep(1500);
 
         final TSocket sock = new TSocket("127.0.0.1", 7911);
         final TFramedTransport transport = new TFramedTransport(sock);
@@ -95,27 +99,29 @@ public class TestPerformance
         data.add(new ThriftFieldImpl(DataItemFactory.create(10001000000L), (short) 3));
 
         String message = String.format("%s:%s", new DateTime().getMillis(), new Base64().encodeToString(new ThriftFieldListSerializer().createPayload(data)));
-        for (int i = 0; i < SCRIBE_PAYLOAD_LENGTH; i++) {
+        for (int i = 0; i < NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT; i++) {
             messages.add(i, new LogEntry("category", message));
         }
         log.info("Scribe payload created");
         int messageSize = getPayloadSize();
 
-        ExecutorService e = Executors.newFixedThreadPool(THREADPOOL_SIZE);
+        ExecutorService e = Executors.newFixedThreadPool(THREADPOOL_SIZE, new NamedThreadFactory("Performance tests (Scribe client)"));
 
         long startTime = System.currentTimeMillis();
-        for (int i = 0; i < NUMBER_OF_PAYLOADS; i++) {
+        for (int i = 0; i < NUMBER_OF_SCRIBE_CLIENTS; i++) {
             e.execute(new ScribeClient());
-            log.info(String.format("Thread %d/%d submitted", i + 1, NUMBER_OF_PAYLOADS));
+            log.info(String.format("Thread %d/%d submitted", i + 1, NUMBER_OF_SCRIBE_CLIENTS));
         }
 
         e.shutdown();
         e.awaitTermination(10, TimeUnit.MINUTES);
         transport.close();
 
+        // TODO: what does that test really? up to the disk?
         final long runTimeSeconds = (System.currentTimeMillis() - startTime) / 1000;
         log.info(String.format("%d messages sent in %d:%02d, %s bytes per payload, %.4f Mb/sec throughput",
-            NUMBER_OF_PAYLOADS, runTimeSeconds / 60, runTimeSeconds % 60, messageSize, 8 / 1024. * messageSize / runTimeSeconds));
+            NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT, runTimeSeconds / 60, runTimeSeconds % 60, messageSize,
+            8 / 1024. * messageSize * NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT / runTimeSeconds));
 
         System.exit(0);
     }

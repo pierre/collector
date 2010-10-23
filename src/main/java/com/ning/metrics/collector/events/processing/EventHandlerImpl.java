@@ -69,6 +69,7 @@ public class EventHandlerImpl implements EventHandler
 
     @SuppressWarnings("unchecked")
     @Override
+    //TODO no  need for stats
     public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats)
     {
         stats.updateTotalEvents();

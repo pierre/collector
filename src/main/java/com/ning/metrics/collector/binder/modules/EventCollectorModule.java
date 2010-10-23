@@ -43,11 +43,11 @@ import com.ning.metrics.collector.binder.annotations.InternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
-import com.ning.metrics.collector.endpoint.extractors.QueryParameterEventExtractor;
 import com.ning.metrics.collector.endpoint.extractors.BodyEventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.QueryParameterEventExtractor;
 import com.ning.metrics.collector.endpoint.filters.FieldExtractors;
 import com.ning.metrics.collector.endpoint.filters.OrFilter;
+import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
@@ -65,12 +65,12 @@ import com.ning.metrics.collector.events.writers.DiskSpoolEventWriter;
 import com.ning.metrics.collector.events.writers.EventWriter;
 import com.ning.metrics.collector.events.writers.HadoopFileEventWriter;
 import com.ning.metrics.collector.util.Filter;
+import com.ning.metrics.collector.util.NamedThreadFactory;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -134,11 +134,11 @@ public class EventCollectorModule implements Module
             */
         binder.bind(ScheduledExecutorService.class)
             .annotatedWith(DiskSpoolFlushExecutor.class)
-            .toInstance(new ScheduledThreadPoolExecutor(2, Executors.defaultThreadFactory()));
+            .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")));
 
         binder.bind(ScheduledExecutorService.class)
             .annotatedWith(BufferingEventCollectorExecutor.class)
-            .toInstance(new ScheduledThreadPoolExecutor(2, Executors.defaultThreadFactory()));
+            .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("tmp to spool promoter")));
 
         /*
          * Filters

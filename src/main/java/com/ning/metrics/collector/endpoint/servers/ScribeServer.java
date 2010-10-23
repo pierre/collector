@@ -17,8 +17,9 @@
 package com.ning.metrics.collector.endpoint.servers;
 
 import com.google.inject.Inject;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.util.NamedThreadFactory;
 import org.apache.log4j.Logger;
-import org.apache.thrift.server.THsHaServer;
 import org.apache.thrift.server.TNonblockingServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TNonblockingServerTransport;
@@ -26,9 +27,6 @@ import org.apache.thrift.transport.TTransportException;
 import scribe.thrift.scribe.Iface;
 import scribe.thrift.scribe.Processor;
 
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -61,15 +59,13 @@ public class ScribeServer
         this.eventRequestHandler = eventRequestHandler;
         this.port = port;
 
-        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
+        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("CollectorTHsHaServer"));
         executor.execute(new Runnable()
         {
             @Override
             public void run()
             {
                 try {
-                    Thread t = Thread.currentThread();
-                    t.setName("Thrift service");
                     start();
                 }
                 catch (TTransportException e) {
@@ -90,7 +86,7 @@ public class ScribeServer
         TNonblockingServerTransport socket = new TNonblockingServerSocket(port);
         Processor processor = new Processor(eventRequestHandler);
 
-        server = new THsHaServer(processor, socket);
+        server = new CollectorTHsHaServer(processor, socket);
         log.info(String.format("Starting terminal Scribe server on port %d", port));
         server.serve();
 
