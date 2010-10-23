@@ -7,6 +7,10 @@ import org.apache.hadoop.io.serializer.Deserializer;
 import org.apache.hadoop.io.serializer.Serialization;
 import org.apache.hadoop.io.serializer.Serializer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class HadoopThriftEnvelopeSerialization implements Serialization<ThriftEnvelope>
 {
     @Override
@@ -15,16 +19,98 @@ public class HadoopThriftEnvelopeSerialization implements Serialization<ThriftEn
         return ThriftEnvelope.class.isAssignableFrom(c);
     }
 
+    private static class HadoopThriftEnvelopeDeserializer implements Deserializer<ThriftEnvelope>
+    {
+        private final ThriftEnvelopeDeserializer delegate;
+
+        private HadoopThriftEnvelopeDeserializer()
+        {
+            delegate = new ThriftEnvelopeDeserializer();
+        }
+
+        /**
+         * <p>Prepare the deserializer for reading.</p>
+         */
+        @Override
+        public void open(InputStream in) throws IOException
+        {
+            delegate.open(in);
+        }
+
+        /**
+         * <p>
+         * Deserialize the next object from the underlying input stream.
+         * If the object <code>t</code> is non-null then this deserializer
+         * <i>may</i> set its internal state to the next object read from the input
+         * stream. Otherwise, if the object <code>t</code> is null a new
+         * deserialized object will be created.
+         * </p>
+         *
+         * @return the deserialized object
+         */
+        @Override
+        public ThriftEnvelope deserialize(ThriftEnvelope thriftEnvelope) throws IOException
+        {
+            return delegate.deserialize(thriftEnvelope);
+        }
+
+        /**
+         * <p>Close the underlying input stream and clear up any resources.</p>
+         */
+        @Override
+        public void close() throws IOException
+        {
+            delegate.close();
+        }
+    }
+
+    private static class HadoopThriftEnvelopeSerializer implements Serializer<ThriftEnvelope>
+    {
+        private final ThriftEnvelopeSerializer delegate;
+
+        private HadoopThriftEnvelopeSerializer()
+        {
+            delegate = new ThriftEnvelopeSerializer();
+        }
+
+        /**
+         * <p>Prepare the serializer for writing.</p>
+         */
+        @Override
+        public void open(OutputStream out) throws IOException
+        {
+            delegate.open(out);
+        }
+
+        /**
+         * <p>Serialize <code>t</code> to the underlying output stream.</p>
+         */
+        @Override
+        public void serialize(ThriftEnvelope thriftEnvelope) throws IOException
+        {
+            delegate.serialize(thriftEnvelope);
+        }
+
+        /**
+         * <p>Close the underlying output stream and clear up any resources.</p>
+         */
+        @Override
+        public void close() throws IOException
+        {
+            delegate.close();
+        }
+    }
+
     @Override
     public Deserializer<ThriftEnvelope> getDeserializer(Class<ThriftEnvelope> c)
     {
-        return (Deserializer<ThriftEnvelope>) new ThriftEnvelopeDeserializer();
+        return new HadoopThriftEnvelopeDeserializer();
     }
 
     @Override
     public Serializer<ThriftEnvelope> getSerializer(Class<ThriftEnvelope> c)
     {
-        return (Serializer<ThriftEnvelope>) new ThriftEnvelopeSerializer();
+        return new HadoopThriftEnvelopeSerializer();
     }
 }
 

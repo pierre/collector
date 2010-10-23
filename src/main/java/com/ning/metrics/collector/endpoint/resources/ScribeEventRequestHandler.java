@@ -99,6 +99,7 @@ public class ScribeEventRequestHandler implements Iface
             return ResultCode.OK;
         }
         else {
+            // We mainly come here if the collectors are falling over (rejected event)
             return ResultCode.TRY_LATER;
         }
     }

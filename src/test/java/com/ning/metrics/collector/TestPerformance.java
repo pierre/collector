@@ -24,11 +24,12 @@ import java.util.concurrent.TimeUnit;
 
 public class TestPerformance
 {
-    private final static int THREADPOOL_SIZE = 10;
-    private final static int NUMBER_OF_SCRIBE_CLIENTS = 400;
-    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 100;
+    private final static int THREADPOOL_SIZE = 5;
+    private final static int NUMBER_OF_SCRIBE_CLIENTS = 6;
+    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD = 60;
+    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 1200;
 
-    private static final ArrayList<LogEntry> messages = new ArrayList<LogEntry>(NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT);
+    private static final ArrayList<LogEntry> messages = new ArrayList<LogEntry>(NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD);
     private static scribe.Client client;
     private final static Logger log = Logger.getLogger(TestPerformance.class);
 
@@ -51,26 +52,28 @@ public class TestPerformance
         public void run()
         {
             ResultCode rescode = null;
-            try {
-                synchronized (lockObject) {
-                    // Not Thread-safe. Sigh. Really Facebook?
-                    rescode = client.Log(messages);
+            for (int i = 0; i < NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT; i++) {
+                try {
+                    synchronized (lockObject) {
+                        // Not Thread-safe. Sigh. Really Facebook?
+                        rescode = client.Log(messages);
+                    }
                 }
-            }
-            catch (TException e) {
-                log.warn(e.getLocalizedMessage());
-            }
+                catch (TException e) {
+                    log.warn(e.getLocalizedMessage());
+                }
 
-            switch (rescode) {
-                case OK:
-                    log.info(String.format("%d messages sent successfully.", messages.size()));
-                    break;
-                case TRY_LATER:
-                    // Push the error back to the caller
-                    log.warn("Try later");
-                    break;
-                default:
-                    log.warn(String.format("Unknown error: %d", rescode.getValue()));
+                switch (rescode) {
+                    case OK:
+                        log.info(String.format("%d messages sent successfully.", messages.size()));
+                        break;
+                    case TRY_LATER:
+                        log.error("Falling over");
+                        System.exit(1);
+                        break;
+                    default:
+                        log.warn(String.format("Unknown error: %d", rescode.getValue()));
+                }
             }
         }
     }
@@ -99,7 +102,7 @@ public class TestPerformance
         data.add(new ThriftFieldImpl(DataItemFactory.create(10001000000L), (short) 3));
 
         String message = String.format("%s:%s", new DateTime().getMillis(), new Base64().encodeToString(new ThriftFieldListSerializer().createPayload(data)));
-        for (int i = 0; i < NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT; i++) {
+        for (int i = 0; i < NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD; i++) {
             messages.add(i, new LogEntry("category", message));
         }
         log.info("Scribe payload created");
@@ -119,9 +122,9 @@ public class TestPerformance
 
         // TODO: what does that test really? up to the disk?
         final long runTimeSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        log.info(String.format("%d messages sent in %d:%02d, %s bytes per payload, %.4f Mb/sec throughput",
-            NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT, runTimeSeconds / 60, runTimeSeconds % 60, messageSize,
-            8 / 1024. * messageSize * NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT / runTimeSeconds));
+        log.error(String.format("%d messages sent in %d:%02d, %s bytes per payload, %.4f Mb/sec throughput",
+            NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT, runTimeSeconds / 60, runTimeSeconds % 60, messageSize,
+            8 / 1024. * messageSize * NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT / runTimeSeconds));
 
         System.exit(0);
     }
