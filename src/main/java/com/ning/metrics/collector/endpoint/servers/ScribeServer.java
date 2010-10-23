@@ -68,6 +68,8 @@ public class ScribeServer
             public void run()
             {
                 try {
+                    Thread t = Thread.currentThread();
+                    t.setName("Thrift service");
                     start();
                 }
                 catch (TTransportException e) {

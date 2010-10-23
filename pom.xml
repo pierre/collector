@@ -70,6 +70,17 @@
             <version>1.6</version>
         </dependency>
         <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+        </dependency>
+        <!-- Required by thrift -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j13</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
             <version>4.1.1</version>
@@ -77,8 +88,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-core</artifactId>
-            <version>0.20.1-3041192001</version>
-            <classifier>core</classifier>
+            <version>0.20.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.thrift</groupId>
