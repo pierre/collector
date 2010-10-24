@@ -23,7 +23,7 @@ public class SmileEnvelopeEvent implements Event
     private DateTime eventDateTime = null;
     private String eventName;
     private Granularity granularity = null;
-    private String message;
+    private byte[] payload;
 
     @Deprecated
     public SmileEnvelopeEvent()
@@ -35,13 +35,13 @@ public class SmileEnvelopeEvent implements Event
      *
      * @param eventName name the event schema
      * @param message   String representation of a SMILE-serialized event
-     * @throws IOException if the message is invalid
+     * @throws IOException if the payload is invalid
      */
     public SmileEnvelopeEvent(String eventName, String message) throws IOException
     {
         this.eventName = eventName;
-        this.message = message;
-        parser = factory.createJsonParser(message);
+        this.payload = message.getBytes();
+        parser = factory.createJsonParser(payload);
         parseEvent();
     }
 
@@ -50,23 +50,23 @@ public class SmileEnvelopeEvent implements Event
         // Go through the stream once
         JsonToken t = parser.nextToken();
         while (t != null && (eventDateTime == null || granularity == null)) {
-            if (t.asString().equals(SMILE_EVENT_DATETIME_TOKEN_NAME)) {
+            if (parser.getCurrentName() != null && parser.getCurrentName().equals(SMILE_EVENT_DATETIME_TOKEN_NAME)) {
                 t = parser.nextValue();
                 if (!t.isNumeric()) {
                     throw new IOException(String.format("Invalid JSON: [%s] is not a timestamp", t.asString()));
                 }
 
                 try {
-                    eventDateTime = new DateTime(Long.valueOf(t.asString()));
+                    eventDateTime = new DateTime(parser.getLongValue());
                 }
                 catch (NumberFormatException e) {
                     throw new IOException(String.format("Invalid JSON: [%s] is not a timestamp", t.asString()));
                 }
             }
-            else if (t.asString().equals(SMILE_EVENT_GRANULARITY_TOKEN_NAME)) {
+            else if (parser.getCurrentName() != null && parser.getCurrentName().equals(SMILE_EVENT_GRANULARITY_TOKEN_NAME)) {
                 t = parser.nextValue();
                 try {
-                    granularity = Granularity.valueOf(t.asString());
+                    granularity = Granularity.valueOf(parser.getText());
                 }
                 catch (IllegalArgumentException e) {
                     throw new IOException(String.format("Invalid JSON: [%s] is not a valid granularity", t.asString()));
@@ -109,7 +109,7 @@ public class SmileEnvelopeEvent implements Event
     @Override
     public Object getData()
     {
-        return message; // This is a String representation of a serialized SMILE event 
+        return payload; // This is a String representation of a serialized SMILE event
     }
 
     @Override
@@ -134,7 +134,7 @@ public class SmileEnvelopeEvent implements Event
     @Override
     public void writeExternal(ObjectOutput out) throws IOException
     {
-        out.write(message.getBytes());
+        out.write(payload);
     }
 
     /**
@@ -157,7 +157,7 @@ public class SmileEnvelopeEvent implements Event
 
         in.readFully(bytes);
 
-        message = new String(bytes);
+        payload = bytes;
         parser = factory.createJsonParser(bytes);
         parseEvent();
         // One has to set the name manually
