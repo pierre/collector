@@ -189,13 +189,13 @@ public class CollectorConfig
     @Config(value = "collector.temporary-event-output-directory")
     public String getTemporaryEventOutputDirectory()
     {
-        return "/tmp/collector";
+        return "/tmp/collector/hdfs/tmp";
     }
 
     @Config(value = "collector.event-output-directory")
     public String getEventOutputDirectory()
     {
-        return "/tmp/collector/hdfs";
+        return "/events";
     }
 
     @Config(value = "collector.hadoop-writer.max-writers")
