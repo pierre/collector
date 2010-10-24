@@ -9,7 +9,7 @@
     </appender>
 
     <logger name="com.ning.metrics">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="com.ning.metrics.collector.binder.modules">
         <level value="info"/>
