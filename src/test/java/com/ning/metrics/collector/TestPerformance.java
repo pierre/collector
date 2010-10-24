@@ -25,9 +25,9 @@ import java.util.concurrent.TimeUnit;
 public class TestPerformance
 {
     private final static int THREADPOOL_SIZE = 5;
-    private final static int NUMBER_OF_SCRIBE_CLIENTS = 6;
-    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD = 60;
-    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 1200;
+    private final static int NUMBER_OF_SCRIBE_CLIENTS = 5;
+    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD = 50;
+    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 500;
 
     private static final ArrayList<LogEntry> messages = new ArrayList<LogEntry>(NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD);
     private static scribe.Client client;
@@ -80,15 +80,6 @@ public class TestPerformance
 
     public static void main(String[] args) throws Exception
     {
-        System.setProperty("collector.activemq.enabled", "false");
-        //TODO
-        //System.setProperty("collector.spool.synctype", "SYNC");
-        System.setProperty("xn.hadoop.host", "file:///127.0.0.1:9000/tmp");
-
-        StandaloneCollectorServer.main();
-
-        Thread.sleep(1500);
-
         final TSocket sock = new TSocket("127.0.0.1", 7911);
         final TFramedTransport transport = new TFramedTransport(sock);
         TBinaryProtocol protocol = new TBinaryProtocol(transport, false, false);
