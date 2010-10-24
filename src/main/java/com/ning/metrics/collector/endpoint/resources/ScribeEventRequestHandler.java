@@ -19,6 +19,7 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.collector.events.data.SmileEnvelopeEvent;
 import com.ning.metrics.collector.events.parsing.StringToThriftEnvelope;
 import com.ning.metrics.collector.events.parsing.ThriftToThriftEnvelope;
 import com.ning.metrics.collector.events.processing.ScribeEventHandler;
@@ -31,6 +32,7 @@ import scribe.thrift.LogEntry;
 import scribe.thrift.ResultCode;
 import scribe.thrift.scribe.Iface;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +95,12 @@ public class ScribeEventRequestHandler implements Iface
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
+            catch (IOException e) {
+                log.info(String.format("Ignoring malformed Smile: %s", entry), e);
+                eventHandler.handleFailure(entry);
+                // We don't want Scribe to try later if it sends messages we don't understand.
+                success = true;
+            }
         }
 
         if (success) {
@@ -117,12 +125,37 @@ public class ScribeEventRequestHandler implements Iface
      * @param category Scribe category, maps to Thrift type
      * @param message  encoded ThriftEnvelope
      * @return parsed ThriftEnvelopeEvent
-     * @throws TException when the ThriftEnvelope cannot be generated
+     * @throws TException          when the ThriftEnvelope cannot be generated
+     * @throws java.io.IOException when the SmileEnvelopeEvent cannot be generated
      */
-    private Event extractEvent(String category, String message) throws TException
+    private Event extractEvent(String category, String message) throws TException, IOException
+    {
+        Event event = extractSmileEnvelopeEvent(category, message);
+
+        if (event == null) {
+            event = extractThriftEnvelopeEvent(category, message);
+        }
+
+        return event;
+    }
+
+    private Event extractSmileEnvelopeEvent(String category, String message) throws IOException
+    {
+        Event event = null;
+
+        // See http://wiki.fasterxml.com/JacksonBinaryFormatSpec
+        // We assume for now that we are sending Smile on the wire. This may change though (lzo compression?)
+        if (message.charAt(0) == ':' && message.charAt(1) == ')' && message.charAt(2) == '\n') {
+            event = new SmileEnvelopeEvent(category, message);
+        }
+
+        return event;
+    }
+
+    private Event extractThriftEnvelopeEvent(String category, String message)
+        throws TException
     {
         Event event;
-
         String[] payload = StringUtils.split(message, ":");
 
         if (payload == null || payload.length != 2) {
@@ -156,7 +189,6 @@ public class ScribeEventRequestHandler implements Iface
                 event = StringToThriftEnvelope.extractEvent(category, new DateTime(eventDateTime), payload[1]);
             }
         }
-
         return event;
     }
 

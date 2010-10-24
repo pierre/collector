@@ -27,6 +27,11 @@ public interface Event extends Externalizable
 	public String getName();
 	public String getVersion();
 	public String getOutputDir(String prefix);
+
+    /**
+     *
+     * @return Object representing the data (ThriftEnvelope, ...)
+     */
 	public Object getData();
 	public void toBytes() throws IOException;
 }
