@@ -95,7 +95,8 @@ public class SmileEnvelopeEvent implements Event
     @Override
     public String getVersion()
     {
-        throw new RuntimeException("There is no versioning for SMILE yet");
+        // TODO Not sure how to version these schemata. Need more thinking here.
+        return "1";
     }
 
     @Override
