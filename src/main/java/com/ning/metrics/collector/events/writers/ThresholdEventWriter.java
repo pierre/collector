@@ -19,8 +19,6 @@ package com.ning.metrics.collector.events.writers;
 import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.events.Event;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,17 +29,17 @@ public class ThresholdEventWriter implements EventWriter
 
     private final EventWriter delegate;
     private final AtomicLong maxWriteCount;
-    private volatile Period maxFlushPeriod;
+    private volatile long maxFlushPeriodNanos;
 
-    private DateTime lastFlush;
+    private long lastFlushNanos;
     private long uncommitedWriteCount = 0;
 
-    public ThresholdEventWriter(EventWriter delegate, long maxUncommittedWriteCount, int maxFlushPeriodInSeconds)
+    public ThresholdEventWriter(EventWriter delegate, long maxUncommittedWriteCount, long maxFlushPeriodInSeconds)
     {
         this.delegate = delegate;
         this.maxWriteCount = new AtomicLong(maxUncommittedWriteCount);
-        this.maxFlushPeriod = Period.seconds(maxFlushPeriodInSeconds);
-        this.lastFlush = getNow();
+        setMaxFlushPeriodInSeconds(maxFlushPeriodInSeconds);
+        this.lastFlushNanos = getNow();
     }
 
     @Override
@@ -60,7 +58,7 @@ public class ThresholdEventWriter implements EventWriter
         log.info("performing commit on delegate EventWriter");
         delegate.commit();
         uncommitedWriteCount = 0;
-        lastFlush = getNow();
+        lastFlushNanos = getNow();
     }
 
     @Override
@@ -77,17 +75,15 @@ public class ThresholdEventWriter implements EventWriter
 
     private synchronized void commitIfNeeded() throws IOException
     {
-        DateTime now = getNow();
-
-        if (uncommitedWriteCount > maxWriteCount.get() || now.minus(maxFlushPeriod).isAfter(lastFlush)) {
+        if (uncommitedWriteCount > maxWriteCount.get() || (getNow() - maxFlushPeriodNanos > lastFlushNanos)) {
             forceCommit();
         }
     }
 
     //unit testing hook;
-    protected DateTime getNow()
+    protected long getNow()
     {
-        return new DateTime();
+        return System.nanoTime();
     }
 
     @Managed(description = "set the max number of writes before a commit is performed")
@@ -103,14 +99,14 @@ public class ThresholdEventWriter implements EventWriter
     }
 
     @Managed(description = "set the max number of seconds between commits of local disk spools")
-    public void setMaxFlushPeriodInSeconds(int maxFlushPeriodInSeconds)
+    public void setMaxFlushPeriodInSeconds(long maxFlushPeriodInSeconds)
     {
-        this.maxFlushPeriod = Period.seconds(maxFlushPeriodInSeconds);
+        this.maxFlushPeriodNanos = maxFlushPeriodInSeconds * 1000000000;
     }
 
     @Managed(description = "the max number of seconds between commits of local disk spools")
-    public int getMaxFlushPeriodInSeconds()
+    public long getMaxFlushPeriodInSeconds()
     {
-        return maxFlushPeriod.getSeconds();
+        return maxFlushPeriodNanos * 1000000000;
     }
 }
