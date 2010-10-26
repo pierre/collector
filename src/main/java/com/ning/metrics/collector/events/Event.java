@@ -18,20 +18,23 @@ package com.ning.metrics.collector.events;
 
 import org.joda.time.DateTime;
 
-import java.io.IOException;
 import java.io.Externalizable;
+import java.io.IOException;
 
 public interface Event extends Externalizable
 {
-	public DateTime getEventDateTime();
-	public String getName();
-	public String getVersion();
-	public String getOutputDir(String prefix);
+    public DateTime getEventDateTime();
+
+    public String getName();
+
+    public String getVersion();
+
+    public String getOutputDir(String prefix);
 
     /**
-     *
      * @return Object representing the data (ThriftEnvelope, ...)
      */
-	public Object getData();
-	public void toBytes() throws IOException;
+    public Object getData();
+
+    public void toBytes() throws IOException;
 }
