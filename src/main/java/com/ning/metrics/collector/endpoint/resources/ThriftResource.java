@@ -18,6 +18,7 @@ package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.collector.util.Granularity;
@@ -65,7 +66,8 @@ public class ThriftResource
         @Context HttpHeaders request
     )
     {
+        EventStats eventStats = new EventStats();
         DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(request, new ByteArrayInputStream(content), eventDateTime, eventGranularity, extractorUtil));
+        return requestHandler.handleEventRequest(eventName, new ParsedRequest(request, new ByteArrayInputStream(content), eventDateTime, eventGranularity, extractorUtil), eventStats);
     }
 }

@@ -22,8 +22,10 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEven
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.writers.EventWriter;
+import com.ning.metrics.collector.util.Stats;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -43,6 +45,9 @@ public class BufferingEventCollector implements EventCollector
     private final ScheduledExecutorService executor;
     private final TaskQueueService taskQueueService;
     private final ActiveMQController activeMQController;
+
+    private final Stats endPointsStats = Stats.timeWindow(30, TimeUnit.MINUTES);
+    private final Stats writerStats = Stats.timeWindow(30, TimeUnit.MINUTES);
 
     @Inject
     public BufferingEventCollector(
@@ -102,7 +107,6 @@ public class BufferingEventCollector implements EventCollector
                         public void execute() throws IOException
                         {
                             eventWriter.commit();
-
                         }
                     });
                 }
@@ -114,7 +118,7 @@ public class BufferingEventCollector implements EventCollector
     }
 
     @Override
-    public boolean collectEvent(final Event event)
+    public boolean collectEvent(final Event event, final EventStats eventStats)
     {
         if ((activeMQController != null) && (event != null)) {
             String humanReadableMessage = event.getData().toString();
@@ -122,6 +126,10 @@ public class BufferingEventCollector implements EventCollector
         }
 
         if (taskQueueService.getQueueSize() < maxQueueSize.get()) {
+            // Note the TimeStamp when we accepted the record
+            eventStats.recordAccepted();
+
+            // Schedule the write to disk
             try {
                 taskQueueService.execute(new Runnable()
                 {
@@ -143,56 +151,101 @@ public class BufferingEventCollector implements EventCollector
                 return false;
             }
 
+            // Update the statistics
+            endPointsStats.record(eventStats.getAcceptedDelayMillis());
+
             return true;
         }
 
         return false;
     }
 
-    private void performOperation(DiskOperation operation)
+    /**
+     * Perform a disk operation. On failure, rollback (put the file in the quarantine area).
+     * This needs to be synchronized, since the eventWriter keeps track of the current file being worked on.
+     *
+     * @param operation DiskOperation to perform
+     */
+    synchronized private void performOperation(final DiskOperation operation)
     {
-        boolean rollback = true;
+        writerStats.profile(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                boolean rollback = true;
 
-        try {
-            operation.execute();
-            rollback = false;
-        }
-        catch (IOException e) {
-            log.warn("Error processing event queue list", e);
-        }
-
-        catch (RuntimeException e) {
-            log.warn("Runtime exception while processing event queue list", e);
-        }
-        finally {
-            if (rollback) {
                 try {
-                    log.warn("exception performing IO operation, attempting rollback");
-                    eventWriter.rollback();
+                    operation.execute();
+                    rollback = false;
                 }
-                catch (IOException e1) {
-                    //noinspection ThrowFromFinallyBlock
-                    log.warn("Unable to rollback on commit error", e1);
+                catch (IOException e) {
+                    log.warn("Error processing event queue list", e);
+                }
+
+                catch (RuntimeException e) {
+                    log.warn("Runtime exception while processing event queue list", e);
+                }
+                finally {
+                    if (rollback) {
+                        try {
+                            log.warn("Exception performing I/O operation, attempting rollback");
+                            eventWriter.rollback();
+                        }
+                        catch (IOException e1) {
+                            //noinspection ThrowFromFinallyBlock
+                            log.warn("Unable to rollback on commit error", e1);
+                        }
+                    }
                 }
             }
-        }
+        });
     }
 
-    @Managed(description = "set the max number of elements in the in-memory queue; queue size > this => reject events")
+    @Managed(description = "Set the max number of elements in the in-memory queue; queue size > this => reject events")
+    @SuppressWarnings("unused")
     public void setMaxQueueSize(long maxQueueSize)
     {
         this.maxQueueSize.set(maxQueueSize);
     }
 
-    @Managed(description = "the max number of elements in the in-memory queue; queue size > this => reject events")
+    @Managed(description = "The max number of elements in the in-memory queue; queue size > this => reject events")
+    @SuppressWarnings("unused")
     public long getMaxQueueSize()
     {
         return maxQueueSize.get();
     }
 
-    @Managed(description = "number of events in memory queue")
+    @Managed(description = "Number of events in the in-memory queue")
     public long getQueueSize()
     {
         return taskQueueService.getQueueSize();
+    }
+
+    @Managed(description = "TP99 of the acceptance time per event (until it's scheduled to be flushed to disk)")
+    @SuppressWarnings("unused")
+    public double getEventsMillisTP99()
+    {
+        return endPointsStats.getMillisTP99();
+    }
+
+    @Managed(description = "Number of events used to calculate the events TP99")
+    @SuppressWarnings("unused")
+    public double getEventsCount()
+    {
+        return endPointsStats.getCount();
+    }
+
+    @Managed(description = "TP99 of the write operations")
+    public double getWriteMillisTP99()
+    {
+        return writerStats.getMillisTP99();
+    }
+
+    @Managed(description = "Number of write operations used to calculate the writes TP99")
+    @SuppressWarnings("unused")
+    public double getWriteCount()
+    {
+        return writerStats.getCount();
     }
 }

@@ -17,12 +17,12 @@
 package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
-import org.joda.time.DateTime;
-
 import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.collector.util.Granularity;
+import org.joda.time.DateTime;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -32,7 +32,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 /**
- * Version 1 of the collector's external API
+ * Version 1 of the collector's external API.
  */
 @Path("/1")
 public class CollectorResource
@@ -59,7 +59,8 @@ public class CollectorResource
 
     )
     {
+        EventStats eventStats = new EventStats();
         DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, extractorUtil));
+        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, extractorUtil), eventStats);
     }
 }

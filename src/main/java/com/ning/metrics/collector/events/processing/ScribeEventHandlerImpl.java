@@ -17,14 +17,14 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
-import scribe.thrift.LogEntry;
-
 import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.annotations.ScribeStats;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
+import org.apache.log4j.Logger;
+import scribe.thrift.LogEntry;
 
 public class ScribeEventHandlerImpl implements ScribeEventHandler
 {
@@ -38,10 +38,10 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
     public ScribeEventHandlerImpl(
         EventCollector collector,
         CollectorConfig config,
-        @ScribeStats EventEndPointStats stats
+        @ScribeStats EventEndPointStats endPointStats
     )
     {
-        this(collector, config.isScribeCollectionEnabled(), stats);
+        this(collector, config.isScribeCollectionEnabled(), endPointStats);
     }
 
     public ScribeEventHandlerImpl(
@@ -55,7 +55,7 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
     }
 
     @Override
-    public boolean processEvent(Event event)
+    public boolean processEvent(Event event, EventStats eventStats)
     {
         assert event != null;
         boolean success;
@@ -65,7 +65,7 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
         if (scribeCollectionEnabled) {
             logger.debug(String.format("Processing event of type [%s], collection enabled", event.getName()));
 
-            success = collector.collectEvent(event);
+            success = collector.collectEvent(event, eventStats);
             if (success) {
                 stats.updateSuccesfulEventCounters(event);
                 logger.debug(String.format("Event accepted: %s", event.getData()));
@@ -84,7 +84,7 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
     }
 
     @Override
-    public void handleFailure(LogEntry l)
+    public void handleFailure(LogEntry l, EventStats eventStats)
     {
         logger.warn(String.format("Error parsing request type: %s", l));
         stats.updateTotalEvents();

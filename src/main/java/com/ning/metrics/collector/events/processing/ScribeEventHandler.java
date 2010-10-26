@@ -16,13 +16,13 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import scribe.thrift.LogEntry;
-
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
+import scribe.thrift.LogEntry;
 
 public interface ScribeEventHandler
 {
-    public boolean processEvent(Event event);
+    public boolean processEvent(Event event, EventStats eventStats);
 
-    public void handleFailure(LogEntry entry);
+    public void handleFailure(LogEntry entry, EventStats eventStats);
 }

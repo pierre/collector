@@ -34,6 +34,7 @@ public class TestEventRequestHandler
     private MockEventHandler eventHandler = null;
     private MockEventExtractor eventExtractor = null;
     private EventRequestHandler eventRequestHandler = null;
+    private EventStats eventStats = null;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
@@ -42,6 +43,7 @@ public class TestEventRequestHandler
         stats = new EventEndPointStats(5);
         eventExtractor = new MockEventExtractor();
         eventRequestHandler = new EventRequestHandler(eventHandler, eventExtractor, stats);
+        eventStats = new EventStats();
     }
 
     @Test(groups = "fast")
@@ -49,7 +51,7 @@ public class TestEventRequestHandler
     {
         Event event = createEvent("fuu");
         eventExtractor.setEvent(event);
-        Response res = eventRequestHandler.handleEventRequest((String) event.getData(), createMockRequestAnnotation());
+        Response res = eventRequestHandler.handleEventRequest((String) event.getData(), createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
         Assert.assertEquals(eventHandler.getProcessedEventList().get(0).getName(), "fuu");
@@ -65,7 +67,7 @@ public class TestEventRequestHandler
     public void testEventExtractorReturnsNull() throws Exception
     {
         eventExtractor.setEvent(null);
-        Response res = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation());
+        Response res = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
 
         // Test that eventHandler sees the null value
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
@@ -83,7 +85,7 @@ public class TestEventRequestHandler
     {
         eventExtractor.setThrowsEventParseException(true);
 
-        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation());
+        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.isHandleFailureCalled(), true);
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
@@ -100,7 +102,7 @@ public class TestEventRequestHandler
     {
         eventExtractor.setThrowsRuntimeException(true);
 
-        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation());
+        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.isHandleFailureCalled(), true);
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
@@ -117,7 +119,7 @@ public class TestEventRequestHandler
     {
         eventHandler.setThrowExceptionBeforeEvent(true);
 
-        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation());
+        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
 
@@ -133,7 +135,7 @@ public class TestEventRequestHandler
     {
         eventHandler.setThrowExceptionAfterEvent(true);
 
-        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation());
+        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
 
@@ -148,7 +150,7 @@ public class TestEventRequestHandler
     public void testHandleFailureThrowsRuntimeException() throws Exception
     {
         eventExtractor.setThrowsRuntimeException(true);
-        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation());
+        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
         Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
 
         Assert.assertEquals(stats.getTotalEvents(), 0);

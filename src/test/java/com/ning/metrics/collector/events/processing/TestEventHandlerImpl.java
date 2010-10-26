@@ -16,17 +16,17 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.collector.events.writers.StubEvent;
 import com.ning.metrics.collector.util.Filter;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
@@ -38,6 +38,7 @@ public class TestEventHandlerImpl
     private EventEndPointStats stats = null;
     private EventHandlerImpl eventHandler = null;
     private ExtractedAnnotation annotation = null;
+    private EventStats eventStats = null;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
@@ -55,6 +56,7 @@ public class TestEventHandlerImpl
         stats = new EventEndPointStats(5);
         annotation = new ParsedRequest(null, null, null, null, new EventExtractorUtilImpl());
         eventHandler = new EventHandlerImpl(collector, requestFilter, true);
+        eventStats = new EventStats();
     }
 
     @Test(groups = "fast")
@@ -62,7 +64,7 @@ public class TestEventHandlerImpl
     {
         Event event = createEvent("fuu");
 
-        Response res = eventHandler.processEvent(event, annotation, stats);
+        Response res = eventHandler.processEvent(event, annotation, stats, eventStats);
         assertSuccessfulEvent(res);
     }
 
@@ -73,14 +75,14 @@ public class TestEventHandlerImpl
 
         collector.setAcceptsEvents(false);
 
-        Response res = eventHandler.processEvent(event, annotation, stats);
+        Response res = eventHandler.processEvent(event, annotation, stats, eventStats);
         assertRejectedEvent(res);
     }
 
     @Test(groups = "fast")
     public void testNullEvent() throws Exception
     {
-        Response response = eventHandler.processEvent(null, annotation, stats);
+        Response response = eventHandler.processEvent(null, annotation, stats, eventStats);
         assertFailedEvent(response);
         Assert.assertEquals((String) response.getMetadata().getFirst("Warning"), "199 com.ning.metrics.collector.events.parsing.EventParsingException: Received empty event");
     }
@@ -89,7 +91,7 @@ public class TestEventHandlerImpl
     public void testFilteredRequest() throws Exception
     {
         filterValue = true;
-        Response res = eventHandler.processEvent(createEvent("fuu"), annotation, stats);
+        Response res = eventHandler.processEvent(createEvent("fuu"), annotation, stats, eventStats);
         assertFilteredEvent(res);
     }
 
@@ -98,7 +100,7 @@ public class TestEventHandlerImpl
     {
         try {
             collector.setThrowsException(true);
-            eventHandler.processEvent(createEvent("fuu"), annotation, stats);
+            eventHandler.processEvent(createEvent("fuu"), annotation, stats, eventStats);
             Assert.fail("expected exception");
         }
         catch (Exception e) {
@@ -111,7 +113,7 @@ public class TestEventHandlerImpl
     {
         eventHandler.setCollectionEnabled(false);
 
-        Response response = eventHandler.processEvent(createEvent("fuu"), annotation, stats);
+        Response response = eventHandler.processEvent(createEvent("fuu"), annotation, stats, eventStats);
         assertRejectedEvent(response);
     }
 

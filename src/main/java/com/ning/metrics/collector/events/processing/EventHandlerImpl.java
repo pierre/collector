@@ -17,16 +17,16 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
-
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
 import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.util.Filter;
+import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
@@ -70,7 +70,7 @@ public class EventHandlerImpl implements EventHandler
     @SuppressWarnings("unchecked")
     @Override
     //TODO no  need for stats
-    public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats)
+    public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats, EventStats eventStats)
     {
         stats.updateTotalEvents();
 
@@ -78,7 +78,7 @@ public class EventHandlerImpl implements EventHandler
             if (event == null) {
                 String msg = "Received empty event";
                 log.info(msg);
-                return handleFailure(Response.Status.BAD_REQUEST, stats, new EventParsingException(msg));
+                return handleFailure(Response.Status.BAD_REQUEST, stats, eventStats, new EventParsingException(msg));
             }
             else {
                 if (requestFilter.passesFilter(event.getName(), annotation)) {
@@ -88,7 +88,7 @@ public class EventHandlerImpl implements EventHandler
                 else {
                     log.debug(String.format("Receiving event of type %s", event.getName()));
 
-                    if (collector.collectEvent(event)) {
+                    if (collector.collectEvent(event, eventStats)) {
                         stats.updateSuccesfulEventCounters(event);
                         return Response.status(Response.Status.ACCEPTED).cacheControl(cacheControl).build();
                     }
@@ -109,7 +109,7 @@ public class EventHandlerImpl implements EventHandler
     }
 
     @Override
-    public Response handleFailure(Response.Status status, EventEndPointStats stats, Exception e)
+    public Response handleFailure(Response.Status status, EventEndPointStats stats, EventStats eventStats, Exception e)
     {
         stats.updateFailedEvents();
         return Response.status(status)

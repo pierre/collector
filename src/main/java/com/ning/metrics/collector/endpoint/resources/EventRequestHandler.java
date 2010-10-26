@@ -17,22 +17,25 @@
 package com.ning.metrics.collector.endpoint.resources;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
-import org.apache.log4j.Logger;
-
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.events.processing.EventHandler;
+import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.Response;
 
+/**
+ * Event handler for the HTTP GET API.
+ */
 public class EventRequestHandler
 {
     private static final Logger log = Logger.getLogger(EventRequestHandler.class);
 
     private final EventExtractor eventExtractor;
-    private final EventEndPointStats stats;
+    private final EventEndPointStats endPointStats;
     private final EventHandler eventHandler;
 
     public EventRequestHandler(
@@ -42,26 +45,26 @@ public class EventRequestHandler
     )
     {
         this.eventExtractor = eventExtractor;
-        this.stats = stats;
+        this.endPointStats = stats;
         this.eventHandler = eventHandler;
     }
 
-    public Response handleEventRequest(String eventString, ExtractedAnnotation annotation)
+    public Response handleEventRequest(String eventString, ExtractedAnnotation annotation, EventStats eventStats)
     {
         try {
             Event event = eventExtractor.extractEvent(eventString, annotation);
             log.debug(String.format("Processing event %s", event));
-            return eventHandler.processEvent(event, annotation, stats);
+            return eventHandler.processEvent(event, annotation, endPointStats, eventStats);
         }
         catch (EventParsingException e) {
-            stats.updateTotalEvents();
+            endPointStats.updateTotalEvents();
 
             log.info(String.format("Unable to process event: %s [%s]", eventString, annotation.toString()), e);
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, stats, e);
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, e);
         }
         catch (RuntimeException e) {
             log.info(String.format("Exception while processing event: %s [%s]", eventString, annotation.toString()), e);
-            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, stats, e);
+            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
         }
     }
 }

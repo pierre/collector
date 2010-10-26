@@ -16,6 +16,12 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.endpoint.MockEventHandler;
+import com.ning.metrics.collector.endpoint.ThriftFieldList;
+import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
+import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.serialization.DataItemFactory;
 import com.ning.serialization.ThriftEnvelope;
 import com.ning.serialization.ThriftFieldImpl;
@@ -29,12 +35,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.MockEventHandler;
-import com.ning.metrics.collector.endpoint.ThriftFieldList;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
-
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.UUID;
@@ -44,6 +44,7 @@ public class TestThriftEventProcessor
     private ThriftEventProcessor eventProcessor = null;
     private EventEndPointStats stats = null;
     private MockEventHandler eventHandler = null;
+    private EventStats eventStats = null;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
@@ -51,6 +52,7 @@ public class TestThriftEventProcessor
         stats = new EventEndPointStats(5);
         eventHandler = new MockEventHandler();
         eventProcessor = new ThriftEventProcessor(eventHandler, stats);
+        eventStats = new EventStats();
     }
 
     @Test(groups = "fast")
@@ -58,7 +60,7 @@ public class TestThriftEventProcessor
     {
         ThriftEvent event = new ThriftEvent(new DateTime("2009-01-01"), "thrifty", UUID.randomUUID(), createDummyThrift());
 
-        Response response = eventProcessor.processEvent(event, createDummyAnnotation());
+        Response response = eventProcessor.processEvent(event, createDummyAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
         Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
@@ -72,7 +74,7 @@ public class TestThriftEventProcessor
     {
         ThriftEvent event = new StubEvent("not-thrift");
 
-        Response response = eventProcessor.processEvent(event, createDummyAnnotation());
+        Response response = eventProcessor.processEvent(event, createDummyAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
         Assert.assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
@@ -88,7 +90,7 @@ public class TestThriftEventProcessor
 
         eventHandler.setThrowExceptionBeforeEvent(true);
 
-        Response response = eventProcessor.processEvent(event, createDummyAnnotation());
+        Response response = eventProcessor.processEvent(event, createDummyAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
         Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
@@ -104,7 +106,7 @@ public class TestThriftEventProcessor
 
         eventHandler.setThrowExceptionAfterEvent(true);
 
-        Response response = eventProcessor.processEvent(event, createDummyAnnotation());
+        Response response = eventProcessor.processEvent(event, createDummyAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
         Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
@@ -119,7 +121,7 @@ public class TestThriftEventProcessor
         ThriftEvent event = new ThriftEvent(new DateTime("2009-01-01"), "thrifty", UUID.randomUUID(), createDummyThrift());
 
         eventHandler.setThrowExceptionBeforeEvent(true);
-        Response response = eventProcessor.processEvent(event, createDummyAnnotation());
+        Response response = eventProcessor.processEvent(event, createDummyAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
         Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
@@ -140,7 +142,7 @@ public class TestThriftEventProcessor
             }
         };
 
-        Response response = eventProcessor.processEvent(event, createDummyAnnotation());
+        Response response = eventProcessor.processEvent(event, createDummyAnnotation(), eventStats);
 
         // Edge case where eventHandler never sees the event
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);

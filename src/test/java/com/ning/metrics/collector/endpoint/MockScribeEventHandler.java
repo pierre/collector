@@ -39,7 +39,7 @@ public class MockScribeEventHandler implements ScribeEventHandler
     }
 
     @Override
-    public boolean processEvent(Event event)
+    public boolean processEvent(Event event, EventStats eventStats)
     {
         stats.updateTotalEvents();
 
@@ -64,7 +64,7 @@ public class MockScribeEventHandler implements ScribeEventHandler
     }
 
     @Override
-    public void handleFailure(LogEntry entry)
+    public void handleFailure(LogEntry entry, EventStats eventStats)
     {
         handleFailureCalled = true;
 

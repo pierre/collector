@@ -18,6 +18,7 @@ package com.ning.metrics.collector.endpoint.resources;
 
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.data.SmileEnvelopeEvent;
 import com.ning.metrics.collector.events.parsing.StringToThriftEnvelope;
@@ -67,6 +68,7 @@ public class ScribeEventRequestHandler implements Iface
     @Override
     public ResultCode Log(List<LogEntry> logEntries)
     {
+        EventStats eventStats = new EventStats();
         boolean success = false;
 
         for (LogEntry entry : logEntries) {
@@ -75,29 +77,29 @@ public class ScribeEventRequestHandler implements Iface
 
                 Event event = extractEvent(entry.getCategory(), entry.getMessage());
                 if (event != null) {
-                    success = eventHandler.processEvent(event);
+                    success = eventHandler.processEvent(event, eventStats);
                 }
                 else {
-                    eventHandler.handleFailure(entry);
+                    eventHandler.handleFailure(entry, eventStats);
                     // We don't want Scribe to try later if it sends messages we don't understand.
                     success = true;
                 }
             }
             catch (RuntimeException e) {
                 log.info(String.format("Ignoring malformed entry: %s", entry), e);
-                eventHandler.handleFailure(entry);
+                eventHandler.handleFailure(entry, eventStats);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
             catch (TException e) {
                 log.info(String.format("Ignoring malformed Thrift: %s", entry), e);
-                eventHandler.handleFailure(entry);
+                eventHandler.handleFailure(entry, eventStats);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
             catch (IOException e) {
                 log.info(String.format("Ignoring malformed Smile: %s", entry), e);
-                eventHandler.handleFailure(entry);
+                eventHandler.handleFailure(entry, eventStats);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }

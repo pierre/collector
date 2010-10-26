@@ -17,12 +17,12 @@
 package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
-import org.joda.time.DateTime;
-
 import com.ning.metrics.collector.binder.annotations.Base64ExternalEventRequestHandler;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.collector.util.Granularity;
+import org.joda.time.DateTime;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -34,7 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * Version 2 of the collector's external API encodes numbers as in a custom base64 encoding
+ * Version 2 of the collector's external API encodes numbers as in a custom base64 encoding.
  */
 @Path("/2")
 public class Base64CollectorResource
@@ -61,7 +61,8 @@ public class Base64CollectorResource
         @Context HttpHeaders httpHeaders
     )
     {
+        EventStats eventStats = new EventStats();
         DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, extractorUtil));
+        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, extractorUtil), eventStats);
     }
 }

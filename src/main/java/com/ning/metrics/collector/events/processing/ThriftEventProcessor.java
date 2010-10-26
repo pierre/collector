@@ -17,17 +17,17 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import com.ning.serialization.ThriftEnvelope;
-import org.apache.log4j.Logger;
-import org.apache.thrift.TException;
-import org.joda.time.DateTime;
-
 import com.ning.metrics.collector.binder.annotations.InternalEventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
+import com.ning.serialization.ThriftEnvelope;
+import org.apache.log4j.Logger;
+import org.apache.thrift.TException;
+import org.joda.time.DateTime;
 
 import javax.ws.rs.core.Response;
 
@@ -47,7 +47,7 @@ public class ThriftEventProcessor
         this.stats = stats;
     }
 
-    public Response processEvent(ThriftEvent realtimeEvent, ExtractedAnnotation annotation)
+    public Response processEvent(ThriftEvent realtimeEvent, ExtractedAnnotation annotation, EventStats eventStats)
     {
         try {
             ThriftEnvelope envelope = realtimeEvent.getThriftEnvelope();
@@ -59,23 +59,23 @@ public class ThriftEventProcessor
             Event event = new ThriftEnvelopeEvent(new DateTime(realtimeEvent.getTimestamp()), envelope);
 
             log.debug(String.format("receiving event of type %s", envelope.getTypeName()));
-            return eventHandler.processEvent(event, annotation, stats);
+            return eventHandler.processEvent(event, annotation, stats, eventStats);
         }
         /* Null payload */
         catch (EventParsingException e) {
             stats.updateTotalEvents();
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, stats, e);
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, stats, eventStats, e);
         }
         /* Invalid event, serialization error */
         catch (TException e) {
             stats.updateTotalEvents();
 
             log.info(String.format("Unable to process event: %s [%s]", realtimeEvent.toString(), annotation.toString()), e);
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, stats, e);
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, stats, eventStats, e);
         }
         catch (RuntimeException e) {
             log.info(String.format("Exception while processing event: %s [%s]", realtimeEvent.toString(), annotation.toString()), e);
-            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, stats, e);
+            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, stats, eventStats, e);
         }
     }
 }

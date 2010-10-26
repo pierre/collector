@@ -33,7 +33,7 @@ public class MockEventHandler implements EventHandler
     private boolean handleFailureCalled = false;
 
     @Override
-    public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats)
+    public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats, EventStats eventStats)
     {
         stats.updateTotalEvents();
 
@@ -53,7 +53,7 @@ public class MockEventHandler implements EventHandler
     }
 
     @Override
-    public Response handleFailure(Response.Status s, EventEndPointStats stats, Exception e)
+    public Response handleFailure(Response.Status s, EventEndPointStats stats, EventStats eventStats, Exception e)
     {
         handleFailureCalled = true;
 

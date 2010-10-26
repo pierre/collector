@@ -16,15 +16,15 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 import com.ning.metrics.collector.events.writers.MockEventWriter;
 import com.ning.metrics.collector.events.writers.StubEvent;
 import com.ning.metrics.collector.events.writers.StubScheduledExecutorService;
 import com.ning.metrics.collector.events.writers.StubTaskQueueService;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,7 @@ public class TestBufferingEventCollector
     private Event event = null;
     private BufferingEventCollector collector = null;
     private ActiveMQControllerImpl activeMQController = null;
+    private EventStats eventStats = null;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
@@ -87,6 +88,7 @@ public class TestBufferingEventCollector
             }
         },
             activeMQController, 5, 30);
+        eventStats = new EventStats();
     }
 
     private void startCollectorThreads()
@@ -119,32 +121,32 @@ public class TestBufferingEventCollector
         startCollectorThreads();
 
         // Message type not recognized yet
-        collector.collectEvent(event);
-        collector.collectEvent(event);
+        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event, eventStats);
         Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
         Assert.assertEquals(activeMQController.getMessagesSent(), 0);
         Assert.assertEquals(activeMQController.getMessagesRejected(), 0);
 
         // Message type now recognized
         activeMQController.addEventTypeToCollect(event.getName());
-        collector.collectEvent(event);
-        collector.collectEvent(event);
+        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event, eventStats);
         Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
         Assert.assertEquals(activeMQController.getMessagesSent(), 2);
         Assert.assertEquals(activeMQController.getMessagesRejected(), 0);
 
         // Close the firehose
         activeMQController.disableCollection();
-        collector.collectEvent(event);
-        collector.collectEvent(event);
+        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event, eventStats);
         Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
         Assert.assertEquals(activeMQController.getMessagesSent(), 2);
         Assert.assertEquals(activeMQController.getMessagesRejected(), 2);
 
         // Re-open the firehose
         activeMQController.enableCollection();
-        collector.collectEvent(event);
-        collector.collectEvent(event);
+        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event, eventStats);
         Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
         Assert.assertEquals(activeMQController.getMessagesSent(), 4);
         Assert.assertEquals(activeMQController.getMessagesRejected(), 2);
@@ -154,7 +156,7 @@ public class TestBufferingEventCollector
     public void testCollectFlow() throws Exception
     {
         startCollectorThreads();
-        collector.collectEvent(event);
+        collector.collectEvent(event, eventStats);
         assertEventCounts(0, 0);
         runDrainerCommands();
         assertEventCounts(1, 0);
@@ -243,7 +245,7 @@ public class TestBufferingEventCollector
         startCollectorThreads();
         submitEvents(5);
         Assert.assertEquals(collector.getQueueSize(), 5);
-        Assert.assertEquals(collector.collectEvent(event), false);
+        Assert.assertEquals(collector.collectEvent(event, eventStats), false);
     }
 
     private void assertEventCounts(int written, int commit)
@@ -255,7 +257,7 @@ public class TestBufferingEventCollector
     private void submitEvents(int num)
     {
         for (int i = 0; i < num; i++) {
-            Assert.assertEquals(collector.collectEvent(event), true);
+            Assert.assertEquals(collector.collectEvent(event, eventStats), true);
         }
     }
 

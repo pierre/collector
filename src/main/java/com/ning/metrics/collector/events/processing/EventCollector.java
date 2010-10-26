@@ -16,9 +16,10 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 
 public interface EventCollector
 {
-	public boolean collectEvent(Event event);
+    public boolean collectEvent(Event event, EventStats eventStats);
 }

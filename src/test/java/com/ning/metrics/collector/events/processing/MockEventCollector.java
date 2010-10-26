@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.Event;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class MockEventCollector implements EventCollector
     }
 
     @Override
-    public boolean collectEvent(Event event)
+    public boolean collectEvent(Event event, EventStats eventStats)
     {
         if (throwsException) {
             throw new RuntimeException();
