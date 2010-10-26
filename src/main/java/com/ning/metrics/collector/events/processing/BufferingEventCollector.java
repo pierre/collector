@@ -46,8 +46,9 @@ public class BufferingEventCollector implements EventCollector
     private final TaskQueueService taskQueueService;
     private final ActiveMQController activeMQController;
 
-    private final Stats endPointsStats = Stats.timeWindow(30, TimeUnit.MINUTES);
+    private final Stats acceptanceStats = Stats.timeWindow(30, TimeUnit.MINUTES);
     private final Stats writerStats = Stats.timeWindow(30, TimeUnit.MINUTES);
+    private final Stats extractionStats = Stats.timeWindow(30, TimeUnit.MINUTES);
 
     @Inject
     public BufferingEventCollector(
@@ -152,12 +153,18 @@ public class BufferingEventCollector implements EventCollector
             }
 
             // Update the statistics
-            endPointsStats.record(eventStats.getAcceptedDelayMillis());
+            updateEndPointsStats(eventStats);
 
             return true;
         }
 
         return false;
+    }
+
+    private void updateEndPointsStats(EventStats eventStats)
+    {
+        extractionStats.record(eventStats.getExtractedDelayMillis());
+        acceptanceStats.record(eventStats.getAcceptedDelayMillis());
     }
 
     /**
@@ -222,21 +229,29 @@ public class BufferingEventCollector implements EventCollector
         return taskQueueService.getQueueSize();
     }
 
+    @Managed(description = "TP99 of the current capacity (events/second)")
+    @SuppressWarnings("unused")
+    public double getEventsSecondTP99()
+    {
+        return 1000.0 / acceptanceStats.getMillisTP99();
+    }
+
     @Managed(description = "TP99 of the acceptance time per event (until it's scheduled to be flushed to disk)")
     @SuppressWarnings("unused")
     public double getEventsMillisTP99()
     {
-        return endPointsStats.getMillisTP99();
+        return acceptanceStats.getMillisTP99();
     }
 
     @Managed(description = "Number of events used to calculate the events TP99")
     @SuppressWarnings("unused")
     public double getEventsCount()
     {
-        return endPointsStats.getCount();
+        return acceptanceStats.getCount();
     }
 
     @Managed(description = "TP99 of the write operations")
+    @SuppressWarnings("unused")
     public double getWriteMillisTP99()
     {
         return writerStats.getMillisTP99();
@@ -247,5 +262,19 @@ public class BufferingEventCollector implements EventCollector
     public double getWriteCount()
     {
         return writerStats.getCount();
+    }
+
+    @Managed(description = "TP99 of the time used to extract events from their original payload")
+    @SuppressWarnings("unused")
+    public double getExtractionMillisTP99()
+    {
+        return extractionStats.getMillisTP99();
+    }
+
+    @Managed(description = "Number of events used to calculate the extraction TP99")
+    @SuppressWarnings("unused")
+    public double getExtractionCount()
+    {
+        return extractionStats.getCount();
     }
 }

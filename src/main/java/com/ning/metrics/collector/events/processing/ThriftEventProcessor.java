@@ -57,6 +57,7 @@ public class ThriftEventProcessor
             }
 
             Event event = new ThriftEnvelopeEvent(new DateTime(realtimeEvent.getTimestamp()), envelope);
+            eventStats.recordExtracted();
 
             log.debug(String.format("receiving event of type %s", envelope.getTypeName()));
             return eventHandler.processEvent(event, annotation, stats, eventStats);

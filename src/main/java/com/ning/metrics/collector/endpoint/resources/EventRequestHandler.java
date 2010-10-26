@@ -53,6 +53,8 @@ public class EventRequestHandler
     {
         try {
             Event event = eventExtractor.extractEvent(eventString, annotation);
+            eventStats.recordExtracted();
+
             log.debug(String.format("Processing event %s", event));
             return eventHandler.processEvent(event, annotation, endPointStats, eventStats);
         }

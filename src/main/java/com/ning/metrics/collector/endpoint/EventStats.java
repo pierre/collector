@@ -1,7 +1,5 @@
 package com.ning.metrics.collector.endpoint;
 
-import org.joda.time.DateTime;
-
 /**
  * Track stats on a per event basis.
  */
@@ -9,6 +7,8 @@ public class EventStats
 {
     private final long receivedTimeStamp;
     private long acceptedTimeStamp;
+
+    private long extractedTimeStamp;
 
     public EventStats()
     {
@@ -24,8 +24,22 @@ public class EventStats
         acceptedTimeStamp = System.nanoTime();
     }
 
+    /**
+     * Set the timestamp when the event has been extracted from its original payload.
+     * This can means a bunch of things depending on the API.
+     */
+    public void recordExtracted()
+    {
+        extractedTimeStamp = System.nanoTime();
+    }
+
     public double getAcceptedDelayMillis()
     {
-        return (acceptedTimeStamp - receivedTimeStamp) / 1000000L;
+        return (acceptedTimeStamp - receivedTimeStamp) / 1000000.0;
+    }
+
+    public double getExtractedDelayMillis()
+    {
+        return (acceptedTimeStamp - extractedTimeStamp) / 1000000.0;
     }
 }

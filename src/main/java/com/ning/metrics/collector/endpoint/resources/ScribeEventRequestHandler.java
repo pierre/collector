@@ -68,16 +68,19 @@ public class ScribeEventRequestHandler implements Iface
     @Override
     public ResultCode Log(List<LogEntry> logEntries)
     {
-        EventStats eventStats = new EventStats();
         boolean success = false;
 
         for (LogEntry entry : logEntries) {
+            EventStats eventStats = new EventStats();
             try {
                 log.debug(String.format("Parsing log: %s", entry));
 
                 Event event = extractEvent(entry.getCategory(), entry.getMessage());
                 if (event != null) {
-                    success = eventHandler.processEvent(event, eventStats);
+                    eventStats.recordExtracted();
+                    if (eventHandler.processEvent(event, eventStats)) {
+                        success = true;
+                    }
                 }
                 else {
                     eventHandler.handleFailure(entry, eventStats);
