@@ -17,9 +17,12 @@
 package com.ning.metrics.collector.events.writers;
 
 import com.google.inject.internal.ImmutableList;
+import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
+import com.ning.metrics.collector.hadoop.HadoopThriftEnvelopeSerialization;
+import com.ning.metrics.collector.hadoop.HadoopThriftWritableSerialization;
 import com.ning.serialization.DataItemFactory;
 import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftEnvelopeSerialization;
 import com.ning.serialization.ThriftField;
 import com.ning.serialization.ThriftFieldImpl;
 import org.apache.hadoop.conf.Configuration;
@@ -31,9 +34,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.ning.metrics.collector.events.Event;
-import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class TestHadoopFileEventWriter
 
         FileSystem hadoopIsStupid = new RawLocalFileSystem();
         Configuration conf = new Configuration();
-        conf.setStrings("io.serializations", ThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
+        conf.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(), HadoopThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
 
         hadoopIsStupid.initialize(URI.create("testy://mctesterson"), conf);
 
