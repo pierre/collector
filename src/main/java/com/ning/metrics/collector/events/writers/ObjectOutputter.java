@@ -18,7 +18,7 @@ package com.ning.metrics.collector.events.writers;
 
 import java.io.IOException;
 
-public interface ObjectOutputter
+interface ObjectOutputter
 {
     public void writeObject(Object obj) throws IOException;
 
