@@ -68,6 +68,7 @@ public class HadoopFileEventWriter implements EventWriter
             return false;
         }
     };
+    private static final TBooleanWritable BOOL_WRITABLE = new TBooleanWritable(true);
 
     @Inject
     public HadoopFileEventWriter(
@@ -130,9 +131,8 @@ public class HadoopFileEventWriter implements EventWriter
         }
 
         SequenceFile.Writer writer = chunk.getWriter();
-        TBooleanWritable boolWritable = new TBooleanWritable(true);
 
-        writer.append(boolWritable, value);
+        writer.append(BOOL_WRITABLE, value);
     }
 
     private List<HadoopOutputChunk> getAllChunks()

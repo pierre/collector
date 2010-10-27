@@ -35,7 +35,6 @@ public class FlushingObjectOutputter implements ObjectOutputter
         objectOut.write(1);
         objectOut.writeObject(obj);
         objectOut.flush();
-
     }
 
     @Override

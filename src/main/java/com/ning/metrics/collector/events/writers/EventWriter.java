@@ -22,8 +22,11 @@ import java.io.IOException;
 
 public interface EventWriter
 {
-	public void write(Event event) throws IOException;
-	public void commit() throws IOException;
-	public void forceCommit() throws IOException;
-	public void rollback() throws IOException;
+    public void write(Event event) throws IOException;
+
+    public void commit() throws IOException;
+
+    public void forceCommit() throws IOException;
+
+    public void rollback() throws IOException;
 }
