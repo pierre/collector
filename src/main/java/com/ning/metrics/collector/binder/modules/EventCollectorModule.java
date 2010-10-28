@@ -24,6 +24,7 @@ import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import com.ning.metrics.collector.FixedManagedJmxExportScope;
 import com.ning.metrics.collector.binder.ArrayListProvider;
+import com.ning.metrics.collector.binder.DiskSpoolEventWriterProvider;
 import com.ning.metrics.collector.binder.EventEndPointStatsProvider;
 import com.ning.metrics.collector.binder.EventFilterProvider;
 import com.ning.metrics.collector.binder.EventRequestHandlerProvider;
@@ -48,6 +49,7 @@ import com.ning.metrics.collector.endpoint.extractors.QueryParameterEventExtract
 import com.ning.metrics.collector.endpoint.filters.FieldExtractors;
 import com.ning.metrics.collector.endpoint.filters.OrFilter;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
+import com.ning.metrics.collector.events.hadoop.writer.HadoopFileEventWriter;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
@@ -61,11 +63,10 @@ import com.ning.metrics.collector.events.processing.EventHandler;
 import com.ning.metrics.collector.events.processing.EventHandlerImpl;
 import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.collector.events.processing.TaskQueueServiceImpl;
-import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
-import com.ning.metrics.serialization.writer.EventWriter;
-import com.ning.metrics.collector.events.hadoop.writer.HadoopFileEventWriter;
 import com.ning.metrics.collector.util.Filter;
 import com.ning.metrics.collector.util.NamedThreadFactory;
+import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
+import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
@@ -117,6 +118,7 @@ public class EventCollectorModule implements Module
             .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=HadoopFileEventWriter"));
 
         binder.bind(DiskSpoolEventWriter.class)
+            .toProvider(DiskSpoolEventWriterProvider.class)
             .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=DiskSpoolEventWriter"));
 
         binder.bind(EventWriter.class)

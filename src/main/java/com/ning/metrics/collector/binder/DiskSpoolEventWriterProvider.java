@@ -1,4 +1,4 @@
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.binder;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
