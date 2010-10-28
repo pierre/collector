@@ -14,9 +14,10 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.writers;
+package com.ning.metrics.collector.events.hadoop.writer;
 
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.writer.EventWriter;
 
 import java.io.IOException;
 import java.util.List;

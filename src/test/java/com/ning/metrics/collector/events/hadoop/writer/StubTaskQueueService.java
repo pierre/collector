@@ -14,38 +14,16 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.writers;
+package com.ning.metrics.collector.events.hadoop.writer;
+
+import com.ning.metrics.collector.events.processing.TaskQueueService;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class StubScheduledExecutorService implements ScheduledExecutorService
+public class StubTaskQueueService implements TaskQueueService
 {
-	@Override
-	public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit)
-	{
-		return null;
-	}
-
-	@Override
-	public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit)
-	{
-		throw new UnsupportedOperationException();
-	}
-
 	@Override
 	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
 	{
@@ -124,4 +102,9 @@ public class StubScheduledExecutorService implements ScheduledExecutorService
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public int getQueueSize()
+	{
+		throw new UnsupportedOperationException();
+	}
 }

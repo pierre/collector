@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.writers;
+package com.ning.metrics.collector.events.hadoop.writer;
 
 import org.joda.time.DateTime;
 

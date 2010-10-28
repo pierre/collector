@@ -1,6 +1,6 @@
 package com.ning.metrics.collector.util;
 
-import com.ning.metrics.collector.binder.annotations.Managed;
+import com.ning.metrics.serialization.util.Managed;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 

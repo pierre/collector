@@ -17,11 +17,11 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
+import com.ning.metrics.serialization.util.Managed;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.log4j.Logger;
 
-import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 
 import javax.jms.Connection;

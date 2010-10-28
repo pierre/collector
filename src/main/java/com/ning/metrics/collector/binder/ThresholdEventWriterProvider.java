@@ -19,8 +19,8 @@ package com.ning.metrics.collector.binder;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.events.writers.DiskSpoolEventWriter;
-import com.ning.metrics.collector.events.writers.ThresholdEventWriter;
+import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
+import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 
 public class ThresholdEventWriterProvider implements Provider<ThresholdEventWriter>
 {

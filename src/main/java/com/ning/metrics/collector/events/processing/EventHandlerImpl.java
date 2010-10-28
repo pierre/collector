@@ -18,7 +18,7 @@ package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
-import com.ning.metrics.collector.binder.annotations.Managed;
+import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;

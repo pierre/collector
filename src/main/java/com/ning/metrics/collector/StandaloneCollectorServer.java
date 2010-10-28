@@ -52,7 +52,7 @@ public class StandaloneCollectorServer
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
         injector = Guice.createInjector(
-            new EventCollectorModule(),      /* Required, wire up the event processor and the writers */
+            new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
             new OpenSourceCollectorModule(), /* Open-Source version of certain interfaces */
 
             new ScribeModule(),              /* Optional, provide the Scribe endpoint */

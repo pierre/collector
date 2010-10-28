@@ -18,9 +18,9 @@ package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
 import com.google.inject.internal.Nullable;
+import com.ning.metrics.serialization.util.Managed;
 import org.apache.log4j.Logger;
 
-import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 
 import java.util.HashSet;

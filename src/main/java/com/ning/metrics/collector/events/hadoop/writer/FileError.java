@@ -14,13 +14,28 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.writers;
+package com.ning.metrics.collector.events.hadoop.writer;
 
 import java.io.IOException;
 
-interface ObjectOutputter
+class FileError
 {
-    public void writeObject(Object obj) throws IOException;
+    private final String filename;
+    private final IOException exception;
 
-    public void close() throws IOException;
+    FileError(String filename, IOException exception)
+    {
+        this.filename = filename;
+        this.exception = exception;
+    }
+
+    public String getFilename()
+    {
+        return filename;
+    }
+
+    public IOException getException()
+    {
+        return exception;
+    }
 }

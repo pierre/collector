@@ -17,10 +17,11 @@
 package com.ning.metrics.collector.endpoint;
 
 import com.google.inject.Inject;
+import com.ning.metrics.serialization.util.Managed;
+import com.ning.metrics.serialization.writer.EventRate;
 import org.apache.log4j.Logger;
 import org.joda.time.Period;
 
-import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 

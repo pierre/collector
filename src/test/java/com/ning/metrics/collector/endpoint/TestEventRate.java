@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.serialization.writer.EventRate;
 import org.joda.time.DateTime;
 import org.joda.time.MutableDateTime;
 import org.joda.time.Period;

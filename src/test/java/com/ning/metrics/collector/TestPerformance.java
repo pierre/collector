@@ -88,8 +88,8 @@ public class TestPerformance
         String message = createThriftPayload();
         //String message = createSmilePayload();
 
-        //NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 2000;
-        //doOneRun(message);
+        NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 2000;
+        doOneRun(message);
 
         //NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 2500;
         //doOneRun(message);
@@ -97,8 +97,8 @@ public class TestPerformance
         //NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 3000;
         //doOneRun(message);
 
-        NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 20000;
-        doOneRun(message);
+        //NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 20000;
+        //doOneRun(message);
 
         transport.close();
 

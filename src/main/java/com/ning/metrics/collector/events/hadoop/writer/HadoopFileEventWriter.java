@@ -14,14 +14,15 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.writers;
+package com.ning.metrics.collector.events.hadoop.writer;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.Managed;
+import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.hadoop.TBooleanWritable;
+import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
@@ -170,11 +171,11 @@ public class HadoopFileEventWriter implements EventWriter
             }
         }
         catch (RuntimeException e) {
-            log.error(String.format("Unable to commit all chunks (hadoop rename failed). Chunks: %s", allChunks), e);
+            log.error(String.format("Unable to commit all chunks (serialization rename failed). Chunks: %s", allChunks), e);
             throw e;
         }
         catch (IOException e) {
-            log.error(String.format("Unable to commit all chunks (hadoop rename failed). Chunks: %s", allChunks), e);
+            log.error(String.format("Unable to commit all chunks (serialization rename failed). Chunks: %s", allChunks), e);
             throw e;
         }
 
@@ -197,11 +198,11 @@ public class HadoopFileEventWriter implements EventWriter
             }
         }
         catch (RuntimeException e) {
-            log.error(String.format("Unable to rollback all chunks (hadoop rename failed). Chunks: %s", allChunks), e);
+            log.error(String.format("Unable to rollback all chunks (serialization rename failed). Chunks: %s", allChunks), e);
             throw e;
         }
         catch (IOException e) {
-            log.error(String.format("unable to rollback all chunks (hadoop rename failed). Chunks: %s", allChunks), e);
+            log.error(String.format("unable to rollback all chunks (serialization rename failed). Chunks: %s", allChunks), e);
             throw e;
         }
         clearAllChunks();

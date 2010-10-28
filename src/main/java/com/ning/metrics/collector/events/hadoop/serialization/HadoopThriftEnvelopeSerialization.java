@@ -1,35 +1,31 @@
-package com.ning.metrics.collector.hadoop;
+package com.ning.metrics.collector.events.hadoop.serialization;
 
-import com.ning.metrics.serialization.thrift.hadoop.ThriftWritable;
-import com.ning.metrics.serialization.thrift.hadoop.ThriftWritableDeserializer;
-import com.ning.metrics.serialization.thrift.hadoop.ThriftWritableSerializer;
-import org.apache.hadoop.conf.Configured;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftEnvelopeDeserializer;
+import com.ning.metrics.serialization.thrift.ThriftEnvelopeSerializer;
 import org.apache.hadoop.io.serializer.Deserializer;
 import org.apache.hadoop.io.serializer.Serialization;
 import org.apache.hadoop.io.serializer.Serializer;
-import org.apache.hadoop.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class HadoopThriftWritableSerialization implements Serialization<ThriftWritable>
+public class HadoopThriftEnvelopeSerialization implements Serialization<ThriftEnvelope>
 {
     @Override
     public boolean accept(Class<?> c)
     {
-        return ThriftWritable.class.isAssignableFrom(c);
+        return ThriftEnvelope.class.isAssignableFrom(c);
     }
 
-    static class HadoopThriftWritableDeserializer extends Configured implements Deserializer<ThriftWritable>
+    private static class HadoopThriftEnvelopeDeserializer implements Deserializer<ThriftEnvelope>
     {
-        private Class<?> writableClass;
-        private final ThriftWritableDeserializer delegate;
+        private final ThriftEnvelopeDeserializer delegate;
 
-        private HadoopThriftWritableDeserializer(Class<?> c)
+        private HadoopThriftEnvelopeDeserializer()
         {
-            delegate = new ThriftWritableDeserializer();
-            writableClass = c;
+            delegate = new ThriftEnvelopeDeserializer();
         }
 
         /**
@@ -53,12 +49,9 @@ public class HadoopThriftWritableSerialization implements Serialization<ThriftWr
          * @return the deserialized object
          */
         @Override
-        public ThriftWritable deserialize(ThriftWritable writable) throws IOException
+        public ThriftEnvelope deserialize(ThriftEnvelope thriftEnvelope) throws IOException
         {
-            if (writable == null) {
-                writable = (ThriftWritable) ReflectionUtils.newInstance(writableClass, getConf());
-            }
-            return delegate.deserialize(writable);
+            return delegate.deserialize(thriftEnvelope);
         }
 
         /**
@@ -71,13 +64,13 @@ public class HadoopThriftWritableSerialization implements Serialization<ThriftWr
         }
     }
 
-    static class HadoopThriftWritableSerializer implements Serializer<ThriftWritable>
+    private static class HadoopThriftEnvelopeSerializer implements Serializer<ThriftEnvelope>
     {
-        private final ThriftWritableSerializer delegate;
+        private final ThriftEnvelopeSerializer delegate;
 
-        private HadoopThriftWritableSerializer()
+        private HadoopThriftEnvelopeSerializer()
         {
-            delegate = new ThriftWritableSerializer();
+            delegate = new ThriftEnvelopeSerializer();
         }
 
         /**
@@ -93,9 +86,9 @@ public class HadoopThriftWritableSerialization implements Serialization<ThriftWr
          * <p>Serialize <code>t</code> to the underlying output stream.</p>
          */
         @Override
-        public void serialize(ThriftWritable thriftWritable) throws IOException
+        public void serialize(ThriftEnvelope thriftEnvelope) throws IOException
         {
-            delegate.serialize(thriftWritable);
+            delegate.serialize(thriftEnvelope);
         }
 
         /**
@@ -109,15 +102,15 @@ public class HadoopThriftWritableSerialization implements Serialization<ThriftWr
     }
 
     @Override
-    public Deserializer<ThriftWritable> getDeserializer(Class<ThriftWritable> c)
+    public Deserializer<ThriftEnvelope> getDeserializer(Class<ThriftEnvelope> c)
     {
-        return new HadoopThriftWritableDeserializer(c);
+        return new HadoopThriftEnvelopeDeserializer();
     }
 
     @Override
-    public Serializer<ThriftWritable> getSerializer(Class<ThriftWritable> c)
+    public Serializer<ThriftEnvelope> getSerializer(Class<ThriftEnvelope> c)
     {
-        return new HadoopThriftWritableSerializer();
+        return new HadoopThriftEnvelopeSerializer();
     }
 }
 
