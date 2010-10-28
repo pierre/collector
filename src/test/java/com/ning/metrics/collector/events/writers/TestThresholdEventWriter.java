@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.writers;
 
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;

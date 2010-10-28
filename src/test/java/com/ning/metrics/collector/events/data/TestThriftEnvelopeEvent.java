@@ -16,12 +16,9 @@
 
 package com.ning.metrics.collector.events.data;
 
-import com.ning.serialization.LongDataItem;
-import com.ning.serialization.StringDataItem;
-import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftFieldImpl;
-import org.apache.thrift.protocol.TField;
-import org.apache.thrift.protocol.TType;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftField;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -42,8 +39,8 @@ public class TestThriftEnvelopeEvent
     public void testGetOutputDir() throws Exception
     {
         ThriftEnvelope thriftEnvelope = new ThriftEnvelope(eventType);
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new StringDataItem("fuuness"), new TField("", TType.STRING, (short) 0)));
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new LongDataItem(100L), new TField("", TType.I64, (short) 1)));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField("fuuness", (short) 0));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField(100L, (short) 1));
         ThriftEnvelopeEvent event = new ThriftEnvelopeEvent(new DateTime("2009-01-01T02:03:04"), thriftEnvelope);
 
         Assert.assertEquals(event.getOutputDir("/events/ning"), String.format("/events/ning/%s/2009/01/01/02", eventType));
@@ -53,8 +50,8 @@ public class TestThriftEnvelopeEvent
     public void testSerialization() throws Exception
     {
         ThriftEnvelope thriftEnvelope = new ThriftEnvelope(eventType);
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new StringDataItem("fuuness"), new TField("", TType.STRING, (short) 0)));
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new LongDataItem(100L), new TField("", TType.I64, (short) 1)));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField("fuuness", (short) 0));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField(100L, (short) 1));
         ThriftEnvelopeEvent event = new ThriftEnvelopeEvent(new DateTime("2009-01-01T02:03:04"), thriftEnvelope);
 
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -77,8 +74,8 @@ public class TestThriftEnvelopeEvent
     public void testVersion1() throws Exception
     {
         ThriftEnvelope thriftEnvelope = new ThriftEnvelope(eventType);
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new LongDataItem(100L), new TField("", TType.I64, (short) 4)));
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new StringDataItem("fuuness"), new TField("", TType.STRING, (short) 1)));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField(100L, (short) 4));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField("fuuness", (short) 1));
         ThriftEnvelopeEvent event = new ThriftEnvelopeEvent(new DateTime("2009-01-01T02:03:04"), thriftEnvelope);
 
         Assert.assertEquals(event.getVersion(), "1.4");
@@ -89,8 +86,8 @@ public class TestThriftEnvelopeEvent
     public void testVersion2() throws Exception
     {
         ThriftEnvelope thriftEnvelope = new ThriftEnvelope(eventType);
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new StringDataItem("fuuness"), new TField("", TType.STRING, (short) 1)));
-        thriftEnvelope.getPayload().add(new ThriftFieldImpl(new LongDataItem(100L), new TField("", TType.I64, (short) 4)));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField("fuuness", (short) 1));
+        thriftEnvelope.getPayload().add(ThriftField.createThriftField(100L, (short) 4));
         ThriftEnvelopeEvent event = new ThriftEnvelopeEvent(new DateTime("2009-01-01T02:03:04"), thriftEnvelope);
 
         Assert.assertEquals(event.getVersion(), "1.4");

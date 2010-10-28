@@ -22,7 +22,7 @@ import com.ning.metrics.collector.binder.annotations.ScribeStats;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 import scribe.thrift.LogEntry;
 

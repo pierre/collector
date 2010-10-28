@@ -18,7 +18,7 @@ package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;

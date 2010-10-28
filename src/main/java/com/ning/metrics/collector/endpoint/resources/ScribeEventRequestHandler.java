@@ -19,11 +19,11 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.Event;
-import com.ning.metrics.collector.events.data.SmileEnvelopeEvent;
-import com.ning.metrics.collector.events.parsing.StringToThriftEnvelope;
-import com.ning.metrics.collector.events.parsing.ThriftToThriftEnvelope;
+import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
+import com.ning.metrics.serialization.event.ThriftToThriftEnvelopeEvent;
 import com.ning.metrics.collector.events.processing.ScribeEventHandler;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -179,19 +179,19 @@ public class ScribeEventRequestHandler implements Iface
         byte[] thrift = new Base64().decode(payload[1].getBytes());
         try {
             if (eventDateTime == null) {
-                event = ThriftToThriftEnvelope.extractEvent(category, thrift);
+                event = ThriftToThriftEnvelopeEvent.extractEvent(category, thrift);
             }
             else {
-                event = ThriftToThriftEnvelope.extractEvent(category, new DateTime(eventDateTime), thrift);
+                event = ThriftToThriftEnvelopeEvent.extractEvent(category, new DateTime(eventDateTime), thrift);
             }
         }
         catch (Exception e) {
             log.debug("Event doesn't look like a Thrift, assuming plain text");
             if (eventDateTime == null) {
-                event = StringToThriftEnvelope.extractEvent(category, payload[1]);
+                event = StringToThriftEnvelopeEvent.extractEvent(category, payload[1]);
             }
             else {
-                event = StringToThriftEnvelope.extractEvent(category, new DateTime(eventDateTime), payload[1]);
+                event = StringToThriftEnvelopeEvent.extractEvent(category, new DateTime(eventDateTime), payload[1]);
             }
         }
         return event;

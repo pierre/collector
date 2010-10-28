@@ -22,7 +22,7 @@ import org.joda.time.Period;
 
 import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;

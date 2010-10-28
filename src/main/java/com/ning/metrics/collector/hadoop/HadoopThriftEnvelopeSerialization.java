@@ -1,8 +1,8 @@
 package com.ning.metrics.collector.hadoop;
 
-import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftEnvelopeDeserializer;
-import com.ning.serialization.ThriftEnvelopeSerializer;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftEnvelopeDeserializer;
+import com.ning.metrics.serialization.thrift.ThriftEnvelopeSerializer;
 import org.apache.hadoop.io.serializer.Deserializer;
 import org.apache.hadoop.io.serializer.Serialization;
 import org.apache.hadoop.io.serializer.Serializer;

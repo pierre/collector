@@ -18,7 +18,7 @@ package com.ning.metrics.collector.events.writers;
 
 import org.joda.time.DateTime;
 
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 
 import java.io.IOException;
 import java.io.ObjectInput;

@@ -1,8 +1,8 @@
 package com.ning.metrics.collector.hadoop;
 
-import com.ning.serialization.ThriftWritable;
-import com.ning.serialization.ThriftWritableDeserializer;
-import com.ning.serialization.ThriftWritableSerializer;
+import com.ning.metrics.serialization.thrift.hadoop.ThriftWritable;
+import com.ning.metrics.serialization.thrift.hadoop.ThriftWritableDeserializer;
+import com.ning.metrics.serialization.thrift.hadoop.ThriftWritableSerializer;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.serializer.Deserializer;
 import org.apache.hadoop.io.serializer.Serialization;

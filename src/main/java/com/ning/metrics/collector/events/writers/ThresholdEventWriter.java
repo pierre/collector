@@ -17,7 +17,7 @@
 package com.ning.metrics.collector.events.writers;
 
 import com.ning.metrics.collector.binder.annotations.Managed;
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

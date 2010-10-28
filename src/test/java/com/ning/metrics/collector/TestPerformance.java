@@ -1,11 +1,9 @@
 package com.ning.metrics.collector;
 
-import com.ning.metrics.collector.endpoint.ThriftFieldList;
-import com.ning.metrics.collector.events.data.SmileEnvelopeEvent;
 import com.ning.metrics.collector.util.NamedThreadFactory;
-import com.ning.serialization.DataItemFactory;
-import com.ning.serialization.ThriftFieldImpl;
-import com.ning.serialization.ThriftFieldListSerializer;
+import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftField;
+import com.ning.metrics.serialization.thrift.ThriftFieldListSerializer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
@@ -87,8 +85,8 @@ public class TestPerformance
     {
         final TFramedTransport transport = createScribeClient();
 
-        //String message = createThriftPayload();
-        String message = createSmilePayload();
+        String message = createThriftPayload();
+        //String message = createSmilePayload();
 
         //NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 2000;
         //doOneRun(message);
@@ -156,11 +154,10 @@ public class TestPerformance
     @SuppressWarnings("unused")
     private static String createThriftPayload() throws TException
     {
-        final ThriftFieldList data = new ThriftFieldList();
-        data.add(new ThriftFieldImpl(DataItemFactory.create("fuu"), (short) 1));
-        data.add(new ThriftFieldImpl(DataItemFactory.create(true), (short) 2));
-        data.add(new ThriftFieldImpl(DataItemFactory.create(3.1459), (short) 3));
-        data.add(new ThriftFieldImpl(DataItemFactory.create(10001000000L), (short) 4));
+        ArrayList<ThriftField> data = new ArrayList<ThriftField>();
+        data.add(ThriftField.createThriftField("Fuu", (short) 1));
+        data.add(ThriftField.createThriftField(true, (short) 2));
+        data.add(ThriftField.createThriftField(3.1459, (short) 3));
         return String.format("%s:%s", new DateTime().getMillis(), new Base64().encodeToString(new ThriftFieldListSerializer().createPayload(data)));
     }
 

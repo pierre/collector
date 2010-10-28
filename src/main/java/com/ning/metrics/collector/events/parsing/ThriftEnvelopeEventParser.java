@@ -17,8 +17,6 @@
 package com.ning.metrics.collector.events.parsing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.events.Event;
-import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
 import com.ning.metrics.collector.events.parsing.converters.BooleanConverter;
 import com.ning.metrics.collector.events.parsing.converters.ByteConverter;
 import com.ning.metrics.collector.events.parsing.converters.DoubleConverter;
@@ -26,18 +24,10 @@ import com.ning.metrics.collector.events.parsing.converters.IntegerConverter;
 import com.ning.metrics.collector.events.parsing.converters.NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.ShortConverter;
 import com.ning.metrics.collector.util.Ip;
-import com.ning.serialization.BooleanDataItem;
-import com.ning.serialization.ByteDataItem;
-import com.ning.serialization.DoubleDataItem;
-import com.ning.serialization.IntegerDataItem;
-import com.ning.serialization.LongDataItem;
-import com.ning.serialization.ShortDataItem;
-import com.ning.serialization.StringDataItem;
-import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftField;
-import com.ning.serialization.ThriftFieldImpl;
-import org.apache.thrift.protocol.TField;
-import org.apache.thrift.protocol.TType;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftField;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +35,8 @@ import java.util.List;
 public class ThriftEnvelopeEventParser implements EventParser
 {
     private static final String TOKEN_SEPARATOR = ",";
-    private static final BooleanConverter BOOLEAN_CONVERTER = new BooleanConverter();
-    private static final DoubleConverter DOUBLE_CONVERTER = new DoubleConverter();
+    private static final BooleanConverter booleanConverter = new BooleanConverter();
+    private static final DoubleConverter doubleConverter = new DoubleConverter();
     private final NumberConverter numberConverter;
     private final ByteConverter byteConverter;
     private final ShortConverter shortConverter;
@@ -74,36 +64,28 @@ public class ThriftEnvelopeEventParser implements EventParser
 
                 if (!token.isEmpty()) {
                     ThriftField field;
-                    TField tField;
 
                     switch (token.getType()) {
                         case 'b':
-                            tField = new TField(String.valueOf(id), TType.BOOL, id);
-                            field = new ThriftFieldImpl(new BooleanDataItem(BOOLEAN_CONVERTER.convert(token.getValue())), tField);
+                            field = ThriftField.createThriftField(booleanConverter.convert(token.getValue()), id);
                             break;
                         case '1':
-                            tField = new TField(String.valueOf(id), TType.BYTE, id);
-                            field = new ThriftFieldImpl(new ByteDataItem(byteConverter.convert(token.getValue())), tField);
+                            field = ThriftField.createThriftField(byteConverter.convert(token.getValue()), id);
                             break;
                         case '2':
-                            tField = new TField(String.valueOf(id), TType.I16, id);
-                            field = new ThriftFieldImpl(new ShortDataItem(shortConverter.convert(token.getValue())), tField);
+                            field = ThriftField.createThriftField(shortConverter.convert(token.getValue()), id);
                             break;
                         case '4':
-                            tField = new TField(String.valueOf(id), TType.I32, id);
-                            field = new ThriftFieldImpl(new IntegerDataItem(integerConverter.convert(token.getValue())), tField);
+                            field = ThriftField.createThriftField(integerConverter.convert(token.getValue()), id);
                             break;
                         case '8':
-                            tField = new TField(String.valueOf(id), TType.I64, id);
-                            field = new ThriftFieldImpl(new LongDataItem(numberConverter.convert(token.getValue())), tField);
+                            field = ThriftField.createThriftField(numberConverter.convert(token.getValue()), id);
                             break;
                         case 'd':
-                            tField = new TField(String.valueOf(id), TType.DOUBLE, id);
-                            field = new ThriftFieldImpl(new DoubleDataItem(DOUBLE_CONVERTER.convert(token.getValue())), tField);
+                            field = ThriftField.createThriftField(doubleConverter.convert(token.getValue()), id);
                             break;
                         case 's':
-                            tField = new TField(String.valueOf(id), TType.STRING, id);
-                            field = new ThriftFieldImpl(new StringDataItem(token.getValue()), tField);
+                            field = ThriftField.createThriftField(token.getValue(), id);
                             break;
                         case 'x':
                             field = getAnnotatedValue(id, token, extractedAnnotation);
@@ -131,19 +113,19 @@ public class ThriftEnvelopeEventParser implements EventParser
     {
         String function = token.getValue().toLowerCase();
         if ("date".equals(function)) {
-            return new ThriftFieldImpl(new LongDataItem(annotation.getDateTime().getMillis()), new TField(String.valueOf(id), TType.I64, id));
+            return ThriftField.createThriftField(annotation.getDateTime().getMillis(), id);
         }
         else if ("host".equals(function)) {
-            return new ThriftFieldImpl(new StringDataItem(annotation.getReferrerHost()), new TField(String.valueOf(id), TType.STRING, id));
+            return ThriftField.createThriftField(annotation.getReferrerHost(), id);
         }
         else if ("path".equals(function)) {
-            return new ThriftFieldImpl(new StringDataItem(annotation.getReferrerPath()), new TField(String.valueOf(id), TType.STRING, id));
+            return ThriftField.createThriftField(annotation.getReferrerPath(), id);
         }
         else if ("ua".equals(function)) {
-            return new ThriftFieldImpl(new StringDataItem(annotation.getUserAgent()), new TField(String.valueOf(id), TType.STRING, id));
+            return ThriftField.createThriftField(annotation.getUserAgent(), id);
         }
         else if ("ip".equals(function)) {
-            return new ThriftFieldImpl(new IntegerDataItem(Ip.ipToInt(annotation.getIpAddress())), new TField(String.valueOf(id), TType.I32, id));
+            return ThriftField.createThriftField(Ip.ipToInt(annotation.getIpAddress()), id);
         }
 
         throw new IllegalArgumentException(String.format("invalid annotation function: %s", function));

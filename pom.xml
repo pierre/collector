@@ -4,7 +4,7 @@
     <groupId>com.ning</groupId>
     <artifactId>metrics.collector</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>collector</name>
     <url>http://github.com/pierre/collector</url>
     <licenses>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
@@ -145,13 +145,8 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>5.12.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>5.11</version>
+            <classifier>jdk15</classifier>
             <scope>test</scope>
         </dependency>
     </dependencies>

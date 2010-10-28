@@ -16,17 +16,16 @@
 
 package com.ning.metrics.collector.events.parsing;
 
-import com.ning.serialization.ThriftEnvelope;
+import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
+import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
+import com.ning.metrics.collector.util.Ip;
+import com.ning.metrics.serialization.event.Granularity;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
-import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
-import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
-import com.ning.metrics.collector.util.Granularity;
-import com.ning.metrics.collector.util.Ip;
 
 import java.io.InputStream;
 

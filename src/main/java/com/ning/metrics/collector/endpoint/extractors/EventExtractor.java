@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 

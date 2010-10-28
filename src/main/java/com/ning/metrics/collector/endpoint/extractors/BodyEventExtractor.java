@@ -16,15 +16,14 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.ThriftFieldListParser;
-import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftField;
-import org.apache.log4j.Logger;
-
-import com.ning.metrics.collector.events.Event;
-import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftFieldListParser;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftField;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;

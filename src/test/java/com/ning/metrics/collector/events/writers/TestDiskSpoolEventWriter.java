@@ -16,19 +16,16 @@
 
 package com.ning.metrics.collector.events.writers;
 
-import com.ning.serialization.DataItemFactory;
-import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftField;
-import com.ning.serialization.ThriftFieldImpl;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftField;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.events.Event;
-import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -279,13 +276,11 @@ public class TestDiskSpoolEventWriter
 
     private ThriftEnvelopeEvent createThriftEnvelopeEvent()
     {
-        ThriftEnvelopeEvent event = new ThriftEnvelopeEvent(new DateTime("2009-01-01"), new ThriftEnvelope("TestEvent", Arrays.<ThriftField>asList(
-            new ThriftFieldImpl(DataItemFactory.create(true), (short) 1),
-            new ThriftFieldImpl(DataItemFactory.create(100), (short) 2),
-            new ThriftFieldImpl(DataItemFactory.create("text here"), (short) 3)
+        return new ThriftEnvelopeEvent(new DateTime("2009-01-01"), new ThriftEnvelope("TestEvent", Arrays.<ThriftField>asList(
+            ThriftField.createThriftField(true, (short) 1),
+            ThriftField.createThriftField(100, (short) 2),
+            ThriftField.createThriftField("text here", (short) 3)
         )));
-
-        return event;
     }
 
 }

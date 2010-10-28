@@ -17,14 +17,12 @@
 package com.ning.metrics.collector.events.writers;
 
 import com.google.inject.internal.ImmutableList;
-import com.ning.metrics.collector.events.Event;
-import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
 import com.ning.metrics.collector.hadoop.HadoopThriftEnvelopeSerialization;
 import com.ning.metrics.collector.hadoop.HadoopThriftWritableSerialization;
-import com.ning.serialization.DataItemFactory;
-import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftField;
-import com.ning.serialization.ThriftFieldImpl;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftField;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
@@ -141,7 +139,7 @@ public class TestHadoopFileEventWriter
             public Object getData()
             {
                 List<ThriftField> thriftFieldList = new ImmutableList.Builder<ThriftField>()
-                    .add(new ThriftFieldImpl(DataItemFactory.create("value"), (short) 1))
+                    .add(ThriftField.createThriftField("value", (short) 1))
                     .build();
 
                 return new ThriftEnvelope(eventName, thriftFieldList);

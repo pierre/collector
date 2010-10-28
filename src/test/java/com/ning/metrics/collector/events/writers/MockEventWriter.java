@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.writers;
 
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 
 import java.io.IOException;
 import java.util.List;

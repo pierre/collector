@@ -22,7 +22,7 @@ import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventRate;
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 import org.joda.time.Period;
 

@@ -14,19 +14,31 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.util;
+package com.ning.metrics.collector.events.writers;
 
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInterval;
+import com.ning.metrics.serialization.event.Event;
 
-import java.io.Serializable;
-import java.util.Collection;
+import java.io.IOException;
 
-public interface PathMapper extends Serializable
+class StubEventWriter implements EventWriter
 {
-    public String getRootPath();
+    @Override
+    public void write(Event event) throws IOException
+    {
+    }
 
-    public Collection<String> getPathsForInterval(ReadableInterval interval);
+    @Override
+    public void commit() throws IOException
+    {
+    }
 
-    public String getPathForDateTime(ReadableDateTime dateTime);
+    @Override
+    public void forceCommit() throws IOException
+    {
+    }
+
+    @Override
+    public void rollback() throws IOException
+    {
+    }
 }

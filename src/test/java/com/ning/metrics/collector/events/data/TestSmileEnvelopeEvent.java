@@ -1,5 +1,6 @@
 package com.ning.metrics.collector.events.data;
 
+import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.smile.SmileFactory;
 import org.joda.time.DateTime;

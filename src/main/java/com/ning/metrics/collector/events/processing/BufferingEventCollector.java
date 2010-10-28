@@ -23,7 +23,7 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExec
 import com.ning.metrics.collector.binder.annotations.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.writers.EventWriter;
 import com.ning.metrics.collector.util.Stats;
 import org.apache.log4j.Logger;

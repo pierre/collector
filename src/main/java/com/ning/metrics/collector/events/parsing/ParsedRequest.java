@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.parsing;
 
-import com.ning.metrics.collector.util.Granularity;
+import com.ning.metrics.serialization.event.Granularity;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 

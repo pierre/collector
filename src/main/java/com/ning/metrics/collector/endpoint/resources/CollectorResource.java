@@ -21,7 +21,7 @@ import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
-import com.ning.metrics.collector.util.Granularity;
+import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.GET;

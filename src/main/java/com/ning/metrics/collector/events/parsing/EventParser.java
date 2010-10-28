@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.parsing;
 
-import com.ning.metrics.collector.events.Event;
+import com.ning.metrics.serialization.event.Event;
 
 public interface EventParser
 {

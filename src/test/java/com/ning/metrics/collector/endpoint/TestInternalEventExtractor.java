@@ -17,27 +17,26 @@
 package com.ning.metrics.collector.endpoint;
 
 import com.ning.metrics.collector.endpoint.extractors.BodyEventExtractor;
-import com.ning.serialization.DataItemFactory;
-import com.ning.serialization.ThriftEnvelope;
-import com.ning.serialization.ThriftFieldImpl;
-import com.ning.serialization.ThriftFieldListSerializer;
+import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
+import com.ning.metrics.collector.events.parsing.EventParsingException;
+import com.ning.metrics.collector.events.parsing.ParsedRequest;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftField;
+import com.ning.metrics.serialization.thrift.ThriftFieldListSerializer;
 import org.apache.thrift.TException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.ning.metrics.collector.events.Event;
-import com.ning.metrics.collector.events.data.ThriftEnvelopeEvent;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
-
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 
 public class TestInternalEventExtractor
 {
     private BodyEventExtractor extractor = null;
-    private ThriftFieldList data = null;
+    private ArrayList<ThriftField> data = null;
     private String eventType = null;
     private byte[] payload = null;
     private int payloadSize = 0;
@@ -48,11 +47,11 @@ public class TestInternalEventExtractor
         extractor = new BodyEventExtractor();
         ThriftFieldListSerializer serializer = new ThriftFieldListSerializer();
 
-        data = new ThriftFieldList();
-        data.add(new ThriftFieldImpl(DataItemFactory.create("fuu"), (short) 1));
-        data.add(new ThriftFieldImpl(DataItemFactory.create(true), (short) 2));
-        data.add(new ThriftFieldImpl(DataItemFactory.create(3.1459), (short) 2));
-        data.add(new ThriftFieldImpl(DataItemFactory.create(10001000000L), (short) 3));
+        data = new ArrayList<ThriftField>();
+        data.add(ThriftField.createThriftField("Fuu", (short) 1));
+        data.add(ThriftField.createThriftField(true, (short) 2));
+        data.add(ThriftField.createThriftField(3.1459, (short) 3));
+        data.add(ThriftField.createThriftField(10001000000L, (short) 4));
 
         payload = serializer.createPayload(data);
         payloadSize = payload.length;
