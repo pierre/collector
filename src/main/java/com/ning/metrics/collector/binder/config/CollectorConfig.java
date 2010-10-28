@@ -16,7 +16,6 @@
 
 package com.ning.metrics.collector.binder.config;
 
-import com.ning.metrics.collector.events.writers.SyncType;
 import com.sun.security.auth.module.UnixSystem;
 import org.skife.config.Config;
 
@@ -41,9 +40,9 @@ public class CollectorConfig
     // Type of outputter to use when spooling: NONE, FLUSH, or SYNC
 
     @Config(value = "collector.spool.synctype")
-    public SyncType getSyncType()
+    public String getSyncType()
     {
-        return SyncType.NONE;
+        return "NONE";
     }
 
     // Whether to forward events to ActiveMQ

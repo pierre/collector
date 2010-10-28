@@ -67,7 +67,7 @@ public class DiskSpoolEventWriter implements EventWriter
         CollectorConfig config
     )
     {
-        this(hadoopFileEventWriter, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), executor, config.getSyncType(), config.getRateWindowSizeMinutes());
+        this(hadoopFileEventWriter, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), executor, SyncType.valueOf(config.getSyncType()), config.getRateWindowSizeMinutes());
     }
 
     public DiskSpoolEventWriter(EventWriter hadoopFileEventWriter, String spoolPath, boolean flushEnabled, long flushIntervalInSeconds, ScheduledExecutorService executor, SyncType syncType, int rateWindowSizeMinutes)

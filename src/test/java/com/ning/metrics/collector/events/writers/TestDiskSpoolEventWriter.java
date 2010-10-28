@@ -140,7 +140,7 @@ public class TestDiskSpoolEventWriter
         CollectorConfig config = new CollectorConfig();
 
         @SuppressWarnings({"UnusedDeclaration"})
-        DiskSpoolEventWriter writer = new DiskSpoolEventWriter(writerSucceeds, spoolPath, true, 30, executor, config.getSyncType(), config.getRateWindowSizeMinutes())
+        DiskSpoolEventWriter writer = new DiskSpoolEventWriter(writerSucceeds, spoolPath, true, 30, executor, SyncType.valueOf(config.getSyncType()), config.getRateWindowSizeMinutes())
         {
             @Override
             protected List<File> getSpooledFileList()
@@ -232,7 +232,7 @@ public class TestDiskSpoolEventWriter
     private DiskSpoolEventWriter createWriter(EventWriter persistentWriter)
     {
         CollectorConfig config = new CollectorConfig();
-        return new DiskSpoolEventWriter(persistentWriter, spoolPath, true, 1, executor, config.getSyncType(), config.getRateWindowSizeMinutes());
+        return new DiskSpoolEventWriter(persistentWriter, spoolPath, true, 1, executor, SyncType.valueOf(config.getSyncType()), config.getRateWindowSizeMinutes());
     }
 
     private void testSpoolDirs(int tmpCount, int spoolCount, int quarantineCount)
