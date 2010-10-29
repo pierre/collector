@@ -36,7 +36,7 @@ import java.util.Map;
  * If you are writing your own Main class, make sure to match the name since
  * the GuiceServletContextListener implementation needs to access the injector created here.
  *
- * @see com.ning.metrics.collector.binder.modules.JettyListener:getInjector
+ * @see com.ning.metrics.collector.binder.modules.JettyListener
  */
 public class StandaloneCollectorServer
 {
