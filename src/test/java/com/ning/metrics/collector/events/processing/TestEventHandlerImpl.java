@@ -22,7 +22,7 @@ import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
-import com.ning.metrics.collector.events.hadoop.writer.StubEvent;
+import com.ning.metrics.serialization.writer.StubEvent;
 import com.ning.metrics.collector.util.Filter;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;

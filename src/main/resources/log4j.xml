@@ -4,7 +4,7 @@
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%p        %X{trace}   %d{ISO8601} %t      %c      %m%n"/>
+            <param name="ConversionPattern" value="%p        %d{ISO8601} %t      %c      %m%n"/>
         </layout>
     </appender>
 

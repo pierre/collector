@@ -18,10 +18,9 @@ package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.hadoop.writer.MockEventWriter;
-import com.ning.metrics.collector.events.hadoop.writer.StubEvent;
-import com.ning.metrics.collector.events.hadoop.writer.StubScheduledExecutorService;
-import com.ning.metrics.collector.events.hadoop.writer.StubTaskQueueService;
+import com.ning.metrics.serialization.writer.MockEventWriter;
+import com.ning.metrics.serialization.writer.StubEvent;
+import com.ning.metrics.serialization.writer.StubScheduledExecutorService;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
