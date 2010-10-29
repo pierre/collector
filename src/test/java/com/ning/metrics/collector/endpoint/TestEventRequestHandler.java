@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
 import com.ning.metrics.collector.events.parsing.ParsedRequest;
-import com.ning.metrics.serialization.writer.StubEvent;
+import com.ning.metrics.serialization.event.StubEvent;
 
 import javax.ws.rs.core.Response;
 

@@ -18,8 +18,8 @@ package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.MockEventWriter;
-import com.ning.metrics.serialization.writer.StubEvent;
 import com.ning.metrics.serialization.writer.StubScheduledExecutorService;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
