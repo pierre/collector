@@ -45,7 +45,7 @@ public class FileSystemProvider implements Provider<FileSystem>
         }
 
         hadoopConfig.setLong("dfs.block.size", collectorConfig.getHadoopBlockSize());
-        hadoopConfig.set("serialization.job.ugi", collectorConfig.getHadoopUgi());
+        hadoopConfig.set("hadoop.job.ugi", collectorConfig.getHadoopUgi());
         hadoopConfig.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(), HadoopThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
 
         fileSystem = FileSystem.get(hadoopConfig);
