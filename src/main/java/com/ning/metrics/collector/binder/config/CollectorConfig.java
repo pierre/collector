@@ -203,7 +203,7 @@ public class CollectorConfig
         return 64;
     }
 
-    @Config(value = "xn.hadoop.host")
+    @Config(value = "collector.hadoop.host")
     public String getHfsHost()
     {
         return "";
