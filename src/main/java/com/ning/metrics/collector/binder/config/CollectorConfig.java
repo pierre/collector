@@ -224,30 +224,30 @@ public class CollectorConfig
     @Config(value = "collector.filters.host")
     public String getFiltersHost()
     {
-        return ",";
+        return "";
     }
 
     @Config(value = "collector.filters.ip")
     public String getFiltersIp()
     {
-        return ",";
+        return "";
     }
 
     @Config(value = "collector.filters.useragent")
     public String getFiltersUserAgent()
     {
-        return ",";
+        return "";
     }
 
     @Config(value = "collector.filters.path")
     public String getFiltersPath()
     {
-        return ",";
+        return "";
     }
 
     @Config(value = "collector.filters.event-type")
     public String getFiltersEventType()
     {
-        return ",";
+        return "";
     }
 }
