@@ -112,7 +112,6 @@ public class Stats
      * Profile a {@link Runnable}.
      *
      * @param task
-     * @return result
      * @throws Exception
      */
     public void profile(Runnable task)
