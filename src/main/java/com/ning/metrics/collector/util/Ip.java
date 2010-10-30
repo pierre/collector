@@ -16,35 +16,35 @@
 
 package com.ning.metrics.collector.util;
 
+import java.util.regex.Pattern;
+
 public class Ip
 {
+    final static Pattern DOT = Pattern.compile("\\.");
+    
     public static int ipToInt(String ip)
     {
-        String[] parts = ip.split("\\.");
-        if (parts.length != 4) {
-            return 0;
+        String[] parts = DOT.split(ip);
+        if (parts.length == 4) {
+            try {
+                return (Integer.parseInt(parts[0]) << 24) | (Integer.parseInt(parts[1]) << 16)
+                    | (Integer.parseInt(parts[2])) << 8 | (Integer.parseInt(parts[3]));
+            }
+            catch (NumberFormatException e) { }
         }
-
-        int value;
-
-        try {
-            value = new Integer(parts[0]) << 24 | new Integer(parts[1]) << 16 | new Integer(parts[2]) << 8 | new Integer(parts[3]);
-        }
-        catch (NumberFormatException e) {
-            value = 0;
-        }
-
-        return value;
+        return 0;
     }
 
     public static String intToIp(int ip)
     {
-        StringBuffer sb = new StringBuffer(15);
-        for (int shift = 24; shift > 0; shift -= 8) {
-            sb.append(Integer.toString((ip >>> shift) & 0xff));
-            sb.append('.');
-        }
-        sb.append(Integer.toString(ip & 0xff));
+        StringBuilder sb = new StringBuilder(15);
+        sb.append(ip >>> 24);
+        sb.append('.');
+        sb.append((ip >> 16) & 0xFF);
+        sb.append('.');
+        sb.append((ip >> 8) & 0xFF);
+        sb.append('.');
+        sb.append(ip  & 0xFF);
         return sb.toString();
     }
 
