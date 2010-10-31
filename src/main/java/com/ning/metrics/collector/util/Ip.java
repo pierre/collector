@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class Ip
 {
     final static Pattern DOT = Pattern.compile("\\.");
-    
+
     public static int ipToInt(String ip)
     {
         String[] parts = DOT.split(ip);
@@ -30,7 +30,8 @@ public class Ip
                 return (Integer.parseInt(parts[0]) << 24) | (Integer.parseInt(parts[1]) << 16)
                     | (Integer.parseInt(parts[2])) << 8 | (Integer.parseInt(parts[3]));
             }
-            catch (NumberFormatException e) { }
+            catch (NumberFormatException e) {
+            }
         }
         return 0;
     }
@@ -44,9 +45,7 @@ public class Ip
         sb.append('.');
         sb.append((ip >> 8) & 0xFF);
         sb.append('.');
-        sb.append(ip  & 0xFF);
+        sb.append(ip & 0xFF);
         return sb.toString();
     }
-
-
 }
