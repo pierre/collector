@@ -220,7 +220,7 @@ public class HadoopFileEventWriter implements EventWriter
 
     public String toString()
     {
-        return String.format("HDFS File Writer [%s]", baseDirectory);
+        return String.format("HDFS File Writer [%s] [%s]", fs.getUri(), baseDirectory);
     }
 
 }
