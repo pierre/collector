@@ -37,14 +37,6 @@ public class CollectorConfig
         return String.format("%s,supergroup", username);
     }
 
-    // Type of outputter to use when spooling: NONE, FLUSH, or SYNC
-
-    @Config(value = "collector.spool.synctype")
-    public String getSyncType()
-    {
-        return "NONE";
-    }
-
     // Whether to forward events to ActiveMQ
 
     @Config(value = "collector.activemq.enabled")
@@ -101,22 +93,10 @@ public class CollectorConfig
         return 7911;
     }
 
-    @Config(value = "collector.event-end-point.rate-window-size-minutes")
-    public int getRateWindowSizeMinutes()
-    {
-        return 5;
-    }
-
     @Config(value = "collector.max-event-queue-size")
     public long getMaxQueueSize()
     {
         return 200000;
-    }
-
-    @Config(value = "collector.buffered-event-collector.refresh-delay-seconds")
-    public int getRefreshDelayInSeconds()
-    {
-        return 60;
     }
 
     @Config(value = "collector.event-routes.persistent")
@@ -125,28 +105,79 @@ public class CollectorConfig
         return true;
     }
 
-    @Config(value = "collector.diskspool.enabled")
-    public boolean isFlushEnabled()
+    //------------------- Spooling -------------------//
+
+    /**
+     * Maximum number of events per file in the temporary spooling area. Past this threshold,
+     * buffered events are promoted to the final spool queue.
+     *
+     * @return the maximu number of events per file
+     */
+    @Config(value = "collector.diskspool.flush-event-queue-size")
+    public long getFlushEventQueueSize()
     {
-        return true;
+        return 10000;
     }
 
+    /**
+     * Maxixum number of seconds before events are promoted from the temporary spooling area to the final spool queue.
+     *
+     * @return maxixmum age of events in seconds in the temporary spool queue
+     */
+    @Config(value = "collector.diskspool.refresh-delay-seconds")
+    public int getRefreshDelayInSeconds()
+    {
+        return 60;
+    }
+
+    /**
+     * Directory for the collector to buffer events before writing them to HDFS
+     *
+     * @return the directory path
+     */
     @Config(value = "collector.diskspool.path")
     public String getSpoolDirectoryName()
     {
         return "/tmp/collector/diskspool";
     }
 
+    /**
+     * If false, events will not be periodically sent to HDFS
+     *
+     * @return whether to send events buffered locally
+     */
+    @Config(value = "collector.diskspool.enabled")
+    public boolean isFlushEnabled()
+    {
+        return true;
+    }
+
+    /**
+     * Delay between flushes (in seconds)
+     *
+     * @return delay between flushes to HDFS
+     */
     @Config(value = "collector.diskspool.refresh-delay-seconds")
     public long getFlushIntervalInSeconds()
     {
         return 30;
     }
 
-    @Config(value = "collector.flush-event-queue-size")
-    public long getFlushEventQueueSize()
+    /**
+     * Type of outputter to use when spooling: NONE, FLUSH, or SYNC
+     *
+     * @return the String representation of the SyncType
+     */
+    @Config(value = "collector.diskspool.synctype")
+    public String getSyncType()
     {
-        return 10000;
+        return "NONE";
+    }
+
+    @Config(value = "collector.event-end-point.rate-window-size-minutes")
+    public int getRateWindowSizeMinutes()
+    {
+        return 5;
     }
 
     @Config(value = "xn.server.ip")

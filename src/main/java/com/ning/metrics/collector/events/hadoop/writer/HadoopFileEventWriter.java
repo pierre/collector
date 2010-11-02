@@ -17,11 +17,11 @@
 package com.ning.metrics.collector.events.hadoop.writer;
 
 import com.google.inject.Inject;
-import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.hadoop.TBooleanWritable;
+import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -154,6 +154,12 @@ public class HadoopFileEventWriter implements EventWriter
     public synchronized void commit() throws IOException
     {
         forceCommit();
+    }
+
+    @Override
+    public synchronized void flush() throws IOException
+    {
+        commit();
     }
 
     @Override

@@ -19,11 +19,12 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
-import com.ning.metrics.serialization.event.ThriftToThriftEnvelopeEvent;
 import com.ning.metrics.collector.events.processing.ScribeEventHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
+import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.event.ThriftToThriftEnvelopeEvent;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -33,7 +34,10 @@ import scribe.thrift.LogEntry;
 import scribe.thrift.ResultCode;
 import scribe.thrift.scribe.Iface;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +180,26 @@ public class ScribeEventRequestHandler implements Iface
             log.debug("Event DateTime not specified, defaulting to NOW()");
         }
 
+        // The payload is Base64 encoded
         byte[] thrift = new Base64().decode(payload[1].getBytes());
+
+        // Assume a ThriftEnvelopeEvent from the eventtracker (uses Java serialization).
+        // This is bigger on the wire, but the interface is portable. Serialize using TBinaryProtocol
+        // if you care about size (see below).
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(thrift)));
+            event = new ThriftEnvelopeEvent();
+            event.readExternal(objectInputStream);
+
+            if (event.getName().equals(category)) {
+                return event;
+            }
+        }
+        catch (Exception e) {
+            log.debug(String.format("Payload is not a ThriftEvent: %s", e.getLocalizedMessage()));
+        }
+
+        // Not a ThriftEvent, probably native Thrift serialization (TBinaryProtocol)
         try {
             if (eventDateTime == null) {
                 event = ThriftToThriftEnvelopeEvent.extractEvent(category, thrift);
