@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Serialization">
+    <publishDate position="right"/>
+    <version position="right"/>
+
+    <body>
+        <links>
+            <item name="Maven Central" href="https://oss.sonatype.org/content/repositories/central/com/ning/"/>
+        </links>
+
+        <menu name="Dwarf">
+            <item name="Dwarf project" href="http://pierre.github.com/dwarf"/>
+            <item name="FAQ" href="/faq.html"/>
+            <item name="Architecture overview" href="/overview.html"/>
+        </menu>
+
+        <menu ref="modules"/>
+        <menu ref="reports"/>
+    </body>
+</project>
