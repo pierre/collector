@@ -89,6 +89,6 @@ public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWrit
             {
                 return hadoopEventWriter.toString();
             }
-        }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), executor, SyncType.valueOf(config.getSyncType()), config.getRateWindowSizeMinutes());
+        }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), executor, SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes());
     }
 }

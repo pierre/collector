@@ -174,6 +174,17 @@ public class CollectorConfig
         return "NONE";
     }
 
+    /**
+     * Size of the batch for the sync type parameter
+     *
+     * @return the number of events to buffer before calling flush or sync
+     */
+    @Config(value = "collector.diskspool.sync-batch-size")
+    public int getSyncBatchSize()
+    {
+        return 50;
+    }
+
     @Config(value = "collector.event-end-point.rate-window-size-minutes")
     public int getRateWindowSizeMinutes()
     {
