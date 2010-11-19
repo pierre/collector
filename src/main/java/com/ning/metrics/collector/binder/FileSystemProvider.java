@@ -19,8 +19,8 @@ package com.ning.metrics.collector.binder;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.events.hadoop.serialization.HadoopThriftEnvelopeSerialization;
-import com.ning.metrics.collector.events.hadoop.serialization.HadoopThriftWritableSerialization;
+import com.ning.metrics.serialization.hadoop.HadoopThriftEnvelopeSerialization;
+import com.ning.metrics.serialization.hadoop.HadoopThriftWritableSerialization;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 
