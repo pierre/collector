@@ -17,10 +17,10 @@
 package com.ning.metrics.collector.events.hadoop.writer;
 
 import com.google.inject.internal.ImmutableList;
-import com.ning.metrics.collector.events.hadoop.serialization.HadoopThriftEnvelopeSerialization;
-import com.ning.metrics.collector.events.hadoop.serialization.HadoopThriftWritableSerialization;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.hadoop.HadoopThriftEnvelopeSerialization;
+import com.ning.metrics.serialization.hadoop.HadoopThriftWritableSerialization;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
 import org.apache.hadoop.conf.Configuration;
