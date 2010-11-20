@@ -57,6 +57,12 @@
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
+            <artifactId>metrics.eventtracker</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-all</artifactId>
             <version>1.0.3-SNAPSHOT</version>
         </dependency>
@@ -83,6 +89,18 @@
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-guice</artifactId>
             <version>1.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>faban</groupId>
+            <artifactId>fabancommon</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>faban</groupId>
+            <artifactId>fabandriver</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -266,6 +284,24 @@
                             <createSourcesJar>true</createSourcesJar>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>assemble-faban-driver</id>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.sun.faban.driver.engine.MasterImpl</mainClass>
+                                </transformer>
+                            </transformers>
+                            <createSourcesJar>false</createSourcesJar>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>faban-jar-with-dependencies</shadedClassifierName>
                         </configuration>
                     </execution>
                 </executions>
