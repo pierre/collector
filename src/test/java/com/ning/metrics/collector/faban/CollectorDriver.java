@@ -45,11 +45,13 @@ public class CollectorDriver
     private final CollectorController controller;
     private final Integer nbOfEventsToSend;
     private final ThriftEnvelopeEvent eventToSend;
+
     private Logger logger;
+    private final DriverContext ctx;
 
     public CollectorDriver()
     {
-        DriverContext ctx = DriverContext.getContext();
+        ctx = DriverContext.getContext();
         logger = ctx.getLogger();
 
         Injector injector = Guice.createInjector(new CollectorControllerModule());
@@ -75,6 +77,7 @@ public class CollectorDriver
     public void doPost()
     {
         try {
+            ctx.recordTime();
             for (int i = 0; i < nbOfEventsToSend; i++) {
                 controller.offerEvent(eventToSend);
 
@@ -84,6 +87,9 @@ public class CollectorDriver
         }
         catch (IOException e) {
             logger.warning(String.format("IOException while sending events: %s", e.getLocalizedMessage()));
+        }
+        finally {
+            ctx.recordTime();
         }
     }
 }
