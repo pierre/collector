@@ -144,6 +144,12 @@ public class TestHadoopFileEventWriter
 
                 return new ThriftEnvelope(eventName, thriftFieldList);
             }
+
+            @Override
+            public byte[] getSerializedEvent()
+            {
+                return null;
+            }
         };
     }
 
