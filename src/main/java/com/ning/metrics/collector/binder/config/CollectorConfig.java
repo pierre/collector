@@ -292,4 +292,48 @@ public class CollectorConfig
     {
         return "";
     }
+
+    /**
+     * Default hostname to use when connecting to the load balancer
+     *
+     * @return the hostname used to connect to the load balancer
+     */
+    @Config(value = "collector.f5.hostname")
+    public String getF5Hostname()
+    {
+        return "";
+    }
+
+    /**
+     * Default username to use when connecting to the load balancer
+     *
+     * @return the username used to connect to the load balancer
+     */
+    @Config(value = "collector.f5.username")
+    public String getF5Username()
+    {
+        return "";
+    }
+
+    /**
+     * Default password to use when connecting to the load balancer
+     *
+     * @return the password used to connect to the load balancer
+     */
+    @Config(value = "collector.f5.password")
+    public String getF5Password()
+    {
+        return "";
+    }
+
+    /**
+     * Default pool name to use when connecting to the load balancer
+     *
+     * @return the pool name used to connect to the load balancer
+     */
+    @Config(value = "collector.f5.poolname")
+    public String getF5PoolName()
+    {
+        return "";
+    }
 }

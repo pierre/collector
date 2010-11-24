@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.util;
 
+import com.google.inject.Inject;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.util.Managed;
 import iControl.CommonEnabledState;
 import iControl.CommonIPPortDefinition;
@@ -35,11 +37,30 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 
 /**
+ * Control the membership to a f5 BIG-IP SLB VIP.
+ * This class is meant to be used via JMX.
+ * <p/>
+ * For environments where JMX is not secure, the password can be passed as a system property.
+ * <p/>
  * Inspired by http://devcentral.f5.com/wiki/default.aspx/iControl/JavaPoolMemberControl.html
  */
 public class F5PoolMemberControl
 {
     private static final Logger log = Logger.getLogger(F5PoolMemberControl.class);
+
+    private final String hostname;
+    private final String username;
+    private final String password;
+    private final String poolName;
+
+    @Inject
+    public F5PoolMemberControl(CollectorConfig config)
+    {
+        hostname = config.getF5Hostname();
+        username = config.getF5Username();
+        password = config.getF5Password();
+        poolName = config.getF5PoolName();
+    }
 
     private static Interfaces getInterface(String hostname, String username, String password)
     {
@@ -47,6 +68,19 @@ public class F5PoolMemberControl
         m_interfaces.initialize(hostname, username, password);
 
         return m_interfaces;
+    }
+
+    /**
+     * Return a list of all pools (use the parameters specified in the system properties)
+     *
+     * @return a list of pool names
+     * @throws Exception generic exception if something goes wrong
+     */
+    @Managed(description = "Get the list of available pools")
+    @SuppressWarnings("unused")
+    public String[] getPoolList() throws Exception
+    {
+        return getPoolList(hostname, username, password);
     }
 
     /**
@@ -66,6 +100,18 @@ public class F5PoolMemberControl
         return getInterface(hostname, username, password).getLocalLBPool().get_list();
     }
 
+    /**
+     * Given a pool name, retrieve the pool members definitions (use the parameters specified in the system properties)
+     *
+     * @return list of CommonIPPortDefinition for all members
+     * @throws Exception generic exception if something goes wrong
+     */
+    @Managed(description = "Get the list of members in a pool")
+    @SuppressWarnings("unused")
+    public String[] getPoolMembers() throws Exception
+    {
+        return getPoolMembers(poolName, hostname, username, password);
+    }
 
     /**
      * Given a pool name, retrieve the pool members definitions
@@ -95,6 +141,20 @@ public class F5PoolMemberControl
         }
 
         return res.toArray(new String[res.size()]);
+    }
+
+    /**
+     * Find the status of a member (use the parameters specified in the system properties)
+     *
+     * @param memberAddress server IP to lookup
+     * @return list of CommonIPPortDefinition for all members
+     * @throws Exception generic exception if something goes wrong
+     */
+    @Managed(description = "Get the list of members in a pool")
+    @SuppressWarnings("unused")
+    public String[] getPoolMemberStatuses(String memberAddress) throws Exception
+    {
+        return getPoolMemberStatuses(memberAddress, poolName, hostname, username, password);
     }
 
     /**
@@ -131,7 +191,22 @@ public class F5PoolMemberControl
 
 
     /**
-     * Enable a server in a pool (it needs to be a member of the pool already)
+     * Add a server to a pool (use the parameters specified in the system properties)
+     *
+     * @param memberAddress server IP to add
+     * @param memberPort    server port
+     * @return the new status of the server
+     * @throws Exception generic exception if something goes wrong
+     */
+    @Managed(description = "Add a member to a pool")
+    @SuppressWarnings("unused")
+    public String[] addPoolMember(String memberAddress, int memberPort) throws Exception
+    {
+        return addPoolMember(memberAddress, memberPort, poolName, hostname, username, password);
+    }
+
+    /**
+     * Add a server to a pool
      *
      * @param memberAddress server IP to add
      * @param memberPort    server port
@@ -165,7 +240,24 @@ public class F5PoolMemberControl
     }
 
     /**
-     * Add a member in a pool
+     * Enable a server in a pool (use the parameters specified in the system properties)
+     * The server needs to be a member of the pool already.
+     *
+     * @param memberAddress server IP to add
+     * @param memberPort    server port
+     * @return the new status of the server
+     * @throws Exception generic exception if something goes wrong
+     */
+    @Managed(description = "Enable a member in a pool")
+    @SuppressWarnings("unused")
+    public String[] enablePoolMember(String memberAddress, int memberPort) throws Exception
+    {
+        return enablePoolMember(memberAddress, memberPort, poolName, hostname, username, password);
+    }
+
+    /**
+     * Enable a server in a pool
+     * The server needs to be a member of the pool already.
      *
      * @param memberAddress server IP to add
      * @param memberPort    server port
@@ -191,6 +283,21 @@ public class F5PoolMemberControl
         setSessionState(m_interfaces, definition, poolName, CommonEnabledState.STATE_ENABLED);
 
         return getPoolMemberStatuses(poolName, memberAddress, hostname, username, password);
+    }
+
+    /**
+     * Disable a server from a pool (use the parameters specified in the system properties)
+     *
+     * @param memberAddress server IP to remove
+     * @param memberPort    server port
+     * @return the new status of the server
+     * @throws Exception generic exception if something goes wrong
+     */
+    @Managed(description = "Disable a member from a pool")
+    @SuppressWarnings("unused")
+    public String[] disablePoolMember(String memberAddress, int memberPort) throws Exception
+    {
+        return disablePoolMember(memberAddress, memberPort, poolName, hostname, username, password);
     }
 
     /**
