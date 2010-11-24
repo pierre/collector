@@ -1,0 +1,347 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 1996-2009, F5 Networks, Inc., Seattle, Washington. All rights reserved.  
+
+F5, F5 Networks, the F5 logo, BIG-IP, 3-DNS, iControl, GLOBAL-SITE, SEE-IT, EDGE-FX, FireGuard, Internet Control Architecture, IP Application Switch, iRules, PACKET VELOCITY, SYN Check, CONTROL YOUR WORLD, OneConnect, ZoneRunner, uRoam, FirePass, and TrafficShield are registered trademarks or trademarks of F5 Networks, Inc., in the U.S. and certain other countries. 
+
+All other trademarks mentioned in this document are the property of their respective owners. F5 Networks' trademarks may not be used in connection with any product or service except as permitted in writing by F5.
+
+-->
+<definitions name="Networking.ProfileIPIP"
+	targetNamespace="urn:iControl"
+	xmlns:tns="urn:iControl"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+<!-- types -->
+
+<types>
+	<xsd:schema targetNamespace='urn:iControl'
+		xmlns='http://www.w3.org/2001/XMLSchema'
+		xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'
+		xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/'>
+		<xsd:complexType name="Common.StringSequence">
+			<xsd:complexContent>
+				<xsd:restriction base='SOAP-ENC:Array'>
+					<xsd:attribute ref='SOAP-ENC:arrayType' wsdl:arrayType='xsd:string[]'/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+		<xsd:complexType name="Common.BooleanSequence">
+			<xsd:complexContent>
+				<xsd:restriction base='SOAP-ENC:Array'>
+					<xsd:attribute ref='SOAP-ENC:arrayType' wsdl:arrayType='xsd:boolean[]'/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:schema>
+</types>
+
+<!-- message -->
+
+<message name="Networking.ProfileIPIP.createRequest">
+	<part name="profile_names" type="tns:Common.StringSequence"/>
+</message>
+<message name="Networking.ProfileIPIP.createResponse">
+</message>
+
+<message name="Networking.ProfileIPIP.delete_all_profilesRequest">
+</message>
+<message name="Networking.ProfileIPIP.delete_all_profilesResponse">
+</message>
+
+<message name="Networking.ProfileIPIP.delete_profileRequest">
+	<part name="profile_names" type="tns:Common.StringSequence"/>
+</message>
+<message name="Networking.ProfileIPIP.delete_profileResponse">
+</message>
+
+<message name="Networking.ProfileIPIP.get_default_profileRequest">
+	<part name="profile_names" type="tns:Common.StringSequence"/>
+</message>
+<message name="Networking.ProfileIPIP.get_default_profileResponse">
+	<part name="return" type="tns:Common.StringSequence"/>
+</message>
+
+<message name="Networking.ProfileIPIP.get_listRequest">
+</message>
+<message name="Networking.ProfileIPIP.get_listResponse">
+	<part name="return" type="tns:Common.StringSequence"/>
+</message>
+
+<message name="Networking.ProfileIPIP.get_versionRequest">
+</message>
+<message name="Networking.ProfileIPIP.get_versionResponse">
+	<part name="return" type="xsd:string"/>
+</message>
+
+<message name="Networking.ProfileIPIP.is_base_profileRequest">
+	<part name="profile_names" type="tns:Common.StringSequence"/>
+</message>
+<message name="Networking.ProfileIPIP.is_base_profileResponse">
+	<part name="return" type="tns:Common.BooleanSequence"/>
+</message>
+
+<message name="Networking.ProfileIPIP.set_default_profileRequest">
+	<part name="profile_names" type="tns:Common.StringSequence"/>
+	<part name="defaults" type="tns:Common.StringSequence"/>
+</message>
+<message name="Networking.ProfileIPIP.set_default_profileResponse">
+</message>
+
+<!-- portType -->
+
+<portType name="Networking.ProfileIPIPPortType">
+	<operation name="create">
+  	<documentation>
+ Creates a set of IP-IP tunnel profiles.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.createRequest"/>
+		<output message="tns:Networking.ProfileIPIP.createResponse"/>
+	</operation>
+	<operation name="delete_all_profiles">
+	<documentation>
+ Deletes all non-system IP-IP tunnel profiles.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.delete_all_profilesRequest"/>
+		<output message="tns:Networking.ProfileIPIP.delete_all_profilesResponse"/>
+	</operation>
+	<operation name="delete_profile">
+	<documentation>
+ Deletes a set of IP-IP tunnel profiles.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.delete_profileRequest"/>
+		<output message="tns:Networking.ProfileIPIP.delete_profileResponse"/>
+	</operation>
+	<operation name="get_default_profile">
+	<documentation>
+ Gets the existing IP-IP tunnel profile from which this set of IP-IP
+ profiles inherits its unspecified attribute values.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.get_default_profileRequest"/>
+		<output message="tns:Networking.ProfileIPIP.get_default_profileResponse"/>
+	</operation>
+	<operation name="get_list">
+	<documentation>
+ Gets the names for all IP-IP tunnel profiles.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.get_listRequest"/>
+		<output message="tns:Networking.ProfileIPIP.get_listResponse"/>
+	</operation>
+	<operation name="get_version">
+	<documentation>
+ Gets the version information for this interface.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.get_versionRequest"/>
+		<output message="tns:Networking.ProfileIPIP.get_versionResponse"/>
+	</operation>
+	<operation name="is_base_profile">
+	<documentation>
+ Determines whether a set of IP-IP tunnel profiles are
+ base/pre-configured (vs user-defined) profiles.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.is_base_profileRequest"/>
+		<output message="tns:Networking.ProfileIPIP.is_base_profileResponse"/>
+	</operation>
+	<operation name="set_default_profile">
+	<documentation>
+ Sets the existing IP-IP tunnel profile from which this set of IP-IP
+ tunnel profiles inherits their unspecified attribute values.
+
+        	</documentation>
+		<input message="tns:Networking.ProfileIPIP.set_default_profileRequest"/>
+		<output message="tns:Networking.ProfileIPIP.set_default_profileResponse"/>
+	</operation>
+</portType>
+
+<!-- binding -->
+
+<binding name="Networking.ProfileIPIPBinding" type="tns:Networking.ProfileIPIPPortType">
+	<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+	<operation name="create">
+	<documentation>
+ Creates a set of IP-IP tunnel profiles.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="delete_all_profiles">
+	<documentation>
+ Deletes all non-system IP-IP tunnel profiles.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="delete_profile">
+	<documentation>
+ Deletes a set of IP-IP tunnel profiles.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="get_default_profile">
+	<documentation>
+ Gets the existing IP-IP tunnel profile from which this set of IP-IP
+ profiles inherits its unspecified attribute values.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="get_list">
+	<documentation>
+ Gets the names for all IP-IP tunnel profiles.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="get_version">
+	<documentation>
+ Gets the version information for this interface.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="is_base_profile">
+	<documentation>
+ Determines whether a set of IP-IP tunnel profiles are
+ base/pre-configured (vs user-defined) profiles.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="set_default_profile">
+	<documentation>
+ Sets the existing IP-IP tunnel profile from which this set of IP-IP
+ tunnel profiles inherits their unspecified attribute values.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:Networking/ProfileIPIP"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:Networking/ProfileIPIP"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+</binding>
+
+<!-- service -->
+
+<service name="Networking.ProfileIPIP">
+	<documentation>
+ The ProfileIPIP interface enables you to manipulate an IP-IP tunnel
+ profile to configure the IP-within-IP tunneling protocol.  The
+ IP-within-IP protocol (RFC2003) specifies how to encapsulate an IP
+ packet within another IP packet.
+
+        	</documentation>
+	<port name="Networking.ProfileIPIPPort" binding="tns:Networking.ProfileIPIPBinding">
+		<soap:address location="https://url_to_service"/>
+	</port>
+</service>
+</definitions>

@@ -1,0 +1,21 @@
+/**
+ * LocalLBProfileDiameter.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ */
+
+package iControl;
+
+public interface LocalLBProfileDiameter extends javax.xml.rpc.Service {
+
+/**
+ * The ProfileDiameter interface enables you to manipulate a local
+ * load balancer's Diameter profile.
+ */
+    public java.lang.String getLocalLBProfileDiameterPortAddress();
+
+    public iControl.LocalLBProfileDiameterPortType getLocalLBProfileDiameterPort() throws javax.xml.rpc.ServiceException;
+
+    public iControl.LocalLBProfileDiameterPortType getLocalLBProfileDiameterPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+}

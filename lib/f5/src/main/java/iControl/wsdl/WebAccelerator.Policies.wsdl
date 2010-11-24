@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 1996-2009, F5 Networks, Inc., Seattle, Washington. All rights reserved.  
+
+F5, F5 Networks, the F5 logo, BIG-IP, 3-DNS, iControl, GLOBAL-SITE, SEE-IT, EDGE-FX, FireGuard, Internet Control Architecture, IP Application Switch, iRules, PACKET VELOCITY, SYN Check, CONTROL YOUR WORLD, OneConnect, ZoneRunner, uRoam, FirePass, and TrafficShield are registered trademarks or trademarks of F5 Networks, Inc., in the U.S. and certain other countries. 
+
+All other trademarks mentioned in this document are the property of their respective owners. F5 Networks' trademarks may not be used in connection with any product or service except as permitted in writing by F5.
+
+-->
+<definitions name="WebAccelerator.Policies"
+	targetNamespace="urn:iControl"
+	xmlns:tns="urn:iControl"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+<!-- types -->
+
+<types>
+	<xsd:schema targetNamespace='urn:iControl'
+		xmlns='http://www.w3.org/2001/XMLSchema'
+		xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'
+		xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/'>
+		<xsd:complexType name="Common.StringSequence">
+			<xsd:complexContent>
+				<xsd:restriction base='SOAP-ENC:Array'>
+					<xsd:attribute ref='SOAP-ENC:arrayType' wsdl:arrayType='xsd:string[]'/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:schema>
+</types>
+
+<!-- message -->
+
+<message name="WebAccelerator.Policies.delete_policyRequest">
+	<part name="name" type="xsd:string"/>
+</message>
+<message name="WebAccelerator.Policies.delete_policyResponse">
+</message>
+
+<message name="WebAccelerator.Policies.get_listRequest">
+</message>
+<message name="WebAccelerator.Policies.get_listResponse">
+	<part name="return" type="tns:Common.StringSequence"/>
+</message>
+
+<message name="WebAccelerator.Policies.get_versionRequest">
+</message>
+<message name="WebAccelerator.Policies.get_versionResponse">
+	<part name="return" type="xsd:string"/>
+</message>
+
+<message name="WebAccelerator.Policies.import_policyRequest">
+	<part name="filename" type="xsd:string"/>
+	<part name="overwrite" type="xsd:boolean"/>
+</message>
+<message name="WebAccelerator.Policies.import_policyResponse">
+</message>
+
+<!-- portType -->
+
+<portType name="WebAccelerator.PoliciesPortType">
+	<operation name="delete_policy">
+ 	<documentation>
+ Delete a named Policy.
+
+        	</documentation>
+		<input message="tns:WebAccelerator.Policies.delete_policyRequest"/>
+		<output message="tns:WebAccelerator.Policies.delete_policyResponse"/>
+	</operation>
+	<operation name="get_list">
+	<documentation>
+ Get a list of Policies present on this WebAccelerator.
+
+        	</documentation>
+		<input message="tns:WebAccelerator.Policies.get_listRequest"/>
+		<output message="tns:WebAccelerator.Policies.get_listResponse"/>
+	</operation>
+	<operation name="get_version">
+	<documentation>
+ Gets the version information for this interface.
+
+        	</documentation>
+		<input message="tns:WebAccelerator.Policies.get_versionRequest"/>
+		<output message="tns:WebAccelerator.Policies.get_versionResponse"/>
+	</operation>
+	<operation name="import_policy">
+	<documentation>
+ Import a Policy onto this WebAccelerator.
+
+        	</documentation>
+		<input message="tns:WebAccelerator.Policies.import_policyRequest"/>
+		<output message="tns:WebAccelerator.Policies.import_policyResponse"/>
+	</operation>
+</portType>
+
+<!-- binding -->
+
+<binding name="WebAccelerator.PoliciesBinding" type="tns:WebAccelerator.PoliciesPortType">
+	<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+	<operation name="delete_policy">
+	<documentation>
+ Delete a named Policy.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:WebAccelerator/Policies"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="get_list">
+	<documentation>
+ Get a list of Policies present on this WebAccelerator.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:WebAccelerator/Policies"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="get_version">
+	<documentation>
+ Gets the version information for this interface.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:WebAccelerator/Policies"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+
+	<operation name="import_policy">
+	<documentation>
+ Import a Policy onto this WebAccelerator.
+
+        	</documentation>
+		<soap:operation soapAction="urn:iControl:WebAccelerator/Policies"/>
+		<input>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</input>
+		<output>
+			<soap:body
+				use="encoded"
+				namespace="urn:iControl:WebAccelerator/Policies"
+				encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		</output>
+	</operation>
+</binding>
+
+<!-- service -->
+
+<service name="WebAccelerator.Policies">
+	<documentation>
+ Allows manipulation of Policies.
+
+        	</documentation>
+	<port name="WebAccelerator.PoliciesPort" binding="tns:WebAccelerator.PoliciesBinding">
+		<soap:address location="https://url_to_service"/>
+	</port>
+</service>
+</definitions>
