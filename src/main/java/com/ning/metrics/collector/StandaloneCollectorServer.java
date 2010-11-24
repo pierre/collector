@@ -19,15 +19,15 @@ package com.ning.metrics.collector;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.ServletModule;
-import com.ning.metrics.collector.endpoint.servers.JettyServer;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-import org.apache.log4j.Logger;
-
 import com.ning.metrics.collector.binder.modules.EventCollectorModule;
 import com.ning.metrics.collector.binder.modules.OpenSourceCollectorModule;
 import com.ning.metrics.collector.binder.modules.ScribeModule;
+import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.endpoint.servers.ScribeServer;
+import com.ning.metrics.collector.util.F5PoolMemberControl;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +73,10 @@ public class StandaloneCollectorServer
 
         /* Start the Scribe endpoint */
         injector.getInstance(ScribeServer.class);
+
+        // Create a F5 BIP-IP controller
+        // This is a standalone class, access it via JMX when you need to take a collector in or out of a pool
+        injector.getInstance(F5PoolMemberControl.class);
 
         final long secondsToStart = (System.currentTimeMillis() - startTime) / 1000;
         log.info(String.format("Collector initialized in %d:%02d", secondsToStart / 60, secondsToStart % 60));

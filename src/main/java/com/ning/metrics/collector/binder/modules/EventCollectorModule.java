@@ -63,6 +63,7 @@ import com.ning.metrics.collector.events.processing.EventHandler;
 import com.ning.metrics.collector.events.processing.EventHandlerImpl;
 import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.collector.events.processing.TaskQueueServiceImpl;
+import com.ning.metrics.collector.util.F5PoolMemberControl;
 import com.ning.metrics.collector.util.Filter;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
@@ -259,5 +260,8 @@ public class EventCollectorModule implements Module
 
         binder.bind(EventCollector.class)
             .to(BufferingEventCollector.class);
+
+        binder.bind(F5PoolMemberControl.class)
+            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=F5poolMemberControl"));
     }
 }
