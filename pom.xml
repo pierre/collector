@@ -365,6 +365,8 @@
                         <exclude>deploy.sh</exclude>
                         <exclude>run.sh</exclude>
                         <exclude>src/site/**</exclude>
+                        <!-- This is a straight import from the GPL f5 BIG-IP library -->
+                        <exclude>lib/f5/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
