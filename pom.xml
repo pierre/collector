@@ -197,6 +197,22 @@
             <classifier>jdk15</classifier>
             <scope>test</scope>
         </dependency>
+
+        <!-- f5 dependencies -->
+        <dependency>
+            <groupId>f5</groupId>
+            <artifactId>icontrol</artifactId>
+            <version>10.2</version>
+            <scope>system</scope>
+            <!-- Source code can be found under lib/f5/src -->
+            <systemPath>${project.basedir}/lib/f5/iControl.jar</systemPath>
+        </dependency>
+        <!-- A copy can be found under lib/f5/3rdparty (shipped in the distribution) -->
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
