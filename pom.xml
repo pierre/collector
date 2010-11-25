@@ -28,6 +28,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <repositories>
+        <repository>
+            <id>file-based-repo-for-external-libs</id>
+            <url>file://${basedir}/lib</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -198,14 +204,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- f5 dependencies -->
+        <!-- f5 dependencies are in a file repository -->
+        <!-- Make sure you have <mirrorOf>external:*</mirrorOf> in your ~/.m2/settings.xml, not <mirrorOf>*</mirrorOf> -->
         <dependency>
             <groupId>f5</groupId>
             <artifactId>icontrol</artifactId>
             <version>10.2</version>
-            <scope>system</scope>
-            <!-- Source code can be found under lib/f5/src -->
-            <systemPath>${project.basedir}/lib/f5/iControl.jar</systemPath>
         </dependency>
         <!-- A copy can be found under lib/f5/3rdparty (shipped in the distribution) -->
         <dependency>

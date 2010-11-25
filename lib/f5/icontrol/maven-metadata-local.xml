@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>f5</groupId>
+  <artifactId>icontrol</artifactId>
+  <version>10.2</version>
+  <versioning>
+    <versions>
+      <version>10.2</version>
+    </versions>
+    <lastUpdated>20101125010434</lastUpdated>
+  </versioning>
+</metadata>
