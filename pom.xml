@@ -64,25 +64,25 @@
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.eventtracker</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>3.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-all</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-common</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>1.0.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-writer</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>1.0.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
