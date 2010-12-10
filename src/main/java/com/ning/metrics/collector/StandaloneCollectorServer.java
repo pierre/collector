@@ -55,8 +55,7 @@ public class StandaloneCollectorServer
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
             new OpenSourceCollectorModule(), /* Open-Source version of certain interfaces */
 
-            new ScribeModule(),              /* Optional, provide the Scribe endpoint */
-
+            // Setup Jetty first (slf4j setup)
             new ServletModule()              /* Optional, provide the Jetty endpoint */
             {
                 @Override
@@ -65,7 +64,9 @@ public class StandaloneCollectorServer
                     // Note! It's "*", NOT "/*"
                     serve("*").with(GuiceContainer.class, params);
                 }
-            }
+            },
+
+            new ScribeModule()              /* Optional, provide the Scribe endpoint */
         );
 
         /* Start the Jetty endpoint */

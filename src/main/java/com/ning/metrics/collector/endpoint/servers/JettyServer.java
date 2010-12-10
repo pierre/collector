@@ -19,6 +19,9 @@ package com.ning.metrics.collector.endpoint.servers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.binder.modules.JettyListener;
+import com.ning.metrics.collector.endpoint.setup.SetupJULBridge;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -29,9 +32,6 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
-
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.binder.modules.JettyListener;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -115,7 +115,11 @@ public class JettyServer
         Context context = new Context(server, "/", Context.SESSIONS);
         context.addEventListener(new JettyListener());
 
-        /* Make sure Guice filter all requests */
+        // Jersey insists on using java.util.logging (JUL)
+        SetupJULBridge listener = new SetupJULBridge();
+        context.addEventListener(listener);
+
+        // Make sure Guice filter all requests
         FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
         context.addFilter(filterHolder, "/*", Handler.DEFAULT);
 
@@ -128,5 +132,7 @@ public class JettyServer
 
         final long secondsToStart = (System.currentTimeMillis() - startTime) / 1000;
         log.info(String.format("Jetty server started in %d:%02d", secondsToStart / 60, secondsToStart % 60));
+
+        server.join();
     }
 }
