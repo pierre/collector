@@ -31,6 +31,7 @@ import iControl.LocalLBPoolMemberMemberObjectStatus;
 import iControl.LocalLBPoolMemberMemberSessionState;
 import iControl.LocalLBPoolMemberMemberStatisticEntry;
 import iControl.LocalLBPoolMemberMemberStatistics;
+import org.apache.axis.AxisFault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -97,7 +98,17 @@ public class F5PoolMemberControl
     public String[] getPoolList(String hostname, String username, String password) throws Exception
     {
         log.info(String.format("Retrieving pool list for %s (username: %s)", hostname, username));
-        return getInterface(hostname, username, password).getLocalLBPool().get_list();
+        try {
+            return getInterface(hostname, username, password).getLocalLBPool().get_list();
+        }
+        catch (AxisFault e) {
+            log.warn(String.format("Unable to get pool list: %s", e.getFaultString()));
+            throw e;
+        }
+        catch (Exception e) {
+            log.warn(String.format("Unable to get pool list: %s", e.getLocalizedMessage()));
+            throw e;
+        }
     }
 
     /**
@@ -130,7 +141,18 @@ public class F5PoolMemberControl
         log.info(String.format("Retrieving pool members for %s (hostname: %s, username: %s)", poolName, hostname, username));
 
         String[] poolNames = {poolName};
-        CommonIPPortDefinition[][] membersDefinitions = getInterface(hostname, username, password).getLocalLBPool().get_member(poolNames);
+        CommonIPPortDefinition[][] membersDefinitions;
+        try {
+            membersDefinitions = getInterface(hostname, username, password).getLocalLBPool().get_member(poolNames);
+        }
+        catch (AxisFault e) {
+            log.warn(String.format("Unable to get pool member: %s", e.getFaultString()));
+            throw e;
+        }
+        catch (Exception e) {
+            log.warn(String.format("Unable to get pool member: %s", e.getLocalizedMessage()));
+            throw e;
+        }
         log.info(String.format("Found pool members for %s (hostname: %s, username: %s): %s", poolName, hostname, username, toString(membersDefinitions)));
 
         ArrayList<String> res = new ArrayList<String>();
@@ -176,7 +198,19 @@ public class F5PoolMemberControl
         ArrayList<String> memberStatuses = new ArrayList<String>();
 
         log.info(String.format("Retrieving pool member status for %s (pool: %s, hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
-        LocalLBPoolMemberMemberObjectStatus[][] members = getInterface(hostname, username, password).getLocalLBPoolMember().get_object_status(poolNames);
+        LocalLBPoolMemberMemberObjectStatus[][] members;
+        try {
+            members = getInterface(hostname, username, password).getLocalLBPoolMember().get_object_status(poolNames);
+        }
+        catch (AxisFault e) {
+            log.warn(String.format("Unable to get pool member: %s", e.getFaultString()));
+            throw e;
+        }
+        catch (Exception e) {
+            log.warn(String.format("Unable to get pool member: %s", e.getLocalizedMessage()));
+            throw e;
+        }
+
         for (LocalLBPoolMemberMemberObjectStatus[] statuses : members) {
             for (LocalLBPoolMemberMemberObjectStatus status : statuses) {
                 if (status.getMember().getAddress().equals(memberAddress)) {
@@ -231,8 +265,12 @@ public class F5PoolMemberControl
             m_interfaces.getLocalLBPool().add_member(poolNames, membersDefinitions);
             log.info(String.format("Added %s to pool %s (hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
         }
+        catch (AxisFault e) {
+            log.warn(String.format("Unable to add pool member: %s", e.getFaultString()));
+            throw e;
+        }
         catch (Exception e) {
-            log.warn(String.format("Error encountered: %s", e.getLocalizedMessage()));
+            log.warn(String.format("Unable to add pool member: %s", e.getLocalizedMessage()));
             throw e;
         }
 
@@ -329,7 +367,19 @@ public class F5PoolMemberControl
         long cur_connections = 1;
         final String[] poolNames = {poolName};
         while (cur_connections > 0) {
-            LocalLBPoolMemberMemberStatistics[] memberStatistics = m_interfaces.getLocalLBPoolMember().get_statistics(poolNames, membersDefinitions);
+            LocalLBPoolMemberMemberStatistics[] memberStatistics;
+            try {
+                memberStatistics = m_interfaces.getLocalLBPoolMember().get_statistics(poolNames, membersDefinitions);
+            }
+            catch (AxisFault e) {
+                log.warn(String.format("Unable to get statistics: %s", e.getFaultString()));
+                throw e;
+            }
+            catch (Exception e) {
+                log.warn(String.format("Unable to get statistics: %s", e.getLocalizedMessage()));
+                throw e;
+            }
+
             LocalLBPoolMemberMemberStatistics memberStats = memberStatistics[0];
 
             LocalLBPoolMemberMemberStatisticEntry[] statisticEntries = memberStats.getStatistics();
@@ -370,8 +420,12 @@ public class F5PoolMemberControl
             m_interfaces.getLocalLBPoolMember().set_session_enabled_state(poolNames, membersSessionStates);
             log.info("Update successful");
         }
+        catch (AxisFault e) {
+            log.warn(String.format("Unable to set session enabled state: %s", e.getFaultString()));
+            throw e;
+        }
         catch (Exception e) {
-            log.warn(String.format("Error encountered: %s", e.getLocalizedMessage()));
+            log.warn(String.format("Unable to set session enabled state: %s", e.getLocalizedMessage()));
             throw e;
         }
     }
@@ -390,8 +444,12 @@ public class F5PoolMemberControl
             m_interfaces.getLocalLBPoolMember().set_monitor_state(poolNames, membersMonitorStates);
             log.info("Update successful");
         }
+        catch (AxisFault e) {
+            log.warn(String.format("Unable to set monitor state: %s", e.getFaultString()));
+            throw e;
+        }
         catch (Exception e) {
-            log.warn(String.format("Error encountered: %s", e.getLocalizedMessage()));
+            log.warn(String.format("Unable to set monitor state: %s", e.getLocalizedMessage()));
             throw e;
         }
     }
