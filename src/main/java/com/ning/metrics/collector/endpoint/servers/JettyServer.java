@@ -41,6 +41,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class JettyServer
 {
     private final static Logger log = Logger.getLogger(JettyServer.class);
+
+    private boolean initialized = false;
+
     private final String ip;
     private final int port;
     private final int sslPort;
@@ -133,6 +136,17 @@ public class JettyServer
         final long secondsToStart = (System.currentTimeMillis() - startTime) / 1000;
         log.info(String.format("Jetty server started in %d:%02d", secondsToStart / 60, secondsToStart % 60));
 
+        initialized = true;
         server.join();
+    }
+
+    /**
+     * Has Jetty finished its startup sequence?
+     *
+     * @return true iff Jetty has been setup
+     */
+    public boolean isInitialized()
+    {
+        return initialized;
     }
 }

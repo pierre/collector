@@ -55,7 +55,6 @@ public class StandaloneCollectorServer
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
             new OpenSourceCollectorModule(), /* Open-Source version of certain interfaces */
 
-            // Setup Jetty first (slf4j setup)
             new ServletModule()              /* Optional, provide the Jetty endpoint */
             {
                 @Override
@@ -70,7 +69,16 @@ public class StandaloneCollectorServer
         );
 
         /* Start the Jetty endpoint */
-        injector.getInstance(JettyServer.class);
+        JettyServer jetty = injector.getInstance(JettyServer.class);
+
+        // We need to wait for Jetty to be fully up (it will setup SLF4j). Otherwise, we may encounter a race condition:
+        //SLF4J: The following loggers will not work becasue they were created
+        //SLF4J: during the default configuration phase of the underlying logging system.
+        //SLF4J: See also http://www.slf4j.org/codes.html#substituteLogger
+        //SLF4J: org.apache.thrift.transport.TIOStreamTransport
+        while (!jetty.isInitialized()) {
+            Thread.sleep(100);
+        }
 
         /* Start the Scribe endpoint */
         injector.getInstance(ScribeServer.class);
