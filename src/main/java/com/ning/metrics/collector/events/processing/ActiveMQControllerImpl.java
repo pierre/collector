@@ -48,7 +48,7 @@ public class ActiveMQControllerImpl implements ActiveMQController
         @Nullable ActiveMQSender activeMQSender
     )
     {
-        this(Arrays.asList(config.getActiveMQEventsToCollect().split(",")), activeMQSender);
+        this(config.getActiveMQEventsToCollect() == null ? null : Arrays.asList(config.getActiveMQEventsToCollect().split(",")), activeMQSender);
     }
 
     public ActiveMQControllerImpl(
