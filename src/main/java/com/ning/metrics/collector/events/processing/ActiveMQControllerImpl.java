@@ -18,11 +18,11 @@ package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
 import com.google.inject.internal.Nullable;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.util.Managed;
 import org.apache.log4j.Logger;
 
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +48,7 @@ public class ActiveMQControllerImpl implements ActiveMQController
         @Nullable ActiveMQSender activeMQSender
     )
     {
-        this(config.getActiveMQEventsToCollect(), activeMQSender);
+        this(Arrays.asList(config.getActiveMQEventsToCollect().split(",")), activeMQSender);
     }
 
     public ActiveMQControllerImpl(

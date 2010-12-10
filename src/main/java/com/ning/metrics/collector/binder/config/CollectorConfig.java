@@ -19,8 +19,6 @@ package com.ning.metrics.collector.binder.config;
 import com.sun.security.auth.module.UnixSystem;
 import org.skife.config.Config;
 
-import java.util.List;
-
 public class CollectorConfig
 {
     @Config(value = "collector.dfs.block.size")
@@ -71,8 +69,8 @@ public class CollectorConfig
 
     // Events types to forward to ActiveMQ (comma delimited)
 
-    @Config(value = "collector.activmq.events")
-    public List<String> getActiveMQEventsToCollect()
+    @Config(value = "collector.activemq.events")
+    public String getActiveMQEventsToCollect()
     {
         return null;
     }
