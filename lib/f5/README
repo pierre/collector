@@ -1,3 +1,7 @@
 See http://devcentral.f5.com/Community/GroupDetails/tabid/1082223/asg/2/Default.aspx.
 
-The iControl.jar is installed in a file repository for maven.
+The jar and sources jar were constructed from the downloaded artifacts
+available from the link above and are installed in a file repository for maven.
+
+The 3rdparty directory is a copy of the 3rdparty directory available
+in the f5 distribution but shouldn't be needed.
