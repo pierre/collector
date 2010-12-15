@@ -39,11 +39,11 @@ How to monitor the collector via JMX
     for an in-depth understanding on how the file-backed queue works.
 
     The <<DiskSpoolEventWriter>> bean exposes stats about the on-disk queue. Current size is given by the <<DiskSpoolSize>>
-    parameter. This value in the size in kb of the events buffered locally, waiting to be flushed to HDFS.
+    parameter. This value is the size in kb of the events buffered locally, waiting to be flushed to HDFS.
 
 * Hadoop writer
 
-    The HadoopFileEventWriter bean gives stats on writes performed on HDFS.
+    The HadoopFileEventWriter bean gives stats on writes performed to HDFS.
 
     The Hadoop writer creates temporary files. These are kept open (events are appended to them) until commit (flush) is
     called, at which point the files are closed and renamed to their final name.
@@ -53,9 +53,13 @@ How to monitor the collector via JMX
 * The 15 seconds test
 
     To make sure a collector is healthy:
-    * Check <<*EvendEndPointStats:FailedToParseEvents>> and <<*EvendEndPointStats:RejectedEvents>> to make sure clients
-    are sending the right payload (former attribute) and that the collector is accepting them (latter attribute).
-    * Check <<BufferingEventCollector:QueueSize>> is bounded and less than <<BufferingEventCollector:MaxQueueSize>>.
-    If not, the collector cannot keep up accepting events and writing them to disk.
-    * Check <<DiskSpoolEventWriter:DiskSpoolSize>> is bounded. If not, events are not being sent to HDFS.
-    * Check <<HadoopFileEventWriter:SecondsSinceLastUpdate>> is bounded. If not, files are not being closed properly on HDFS.
+
+        * Check <<*EvendEndPointStats:FailedToParseEvents>> and <<*EvendEndPointStats:RejectedEvents>> to make sure clients
+            are sending the right payload (former attribute) and that the collector is accepting them (latter attribute).
+
+        * Check <<BufferingEventCollector:QueueSize>> is bounded and less than <<BufferingEventCollector:MaxQueueSize>>.
+            If not, the collector cannot keep up accepting events and writing them to disk.
+
+        * Check <<DiskSpoolEventWriter:DiskSpoolSize>> is bounded. If not, events are not being sent to HDFS.
+
+        * Check <<HadoopFileEventWriter:SecondsSinceLastUpdate>> is bounded. If not, files are not being closed properly on HDFS.
