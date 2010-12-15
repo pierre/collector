@@ -23,10 +23,20 @@ How to monitor the collector via JMX
     The <<BufferingEventCollector>> bean exposes stats about this queue. Current size is given by the <<QueueSize>>
     attribute.
     The <<EventsMillisTP99>> attribute gives the TP99 of the acceptance time per event (until it's scheduled to be
-    flushed to disk), i.e. the time it waits in the memory queue before being written to disk.
+    flushed to disk), i.e. the lifetime of an Event from the endpoint (right at the beginning) to being scheduled to be written to disk.
     The <<EventsSecondTP99>> attribute gives the total number of events accepted. The current number of events written
     to disk per second is given by <<EventsSecondTP99>>.
     All TP99 values are computed over the last 30 minutes.
+
+    Similarly, extraction attributes give the same statistics but measure the lifetime of an Event after it has been turned
+    into an Event object (deserialization varies between API endpoints).
+
+    Discrepancies between two statistics give insight on how much time is spent deserializing the original payload.
+
+    Write stats gives insights on all write operations, i.e. write calls for each Event received (does not necessarily mean
+    flush or sync to disk) and commits (by a periodic flusher), both on the ThresholdEventWriter. See the description in
+    the com.ning:metrics.serialization-writer {{{http://pierre.github.com/dwarf/serialization/metrics.serialization-writer/apidocs/index.html}Javadocs}}
+    for an in-depth understanding on how the file-backed queue works.
 
     The <<DiskSpoolEventWriter>> bean exposes stats about the on-disk queue. Current size is given by the <<DiskSpoolSize>>
     parameter. This value in the size in kb of the events buffered locally, waiting to be flushed to HDFS.
@@ -39,3 +49,13 @@ How to monitor the collector via JMX
     called, at which point the files are closed and renamed to their final name.
     The delay in seconds between two flushes is given by the <<SecondsSinceLastUpdate>> attribute. It measures how long
     temporary files were kept open.
+
+* The 15 seconds test
+
+    To make sure a collector is healthy:
+    * Check <<*EvendEndPointStats:FailedToParseEvents>> and <<*EvendEndPointStats:RejectedEvents>> to make sure clients
+    are sending the right payload (former attribute) and that the collector is accepting them (latter attribute).
+    * Check <<BufferingEventCollector:QueueSize>> is bounded and less than <<BufferingEventCollector:MaxQueueSize>>.
+    If not, the collector cannot keep up accepting events and writing them to disk.
+    * Check <<DiskSpoolEventWriter:DiskSpoolSize>> is bounded. If not, events are not being sent to HDFS.
+    * Check <<HadoopFileEventWriter:SecondsSinceLastUpdate>> is bounded. If not, files are not being closed properly on HDFS.
