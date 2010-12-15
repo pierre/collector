@@ -15,19 +15,19 @@
   ~ under the License.
   -->
 
-<project name="Serialization">
+<project name="Collector">
     <publishDate position="right"/>
     <version position="right"/>
 
     <body>
         <links>
-            <item name="Maven Central" href="https://oss.sonatype.org/content/repositories/central/com/ning/"/>
+            <item name="Maven Central" href="http://repo1.maven.org/maven2/com/ning/"/>
         </links>
 
         <menu name="Dwarf">
             <item name="Dwarf project" href="http://pierre.github.com/dwarf"/>
-            <item name="FAQ" href="/faq.html"/>
-            <item name="Architecture overview" href="/overview.html"/>
+            <!--<item name="FAQ" href="/faq.html"/>-->
+            <item name="Monitoring via JMX" href="/monitoring.html"/>
         </menu>
 
         <menu ref="modules"/>

@@ -1,0 +1,41 @@
+How to monitor the collector via JMX
+
+* Event endpoints
+
+    All API endpoints (different HTTP ones, Thrift) expose stats for events the endpoint could succefully decode to an
+    Event instance (before any other processing, writing, ... has been down through the chain).
+
+    The Thrift endpoint stats is named <<ScribeEventEndPointStats>>. The HTTP ones are <<ExternalEventEndPointStats>>
+    and <<InternalEventEndPointStats>>.
+
+    Attributes displayed should be straightforward (hover the mouse on an attribute name in Jconsole to get a description).
+
+    There is one subtlety: attributes which names end with <<PerMinute>> are computed on the fly by averaging the rate
+    of the metric over a period of time, specified by the <collector.event-end-point.rate-window-size-minutes> System property.
+    By default, the rate-window-size-minutes is 5 (i.e. <<PerMinute>> metrics are averaged over the last 5 minutes).
+
+* Disk writer
+
+    Accepted events are scheduled to go to disk locally before going to HDFS. Before being written, events are waiting
+    in an in-memory queue. This queue needs to be bounded and kept small, as all events in it are lost if the collector
+    dies.
+
+    The <<BufferingEventCollector>> bean exposes stats about this queue. Current size is given by the <<QueueSize>>
+    attribute.
+    The <<EventsMillisTP99>> attribute gives the TP99 of the acceptance time per event (until it's scheduled to be
+    flushed to disk), i.e. the time it waits in the memory queue before being written to disk.
+    The <<EventsSecondTP99>> attribute gives the total number of events accepted. The current number of events written
+    to disk per second is given by <<EventsSecondTP99>>.
+    All TP99 values are computed over the last 30 minutes.
+
+    The <<DiskSpoolEventWriter>> bean exposes stats about the on-disk queue. Current size is given by the <<DiskSpoolSize>>
+    parameter. This value in the size in kb of the events buffered locally, waiting to be flushed to HDFS.
+
+* Hadoop writer
+
+    The HadoopFileEventWriter bean gives stats on writes performed on HDFS.
+
+    The Hadoop writer creates temporary files. These are kept open (events are appended to them) until commit (flush) is
+    called, at which point the files are closed and renamed to their final name.
+    The delay in seconds between two flushes is given by the <<SecondsSinceLastUpdate>> attribute. It measures how long
+    temporary files were kept open.
