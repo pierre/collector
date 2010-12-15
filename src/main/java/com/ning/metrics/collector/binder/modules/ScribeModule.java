@@ -44,7 +44,7 @@ public class ScribeModule implements Module
         binder.bind(EventEndPointStats.class)
             .annotatedWith(ScribeStats.class)
             .toProvider(EventEndPointStatsProvider.class)
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=ScribeEventHandler"));
+            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=ScribeEventEndPointStats"));
 
         binder.bind(ScribeEventHandler.class)
             .to(ScribeEventHandlerImpl.class);
