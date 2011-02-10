@@ -96,6 +96,13 @@ public class HadoopFileEventWriter implements EventWriter
         this.sessionId = String.format("%s-%d", ip, port);
     }
 
+    /**
+     * Write a given event in Hadoop. The location is determined by the event getOutputDir method.
+     * If no exception is thrown, one is guaranteed that the write succeeded (to the extend of Hadoop guarantees...).
+     *
+     * @param event Event to write (contains HDFS path information and payload to write)
+     * @throws IOException if the write is not successful
+     */
     public synchronized void write(Event event) throws IOException
     {
         for (FileError fileError : fileErrorList) {

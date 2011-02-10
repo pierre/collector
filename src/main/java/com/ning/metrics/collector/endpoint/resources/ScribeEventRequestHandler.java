@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.processing.ScribeEventHandler;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.SmileBucketEvent;
 import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
@@ -31,7 +32,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
-import org.codehaus.jackson.JsonNode;
 import org.joda.time.DateTime;
 import scribe.thrift.LogEntry;
 import scribe.thrift.ResultCode;
@@ -41,7 +41,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,20 +81,18 @@ public class ScribeEventRequestHandler implements Iface
             EventStats eventStats = new EventStats();
             try {
                 log.debug(String.format("Parsing log: %s", entry));
+                Event event = extractEvent(entry.getCategory(), entry.getMessage());
 
-                List<Event> events = extractEvent(entry.getCategory(), entry.getMessage());
-                for (Event event : events) {
-                    if (event != null) {
-                        eventStats.recordExtracted();
-                        if (eventHandler.processEvent(event, eventStats)) {
-                            success = true;
-                        }
-                    }
-                    else {
-                        eventHandler.handleFailure(entry, eventStats);
-                        // We don't want Scribe to try later if it sends messages we don't understand.
+                if (event != null) {
+                    eventStats.recordExtracted();
+                    if (eventHandler.processEvent(event, eventStats)) {
                         success = true;
                     }
+                }
+                else {
+                    eventHandler.handleFailure(entry, eventStats);
+                    // We don't want Scribe to try later if it sends messages we don't understand.
+                    success = true;
                 }
             }
             catch (RuntimeException e) {
@@ -143,38 +140,31 @@ public class ScribeEventRequestHandler implements Iface
      * @throws TException          when the ThriftEnvelope cannot be generated
      * @throws java.io.IOException when the SmileEnvelopeEvent cannot be generated
      */
-    private List<Event> extractEvent(String category, String message) throws TException, IOException
+    private Event extractEvent(String category, String message) throws TException, IOException
     {
-        List<Event> events = extractSmileEnvelopeEvent(category, message);
+        Event smileEvents = extractSmileEnvelopeEvent(category, message);
 
-        if (events == null) {
-            Event event = extractThriftEnvelopeEvent(category, message);
-            ArrayList<Event> list = new ArrayList<Event>();
-            list.add(event);
-            return list;
-        } else {
-            return events;
+        if (smileEvents == null) {
+            return extractThriftEnvelopeEvent(category, message);
+        }
+        else {
+            return smileEvents;
         }
     }
 
-    private List<Event> extractSmileEnvelopeEvent(String category, String message) throws IOException
+    private Event extractSmileEnvelopeEvent(String category, String message) throws IOException
     {
         // See http://wiki.fasterxml.com/JacksonBinaryFormatSpec
         // We assume for now that we are sending Smile on the wire. This may change though (lzo compression?)
         if (message.charAt(0) == ':' && message.charAt(1) == ')' && message.charAt(2) == '\n') {
-            SmileBucketDeserializer deserializer= new SmileBucketDeserializer();
+            SmileBucketDeserializer deserializer = new SmileBucketDeserializer();
 
-            deserializer.open(new ByteArrayInputStream(message.getBytes()));
-            SmileBucket bucket = deserializer.deserialize();
-            deserializer.close();
-
-            ArrayList<Event> events = new ArrayList<Event>();
-            for (JsonNode node : bucket) {
-                Event event = new SmileEnvelopeEvent(category, node);
-            }
-
-            return events;
-        } else {
+            SmileBucket bucket = SmileBucketDeserializer.deserialize(new ByteArrayInputStream(message.getBytes()));
+            // Assume the sender does the right thing and send the same granularity
+            // TODO create a bucket per granularity found? Seems expensive for such a corner case.
+            return new SmileBucketEvent(category, SmileEnvelopeEvent.getGranularityFromJson(bucket.get(0)), bucket);
+        }
+        else {
             return null;
         }
     }
