@@ -157,8 +157,6 @@ public class ScribeEventRequestHandler implements Iface
         // See http://wiki.fasterxml.com/JacksonBinaryFormatSpec
         // We assume for now that we are sending Smile on the wire. This may change though (lzo compression?)
         if (message.charAt(0) == ':' && message.charAt(1) == ')' && message.charAt(2) == '\n') {
-            SmileBucketDeserializer deserializer = new SmileBucketDeserializer();
-
             SmileBucket bucket = SmileBucketDeserializer.deserialize(new ByteArrayInputStream(message.getBytes()));
             // Assume the sender does the right thing and send the same granularity
             // TODO create a bucket per granularity found? Seems expensive for such a corner case.
