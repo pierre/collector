@@ -98,10 +98,14 @@ public class HadoopFileEventWriter implements EventWriter
 
     /**
      * Write a given event in Hadoop. The location is determined by the event getOutputDir method.
+     * Note! In case of Smile and SmileBucketEvents, we assume that events in the buckets share the same granularity
+     * and output path.
+     * <p/>
      * If no exception is thrown, one is guaranteed that the write succeeded (to the extend of Hadoop guarantees...).
      *
      * @param event Event to write (contains HDFS path information and payload to write)
      * @throws IOException if the write is not successful
+     * @see com.ning.metrics.serialization.smile.SmileEnvelopeEventsToSmileBucketEvents to bundle properly Smile events
      */
     public synchronized void write(Event event) throws IOException
     {
@@ -112,12 +116,27 @@ public class HadoopFileEventWriter implements EventWriter
 
         String outputDir = event.getOutputDir(baseDirectory);
         String tmpOutputDir = event.getOutputDir(tmpDirectory);
-        Object value = event.getData();
+        writeEventToHDFS(event, outputDir, tmpOutputDir);
+    }
 
+    private void writeEventToHDFS(Event event, String outputDir, String tmpOutputDir) throws IOException
+    {
+        Object value = event.getData();
+        HadoopOutputChunk chunk = getChunk(event, outputDir, tmpOutputDir, value);
+
+        if (chunk != null) {
+            SequenceFile.Writer writer = chunk.getWriter();
+            writer.append(BOOL_WRITABLE, value);
+        }
+    }
+
+    private HadoopOutputChunk getChunk(Event event, String outputDir, String tmpOutputDir, Object value) throws IOException
+    {
         if (value == null) {
             // Trying to write a null value triggers an NPE in SequenceFile$BlockCompressWriter.append.
-            // Throw an early exception to quarantine the data but avoid creating useless directories in HDFS.
-            throw new RuntimeException("Deserialized event contains no data: " + event);
+            // Return here to avoid creating useless directories in HDFS.
+            log.warn("Deserialized event contains no data: " + event);
+            return null;
         }
 
         HadoopOutputChunk chunk = outputChunks.get(outputDir);
@@ -137,10 +156,7 @@ public class HadoopFileEventWriter implements EventWriter
             chunk = new HadoopOutputChunk(tmpOutputPath, outputPath, writer);
             outputChunks.put(outputDir, chunk);
         }
-
-        SequenceFile.Writer writer = chunk.getWriter();
-
-        writer.append(BOOL_WRITABLE, value);
+        return chunk;
     }
 
     private List<HadoopOutputChunk> getAllChunks()
