@@ -41,12 +41,15 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ScribeEventRequestHandler implements Iface
 {
+    private static final Charset CHARSET = Charset.forName("ISO-8859-1");
+
     private static final String SERVICE_NAME = "Ning Scribed Service";
     private static final String VERSION = "0.1";
     private static final long startTime = System.currentTimeMillis();
@@ -157,7 +160,7 @@ public class ScribeEventRequestHandler implements Iface
         // See http://wiki.fasterxml.com/JacksonBinaryFormatSpec
         // We assume for now that we are sending Smile on the wire. This may change though (lzo compression?)
         if (message.charAt(0) == ':' && message.charAt(1) == ')' && message.charAt(2) == '\n') {
-            SmileBucket bucket = SmileBucketDeserializer.deserialize(new ByteArrayInputStream(message.getBytes()));
+            SmileBucket bucket = SmileBucketDeserializer.deserialize(new ByteArrayInputStream(message.getBytes(CHARSET)));
             // Assume the sender does the right thing and send the same granularity
             // TODO create a bucket per granularity found? Seems expensive for such a corner case.
             return new SmileBucketEvent(category, SmileEnvelopeEvent.getGranularityFromJson(bucket.get(0)), bucket);
