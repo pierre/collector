@@ -19,6 +19,7 @@ package com.ning.metrics.collector.binder;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.serialization.hadoop.HadoopSmileOutputStreamSerialization;
 import com.ning.metrics.serialization.hadoop.HadoopThriftEnvelopeSerialization;
 import com.ning.metrics.serialization.hadoop.HadoopThriftWritableSerialization;
 import org.apache.hadoop.conf.Configuration;
@@ -46,7 +47,10 @@ public class FileSystemProvider implements Provider<FileSystem>
 
         hadoopConfig.setLong("dfs.block.size", collectorConfig.getHadoopBlockSize());
         hadoopConfig.set("hadoop.job.ugi", collectorConfig.getHadoopUgi());
-        hadoopConfig.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(), HadoopThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
+        hadoopConfig.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(),
+            HadoopThriftEnvelopeSerialization.class.getName(),
+            HadoopSmileOutputStreamSerialization.class.getName(),
+            "org.apache.hadoop.io.serializer.WritableSerialization");
 
         fileSystem = FileSystem.get(hadoopConfig);
     }

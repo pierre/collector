@@ -19,7 +19,6 @@ package com.ning.metrics.collector.events.hadoop.writer;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.hadoop.TBooleanWritable;
 import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.serialization.writer.EventWriter;
@@ -122,7 +121,7 @@ public class HadoopFileEventWriter implements EventWriter
     private void writeEventToHDFS(Event event, String outputDir, String tmpOutputDir) throws IOException
     {
         Object value = event.getData();
-        HadoopOutputChunk chunk = getChunk(event, outputDir, tmpOutputDir, value);
+        HadoopOutputChunk chunk = getChunk(event, outputDir, tmpOutputDir, value, value.getClass());
 
         if (chunk != null) {
             SequenceFile.Writer writer = chunk.getWriter();
@@ -130,7 +129,7 @@ public class HadoopFileEventWriter implements EventWriter
         }
     }
 
-    private HadoopOutputChunk getChunk(Event event, String outputDir, String tmpOutputDir, Object value) throws IOException
+    private HadoopOutputChunk getChunk(Event event, String outputDir, String tmpOutputDir, Object value, Class clazz) throws IOException
     {
         if (value == null) {
             // Trying to write a null value triggers an NPE in SequenceFile$BlockCompressWriter.append.
@@ -152,7 +151,7 @@ public class HadoopFileEventWriter implements EventWriter
             }
 
             log.info(String.format("OutputPath (tmp): %s (%s)", outputPath.toUri().getPath(), tmpOutputPath.toUri().getPath()));
-            SequenceFile.Writer writer = SequenceFile.createWriter(fs, fs.getConf(), tmpOutputPath, TBooleanWritable.class, ThriftEnvelope.class, SequenceFile.CompressionType.BLOCK);
+            SequenceFile.Writer writer = SequenceFile.createWriter(fs, fs.getConf(), tmpOutputPath, TBooleanWritable.class, clazz, SequenceFile.CompressionType.BLOCK);
             chunk = new HadoopOutputChunk(tmpOutputPath, outputPath, writer);
             outputChunks.put(outputDir, chunk);
         }
