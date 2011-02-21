@@ -29,6 +29,14 @@
     </properties>
     <repositories>
         <repository>
+            <id>javaNet</id>
+            <url>http://download.java.net/maven/2/</url>
+        </repository>
+        <repository>
+            <id>guiceyfruit</id>
+            <url>http://guiceyfruit.googlecode.com/svn/repo/releases/</url>
+        </repository>
+        <repository>
             <id>file-based-repo-for-external-libs</id>
             <url>file://${basedir}/lib</url>
         </repository>
