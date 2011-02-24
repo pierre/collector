@@ -20,7 +20,11 @@ import argparse
 import base64
 import imaplib
 import logging
+import rfc822
+import socket
+import StringIO
 import sys
+import time
 
 from scribe import scribe
 from thrift.transport import TTransport, TSocket
@@ -39,21 +43,30 @@ def get_messages(host, user, password):
     user -- login connection information
     password -- password connection information
 
+    See http://stackoverflow.com/questions/315362/properly-formatted-example-for-python-imap-email-access
     """
-    M = imaplib.IMAP4()
-    M.login(IMAP_USER, IMAP_PASS)
+    M = imaplib.IMAP4_SSL(host)
+    M.login(user, password)
 
     M.select()
-    typ, data = M.search(None, 'ALL')
+    typ, data = M.search(None, 'UNSEEN')
     messages = []
     for num in data[0].split():
         typ, data = M.fetch(num, '(RFC822)')
-        print 'Message %s\n%s\n' % (num, data[0][1])
+        file = StringIO.StringIO(data[0][1])
+        message = rfc822.Message(file)
+
+        msgDate = time.mktime(rfc822.parsedate(message['date']))
+        messages.append(create_event('IMAP',
+                                      message['from'],
+                                      message['to'],
+                                      message['subject'],
+                                      int(msgDate)))
     M.close()
 
     M.logout()
 
-    log.info('Found %d messages at %s', len(messages), host)
+    log.info('Found %d unseen messages at %s', len(messages), host)
     return messages
 
 
@@ -65,13 +78,13 @@ def create_event(src, msgFrom, msgTo, msgSubject, msgDate):
     msgFrom -- email FROM header
     msgTo -- email TO header
     msgSubject -- email subject
-    msgDate -- time when the message was received
+    msgDate -- time when the message was received (seconds since epoch)
 
     """
     transportOut = TTransport.TMemoryBuffer()
     protocolOut = TBinaryProtocol.TBinaryProtocol(transportOut)
 
-    timeInMilliSinceEpoch = int(msgDate) * 1000
+    timeInMilliSinceEpoch = msgDate * 1000
 
     opsAlert = OpsAlert(src, msgFrom, msgTo, msgSubject, timeInMilliSinceEpoch)
     opsAlert.write(protocolOut)
@@ -119,7 +132,10 @@ def main(argv=None):
     parser.add_argument('--scribePort', required=True, help='Scribe port')
     args = parser.parse_args()
 
-    get_messages(args.imapServer, args.imapUsername, args.imapPassword)
+    try:
+        get_messages(args.imapServer, args.imapUsername, args.imapPassword)
+    except socket.error, err:
+        log.error('Unable to connect to the IMAP server: %s', err)
 
 if __name__ == "__main__":
     sys.exit(main())
