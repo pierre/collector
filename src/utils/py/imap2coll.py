@@ -27,6 +27,7 @@ import sys
 import time
 
 from scribe import scribe
+import thrift
 from thrift.transport import TTransport, TSocket
 from thrift.protocol import TBinaryProtocol
 
@@ -110,7 +111,7 @@ def send_events(events, scribeHost, scribePort):
 
     transport.open()
     log.info('Sending %d messages to %s:%d', len(events), scribeHost, scribePort)
-    result = client.Log(messages=[logEntry])
+    result = client.Log(messages=events)
     transport.close()
 
     return result
@@ -133,9 +134,12 @@ def main(argv=None):
     args = parser.parse_args()
 
     try:
-        get_messages(args.imapServer, args.imapUsername, args.imapPassword)
+        events = get_messages(args.imapServer, args.imapUsername, args.imapPassword)
+        send_events(events, args.scribeHost, int(args.scribePort))
     except socket.error, err:
         log.error('Unable to connect to the IMAP server: %s', err)
+    except thrift.transport.TTransport.TTransportException, err:
+        log.error('Unable to connect to Scribe: %s', err)
 
 if __name__ == "__main__":
     sys.exit(main())
