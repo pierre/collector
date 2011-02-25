@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.events.parsing;
 
+@SuppressWarnings("serial")
 public class EventParsingException extends Exception
 {
     public EventParsingException()

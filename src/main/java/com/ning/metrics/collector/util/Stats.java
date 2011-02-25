@@ -34,11 +34,16 @@ public class Stats
 
     private volatile DescriptiveStatistics millisStats;
     private volatile DescriptiveStatistics sizeStats;
+
+    @SuppressWarnings("unused")
     private final WindowType windowType;
     private final String windowString;
 
+    @SuppressWarnings("unused")
     private int capacity;
+    @SuppressWarnings("unused")
     private long period;
+    @SuppressWarnings("unused")
     private TimeUnit timeUnit;
 
     private enum WindowType

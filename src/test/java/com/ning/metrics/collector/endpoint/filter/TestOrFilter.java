@@ -26,6 +26,7 @@ import com.ning.metrics.collector.util.Filter;
 import java.util.Arrays;
 import java.util.Collections;
 
+@SuppressWarnings("unchecked")
 public class TestOrFilter
 {
     private static final Filter TRUE_FILTER = new Filter<ExtractedAnnotation>()

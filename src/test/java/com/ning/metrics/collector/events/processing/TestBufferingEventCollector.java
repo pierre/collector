@@ -260,7 +260,7 @@ public class TestBufferingEventCollector
         }
     }
 
-    private static class ScheduledCommand
+    static class ScheduledCommand
     {
         private final Runnable command;
         private final long delay;

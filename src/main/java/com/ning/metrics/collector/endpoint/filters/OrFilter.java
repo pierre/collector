@@ -23,6 +23,7 @@ import com.ning.metrics.collector.util.Filter;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class OrFilter implements Filter<ExtractedAnnotation>
 {
     private final List<Filter> filterList;

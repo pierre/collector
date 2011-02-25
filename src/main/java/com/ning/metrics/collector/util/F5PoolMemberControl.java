@@ -78,7 +78,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of available pools")
-    @SuppressWarnings("unused")
     public String[] getPoolList() throws Exception
     {
         return getPoolList(hostname, username, password);
@@ -94,7 +93,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of available pools")
-    @SuppressWarnings("unused")
     public String[] getPoolList(String hostname, String username, String password) throws Exception
     {
         log.info(String.format("Retrieving pool list for %s (username: %s)", hostname, username));
@@ -118,7 +116,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of members in a pool")
-    @SuppressWarnings("unused")
     public String[] getPoolMembers() throws Exception
     {
         return getPoolMembers(poolName, hostname, username, password);
@@ -135,7 +132,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of members in a pool")
-    @SuppressWarnings("unused")
     public String[] getPoolMembers(String poolName, String hostname, String username, String password) throws Exception
     {
         log.info(String.format("Retrieving pool members for %s (hostname: %s, username: %s)", poolName, hostname, username));
@@ -173,7 +169,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of members in a pool")
-    @SuppressWarnings("unused")
     public String[] getPoolMemberStatuses(String memberAddress) throws Exception
     {
         return getPoolMemberStatuses(memberAddress, poolName, hostname, username, password);
@@ -191,7 +186,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of members in a pool")
-    @SuppressWarnings("unused")
     public String[] getPoolMemberStatuses(String memberAddress, String poolName, String hostname, String username, String password) throws Exception
     {
         String[] poolNames = {poolName};
@@ -233,7 +227,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Add a member to a pool")
-    @SuppressWarnings("unused")
     public String[] addPoolMember(String memberAddress, int memberPort) throws Exception
     {
         return addPoolMember(memberAddress, memberPort, poolName, hostname, username, password);
@@ -252,7 +245,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Add a member to a pool")
-    @SuppressWarnings("unused")
     public String[] addPoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
@@ -287,7 +279,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Enable a member in a pool")
-    @SuppressWarnings("unused")
     public String[] enablePoolMember(String memberAddress, int memberPort) throws Exception
     {
         return enablePoolMember(memberAddress, memberPort, poolName, hostname, username, password);
@@ -307,7 +298,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Enable a member in a pool")
-    @SuppressWarnings("unused")
     public String[] enablePoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
@@ -332,7 +322,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Disable a member from a pool")
-    @SuppressWarnings("unused")
     public String[] disablePoolMember(String memberAddress, int memberPort) throws Exception
     {
         return disablePoolMember(memberAddress, memberPort, poolName, hostname, username, password);
@@ -351,7 +340,6 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Disable a member from a pool")
-    @SuppressWarnings("unused")
     public String[] disablePoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);

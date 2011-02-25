@@ -135,7 +135,7 @@ public class TestPerformance
         long startTime = scheduleScribeAgents();
 
         final long runTimeSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        final double throughput = 8 / 1024. * messageSize * NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT / runTimeSeconds;
+        //final double throughput = 8 / 1024. * messageSize * NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT / runTimeSeconds;
         // TODO troughput meaningless in its current form (what payload?)
         //log.error(String.format("%d messages sent in %d:%02d, %s bytes per payload, %.4f Mb/sec throughput",
         log.error(String.format("%d messages sent in %d:%02d, %s bytes per payload",
@@ -167,7 +167,6 @@ public class TestPerformance
         return transport;
     }
 
-    @SuppressWarnings("unused")
     private static String createThriftPayload() throws TException
     {
         ArrayList<ThriftField> data = new ArrayList<ThriftField>();
@@ -177,7 +176,7 @@ public class TestPerformance
         return String.format("%s:%s", new DateTime().getMillis(), new Base64().encodeToString(new ThriftFieldListSerializer().createPayload(data)));
     }
 
-
+    @SuppressWarnings("unused")
     private static String createSmilePayload() throws IOException
     {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();

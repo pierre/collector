@@ -210,14 +210,12 @@ public class BufferingEventCollector implements EventCollector
     }
 
     @Managed(description = "Set the max number of elements in the in-memory queue; queue size > this => reject events")
-    @SuppressWarnings("unused")
     public void setMaxQueueSize(long maxQueueSize)
     {
         this.maxQueueSize.set(maxQueueSize);
     }
 
     @Managed(description = "The max number of elements in the in-memory queue; queue size > this => reject events")
-    @SuppressWarnings("unused")
     public long getMaxQueueSize()
     {
         return maxQueueSize.get();
@@ -230,49 +228,42 @@ public class BufferingEventCollector implements EventCollector
     }
 
     @Managed(description = "TP99 of the current capacity (events/second)")
-    @SuppressWarnings("unused")
     public double getEventsSecondTP99()
     {
         return 1000.0 / acceptanceStats.getMillisTP99();
     }
 
     @Managed(description = "TP99 of the acceptance time per event (until it's scheduled to be flushed to disk)")
-    @SuppressWarnings("unused")
     public double getEventsMillisTP99()
     {
         return acceptanceStats.getMillisTP99();
     }
 
     @Managed(description = "Number of events used to calculate the events TP99")
-    @SuppressWarnings("unused")
     public double getEventsCount()
     {
         return acceptanceStats.getCount();
     }
 
     @Managed(description = "TP99 of the write operations")
-    @SuppressWarnings("unused")
     public double getWriteMillisTP99()
     {
         return writerStats.getMillisTP99();
     }
 
     @Managed(description = "Number of write operations used to calculate the writes TP99")
-    @SuppressWarnings("unused")
     public double getWriteCount()
     {
         return writerStats.getCount();
     }
 
     @Managed(description = "TP99 of the time used to extract events from their original payload")
-    @SuppressWarnings("unused")
     public double getExtractionMillisTP99()
     {
         return extractionStats.getMillisTP99();
     }
 
     @Managed(description = "Number of events used to calculate the extraction TP99")
-    @SuppressWarnings("unused")
     public double getExtractionCount()
     {
         return extractionStats.getCount();
