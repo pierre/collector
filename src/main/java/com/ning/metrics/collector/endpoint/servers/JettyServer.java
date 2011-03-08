@@ -52,7 +52,6 @@ public class JettyServer
     private final String keystorePassword;
 
     @Inject
-    @SuppressWarnings("unused")
     public JettyServer(
         CollectorConfig config
     )

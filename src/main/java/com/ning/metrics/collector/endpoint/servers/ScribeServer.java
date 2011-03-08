@@ -41,7 +41,6 @@ public class ScribeServer
 
     private static final Logger log = Logger.getLogger(ScribeServer.class);
 
-    @SuppressWarnings("unused")
     @Inject
     public ScribeServer(
         Iface eventRequestHandler,

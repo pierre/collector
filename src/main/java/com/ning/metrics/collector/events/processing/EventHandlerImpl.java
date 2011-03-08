@@ -36,15 +36,16 @@ public class EventHandlerImpl implements EventHandler
     private static final Logger log = Logger.getLogger(EventHandlerImpl.class);
 
     private final EventCollector collector;
+
+    @SuppressWarnings("unchecked")
     private final Filter requestFilter;
     private volatile boolean collectionEnabled;
     private final CacheControl cacheControl;
 
-    @SuppressWarnings("unused")
     @Inject
     public EventHandlerImpl(
         EventCollector collector,
-        @EventEndpointRequestFilter Filter requestFilter,
+        @SuppressWarnings("unchecked") @EventEndpointRequestFilter Filter requestFilter,
         CollectorConfig config
     )
     {
@@ -53,7 +54,7 @@ public class EventHandlerImpl implements EventHandler
 
     public EventHandlerImpl(
         EventCollector collector,
-        Filter requestFilter,
+        @SuppressWarnings("unchecked") Filter requestFilter,
         boolean enabled
     )
     {

@@ -54,7 +54,6 @@ public class ActiveMQSenderImpl implements ActiveMQSender
     private volatile int sessionRetries = 0;
 
     @Inject
-    @SuppressWarnings("unused")
     public ActiveMQSenderImpl(
         CollectorConfig config
     )
@@ -220,28 +219,24 @@ public class ActiveMQSenderImpl implements ActiveMQSender
     }
 
     @Managed(description = "get the number of times we retried to connect to ActiveMQ")
-    @SuppressWarnings("unused")
     public int getConnectionRetries()
     {
         return connectionRetries;
     }
 
     @Managed(description = "get the number of times we retried to establish a session to ActiveMQ")
-    @SuppressWarnings("unused")
     public int getSessionRetries()
     {
         return sessionRetries;
     }
 
     @Managed(description = "don't keep trying to (re)connect to ActiveMQ")
-    @SuppressWarnings("unused")
     public void giveUpTryingToConnect()
     {
         stopReconnecting.set(true);
     }
 
     @Managed(description = "keep trying to (re)connect to ActiveMQ")
-    @SuppressWarnings("unused")
     public void keepTryingToConnect()
     {
         stopReconnecting.set(false);

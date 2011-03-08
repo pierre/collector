@@ -83,6 +83,7 @@ public class EventCollectorModule implements Module
 {
     private static final Logger log = Logger.getLogger(EventCollectorModule.class);
 
+    @SuppressWarnings("unchecked")
     @Override
     public void configure(Binder binder)
     {

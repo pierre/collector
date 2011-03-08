@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+@SuppressWarnings("serial")
 public class HadoopFileEventWriter implements EventWriter
 {
     private static final Logger log = Logger.getLogger(HadoopFileEventWriter.class);
@@ -129,7 +130,7 @@ public class HadoopFileEventWriter implements EventWriter
         }
     }
 
-    private HadoopOutputChunk getChunk(Event event, String outputDir, String tmpOutputDir, Object value, Class clazz) throws IOException
+    private HadoopOutputChunk getChunk(Event event, String outputDir, String tmpOutputDir, Object value, Class<?> clazz) throws IOException
     {
         if (value == null) {
             // Trying to write a null value triggers an NPE in SequenceFile$BlockCompressWriter.append.

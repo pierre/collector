@@ -18,7 +18,6 @@ package com.ning.metrics.collector.events.parsing;
 
 import com.ning.metrics.serialization.event.Granularity;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -29,8 +28,6 @@ import java.util.regex.Pattern;
 public class EventExtractorUtilImpl implements EventExtractorUtil
 {
     private static final Pattern REFERRER_PATTERN = Pattern.compile("^https?://([^/]+)(.*?)");
-
-    private static final Logger log = Logger.getLogger(EventExtractorUtilImpl.class);
 
     @Override
     public Granularity granularityFromString(String granularityString)

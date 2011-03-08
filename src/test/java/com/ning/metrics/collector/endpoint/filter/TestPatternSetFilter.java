@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unchecked")
 public class TestPatternSetFilter
 {
     @Test(groups = "fast")
