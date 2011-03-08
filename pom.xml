@@ -437,6 +437,8 @@
                         <exclude>deploy.sh</exclude>
                         <exclude>run.sh</exclude>
                         <exclude>src/site/**</exclude>
+                        <!-- We have some extra dependencies in there, see license on a per file basis -->
+                        <exclude>src/utils/**</exclude>
                         <!-- This is a straight import from the GPL f5 BIG-IP library -->
                         <exclude>lib/f5/**</exclude>
                     </excludes>
