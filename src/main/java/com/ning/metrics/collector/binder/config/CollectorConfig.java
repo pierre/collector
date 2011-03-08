@@ -109,7 +109,7 @@ public class CollectorConfig
      * Maximum number of events per file in the temporary spooling area. Past this threshold,
      * buffered events are promoted to the final spool queue.
      *
-     * @return the maximu number of events per file
+     * @return the maximum number of events per file
      */
     @Config(value = "collector.diskspool.flush-event-queue-size")
     public long getFlushEventQueueSize()

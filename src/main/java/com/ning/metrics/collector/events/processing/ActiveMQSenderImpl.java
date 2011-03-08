@@ -17,12 +17,11 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.util.Managed;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.log4j.Logger;
-
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -145,7 +144,7 @@ public class ActiveMQSenderImpl implements ActiveMQSender
                 logger.info("Connection to ActiveMQ established");
             }
             catch (JMSException e) {
-                logger.warn("Unable to create a connection and/or a session with the ActiveMQ endpoint");
+                logger.warn("Unable to create a connection and/or a session with the ActiveMQ endpoint", e);
             }
         }
     }
@@ -208,6 +207,8 @@ public class ActiveMQSenderImpl implements ActiveMQSender
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
             producer.setTimeToLive(messagesTTLMilliseconds);
             send(producer, message);
+            producer.close();
+
             return true;
         }
         catch (JMSException e) {
