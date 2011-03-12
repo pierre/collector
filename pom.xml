@@ -8,7 +8,7 @@
     <groupId>com.ning</groupId>
     <artifactId>metrics.collector</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.3-cdh-SNAPSHOT</version>
+    <version>1.0.3-cdh</version>
     <name>collector</name>
     <description>Event Collector core</description>
     <url>http://github.com/pierre/collector</url>
