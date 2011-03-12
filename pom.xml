@@ -455,6 +455,7 @@
                         <exclude>.git/**</exclude>
                         <exclude>.gitignore</exclude>
                         <exclude>API.txt</exclude>
+                        <exclude>RELEASE.sh</exclude>
                         <exclude>deploy.sh</exclude>
                         <exclude>run.sh</exclude>
                         <exclude>run-local.sh</exclude>
