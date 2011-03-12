@@ -16,7 +16,7 @@ function confirm() {
 VERSION_SNAPSHOT=$(grep SNAPSHOT pom.xml  | head -1 | sed 's/ *<version>\(.*\)<\/version> */\1/g')
 CDH_VERSION_SNAPSHOT=$(echo $VERSION_SNAPSHOT | sed s/-SNAPSHOT/-cdh-SNAPSHOT/)
 
-confirm "The SNAPSHOT Apache version is [$VERSION_SNAPSHOT] and the Cloudera one [$CDH_VERSION_SNAPSHOT]. Correct? "
+confirm "The (current) SNAPSHOT Apache version is [$VERSION_SNAPSHOT] and the Cloudera one [$CDH_VERSION_SNAPSHOT]. Correct? "
 
 mvn release:clean
 mvn release:prepare
@@ -31,7 +31,7 @@ echo
 sed -i bleh s/$NEXT_VERSION_SNAPSHOT/$CDH_VERSION_SNAPSHOT/g pom.xml && rm pom.xmlbleh
 
 diff=$(git diff -q)
-confirm "Verify that the following is the SNAPSHOT Cloudera patch. Ok?
+confirm "Verify that the following is the SNAPSHOT Cloudera version. Ok?
 $diff
 "
 
