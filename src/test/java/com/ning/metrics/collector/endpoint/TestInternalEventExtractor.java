@@ -67,6 +67,7 @@ public class TestInternalEventExtractor
             new ByteArrayInputStream(payload),
             null,
             null,
+            null,
             new EventExtractorUtilImpl()
         );
         Event event = extractor.extractEvent(eventType, validRequest);
@@ -86,6 +87,7 @@ public class TestInternalEventExtractor
         ParsedRequest routedRequest = new ParsedRequest(
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             new ByteArrayInputStream(payload),
+            null,
             null,
             null,
             new EventExtractorUtilImpl()
@@ -110,6 +112,7 @@ public class TestInternalEventExtractor
             null,
             null,
             null,
+            null,
             new EventExtractorUtilImpl()
         );
         Assert.assertEquals(extractor.extractEvent(null, missingNameRequest), null);
@@ -120,6 +123,7 @@ public class TestInternalEventExtractor
     {
         ParsedRequest throwsIOExceptionRequest = new ParsedRequest(
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
+            null,
             null,
             null,
             null,
@@ -144,6 +148,7 @@ public class TestInternalEventExtractor
             new ByteArrayInputStream(invalidBytes),
             null,
             null,
+            null,
             new EventExtractorUtilImpl()
         );
 
@@ -162,6 +167,7 @@ public class TestInternalEventExtractor
         ParsedRequest invalidContentTypeRequest = new ParsedRequest(
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", null),
             new ByteArrayInputStream(payload),
+            null,
             null,
             null,
             new EventExtractorUtilImpl()

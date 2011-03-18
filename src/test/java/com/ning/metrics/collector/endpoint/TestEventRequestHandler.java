@@ -179,6 +179,6 @@ public class TestEventRequestHandler
      */
     private ParsedRequest createMockRequestAnnotation()
     {
-        return new ParsedRequest(new MockHttpHeaders(), null, null, null, new EventExtractorUtilImpl());
+        return new ParsedRequest(new MockHttpHeaders(), null, null, null, null, new EventExtractorUtilImpl());
     }
 }

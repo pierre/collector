@@ -44,16 +44,18 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param httpHeaders       HTTP headers of the incoming request
      * @param eventDateTime     query value parameter (optional)
      * @param granularityString query value parameter (optional)
+     * @param peerIpAddress     requestor (peer) IP address (optional)
      * @param extractorUtil     implementation of EventExtractorUtil
      */
     public ParsedRequest(
         HttpHeaders httpHeaders,
         DateTime eventDateTime,
         String granularityString,
+        String peerIpAddress,
         EventExtractorUtil extractorUtil
     )
     {
-        this(httpHeaders, null, eventDateTime, granularityString, extractorUtil);
+        this(httpHeaders, null, eventDateTime, granularityString, peerIpAddress, extractorUtil);
     }
 
     /**
@@ -63,6 +65,7 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param inputStream       content of the POST request
      * @param eventDateTime     query value parameter (optional)
      * @param granularityString query value parameter (optional)
+     * @param peerIpAddress     requestor (peer) IP address (optional)
      * @param extractorUtil     implementation of EventExtractorUtil
      */
     public ParsedRequest(
@@ -70,6 +73,7 @@ public class ParsedRequest implements ExtractedAnnotation
         InputStream inputStream,
         DateTime eventDateTime,
         String granularityString,
+        String peerIpAddress,
         EventExtractorUtil extractorUtil
     )
     {
@@ -81,6 +85,9 @@ public class ParsedRequest implements ExtractedAnnotation
         referrerPath = extractorUtil.getReferrerPathFromHeaders(httpHeaders);
 
         ipAddress = extractorUtil.ipAddressFromHeaders(httpHeaders);
+        if (ipAddress == null) {
+            ipAddress = peerIpAddress;
+        }
 
         try {
             contentLength = extractorUtil.contentLengthFromHeaders(httpHeaders);

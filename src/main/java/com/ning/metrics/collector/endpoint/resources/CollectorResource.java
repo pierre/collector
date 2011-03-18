@@ -24,6 +24,7 @@ import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -55,12 +56,12 @@ public class CollectorResource
         @QueryParam("v") String event,
         @QueryParam("date") String eventDateTimeString,
         @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
-        @Context HttpHeaders httpHeaders
-
+        @Context HttpHeaders httpHeaders,
+        @Context HttpServletRequest request
     )
     {
         EventStats eventStats = new EventStats();
         DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, extractorUtil), eventStats);
+        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, request.getRemoteAddr(), extractorUtil), eventStats);
     }
 }

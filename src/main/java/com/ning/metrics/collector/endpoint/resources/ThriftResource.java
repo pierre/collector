@@ -24,6 +24,7 @@ import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -63,11 +64,12 @@ public class ThriftResource
         @QueryParam("date") String eventDateTimeString,
         @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
         byte[] content,
-        @Context HttpHeaders request
+        @Context HttpHeaders httpHeaders,
+        @Context HttpServletRequest request
     )
     {
         EventStats eventStats = new EventStats();
         DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(request, new ByteArrayInputStream(content), eventDateTime, eventGranularity, extractorUtil), eventStats);
+        return requestHandler.handleEventRequest(eventName, new ParsedRequest(httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), extractorUtil), eventStats);
     }
 }

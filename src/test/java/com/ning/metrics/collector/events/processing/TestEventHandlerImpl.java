@@ -54,7 +54,7 @@ public class TestEventHandlerImpl
             }
         };
         stats = new EventEndPointStats(5);
-        annotation = new ParsedRequest(null, null, null, null, new EventExtractorUtilImpl());
+        annotation = new ParsedRequest(null, null, null, null, null, new EventExtractorUtilImpl());
         eventHandler = new EventHandlerImpl(collector, requestFilter, true);
         eventStats = new EventStats();
     }
