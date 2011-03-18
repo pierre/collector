@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class MockHttpHeaders implements HttpHeaders
 {
-    private MultivaluedMap<String,String> headers = new InBoundHeaders();
+    private MultivaluedMap<String, String> headers = new InBoundHeaders();
 
     public MockHttpHeaders()
     {
@@ -48,7 +48,6 @@ public class MockHttpHeaders implements HttpHeaders
         String userAgent,
         String ip,
         Integer contentLength
-
     )
     {
         if (referer != null) {
@@ -66,6 +65,11 @@ public class MockHttpHeaders implements HttpHeaders
         if (contentLength != null) {
             headers.putSingle("Content-Length", contentLength.toString());
         }
+    }
+
+    public void addHeader(String key, String value)
+    {
+        headers.putSingle(key, value);
     }
 
     /**

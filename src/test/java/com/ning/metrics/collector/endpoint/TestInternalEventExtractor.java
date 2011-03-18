@@ -181,4 +181,21 @@ public class TestInternalEventExtractor
             Assert.assertEquals(e.getClass(), EventParsingException.class);
         }
     }
+
+    @Test(groups = "fast")
+    public void testManuallySetIp() throws Exception
+    {
+        MockHttpHeaders headers = new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", null, payloadSize);
+
+        ParsedRequest request = new ParsedRequest(
+            headers,
+            new ByteArrayInputStream(payload),
+            null,
+            null,
+            "1.2.3.4",
+            new EventExtractorUtilImpl()
+        );
+
+        Assert.assertEquals(request.getIpAddress(), "1.2.3.4");
+    }
 }

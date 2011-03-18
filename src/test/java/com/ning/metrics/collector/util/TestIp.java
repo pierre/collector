@@ -36,4 +36,10 @@ public class TestIp
         Assert.assertEquals(Ip.ipToInt("0.0.0.0"), 0);
         Assert.assertEquals(Ip.ipToInt("127.16.52.1"), 0x7F103401);
     }
+
+    @Test(groups = "fast")
+    public void testIpNull() throws Exception
+    {
+        Assert.assertEquals(Ip.ipToInt(null), 0);
+    }
 }

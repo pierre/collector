@@ -24,6 +24,10 @@ public class Ip
 
     public static int ipToInt(String ip)
     {
+        if (ip == null) {
+            return 0;
+        }
+
         String[] parts = DOT.split(ip);
         if (parts.length == 4) {
             try {
