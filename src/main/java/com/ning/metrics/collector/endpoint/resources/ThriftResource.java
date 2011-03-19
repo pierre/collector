@@ -58,7 +58,6 @@ public class ThriftResource
     @POST
     @Consumes("ning/thrift")
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("/rest/1.0/event")
     public Response post(
         @QueryParam("name") String eventName,
         @QueryParam("date") String eventDateTimeString,
