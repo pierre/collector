@@ -24,6 +24,9 @@ import com.ning.metrics.collector.events.parsing.EventParser;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 /**
  * API versions 1 and 2: query parameters-based API (via GET)
  */
@@ -31,6 +34,7 @@ public class QueryParameterEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
     private final EventParser thriftEventParser;
+    private static LinkedList<Event> v = new LinkedList<Event>();
 
     @Inject
     public QueryParameterEventExtractor(EventParser thriftEventParser)
@@ -39,7 +43,7 @@ public class QueryParameterEventExtractor implements EventExtractor
     }
 
     @Override
-    public Event extractEvent(String event, ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<? extends Event> extractEvent(String event, ExtractedAnnotation annotation) throws EventParsingException
     {
         if (event != null) {
             log.debug(String.format("Query parameter to process: %s", event));
@@ -48,7 +52,10 @@ public class QueryParameterEventExtractor implements EventExtractor
 
             log.debug(String.format("Event type [%s], event string [%s]", type, eventTypeString));
 
-            return thriftEventParser.parseThriftEvent(type, eventTypeString, annotation);
+            // This API only supports sending one event at a time
+            v.clear();
+            v.add(thriftEventParser.parseThriftEvent(type, eventTypeString, annotation));
+            return v;
         }
         else {
             return null;

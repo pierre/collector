@@ -38,4 +38,6 @@ public interface ExtractedAnnotation
     public int getContentLength();
 
     public InputStream getInputStream();
+
+    public String getContentType();
 }

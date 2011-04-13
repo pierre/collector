@@ -20,6 +20,8 @@ import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 
+import java.util.Collection;
+
 public interface EventExtractor
 {
     /**
@@ -32,5 +34,5 @@ public interface EventExtractor
      * @return a constructed Event
      * @throws EventParsingException if the event can't be parsed properly
      */
-    public Event extractEvent(String event, ExtractedAnnotation annotation) throws EventParsingException;
+    public Collection<? extends Event> extractEvent(String event, ExtractedAnnotation annotation) throws EventParsingException;
 }

@@ -295,6 +295,12 @@ public class TestThriftEnvelopeEventParser
         }
 
         @Override
+        public String getContentType()
+        {
+            return null;
+        }
+
+        @Override
         public InputStream getInputStream()
         {
             return null;

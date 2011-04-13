@@ -6,3 +6,4 @@ classes/*
 test-output/*
 release.properties
 pom.xml.releaseBackup
+.DS_STORE

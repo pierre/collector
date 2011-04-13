@@ -21,6 +21,9 @@ import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 public class MockEventExtractor implements EventExtractor
 {
     private boolean throwsEventParseException = false;
@@ -28,7 +31,7 @@ public class MockEventExtractor implements EventExtractor
     private Event event = null;
 
     @Override
-    public Event extractEvent(String eventName, ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<Event> extractEvent(String eventName, ExtractedAnnotation annotation) throws EventParsingException
     {
         if (throwsEventParseException) {
             throw new EventParsingException();
@@ -38,7 +41,9 @@ public class MockEventExtractor implements EventExtractor
             throw new RuntimeException();
         }
 
-        return event;
+        LinkedList<Event> events = new LinkedList<Event>();
+        events.add(event);
+        return events;
     }
 
     public void setEvent(Event event)

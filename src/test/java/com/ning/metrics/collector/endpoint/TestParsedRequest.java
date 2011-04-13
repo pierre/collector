@@ -101,8 +101,9 @@ public class TestParsedRequest
     @Test(groups = "fast")
     public void testParseDateDefault() throws Exception
     {
+        long currentTime = System.currentTimeMillis();
         ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
-        Assert.assertTrue(Math.abs(parsedRequest.getDateTime().getMillis() - System.currentTimeMillis()) < 5);
+        Assert.assertTrue(Math.abs(parsedRequest.getDateTime().getMillis() - currentTime) < 5);
     }
 
     private HttpHeaders createDummyHeaders()

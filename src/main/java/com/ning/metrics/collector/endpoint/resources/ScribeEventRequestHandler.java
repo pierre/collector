@@ -150,7 +150,7 @@ public class ScribeEventRequestHandler implements Iface
      */
     private Collection<? extends Event> extractEvent(String category, String message) throws TException, IOException
     {
-        Collection<SmileBucketEvent> smileEvents = extractSmileEnvelopeEvent(category, message);
+        Collection<SmileBucketEvent> smileEvents = extractSmileBucketEvents(category, message);
 
         if (smileEvents == null) {
             ArrayList<Event> thriftEnvelope = new ArrayList<Event>();
@@ -162,7 +162,7 @@ public class ScribeEventRequestHandler implements Iface
         }
     }
 
-    private Collection<SmileBucketEvent> extractSmileEnvelopeEvent(String category, String message) throws IOException
+    private Collection<SmileBucketEvent> extractSmileBucketEvents(String category, String message) throws IOException
     {
         // See http://wiki.fasterxml.com/JacksonBinaryFormatSpec
         // We assume for now that we are sending Smile on the wire. This may change though (lzo compression?)

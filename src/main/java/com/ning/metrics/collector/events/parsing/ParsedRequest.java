@@ -36,6 +36,7 @@ public class ParsedRequest implements ExtractedAnnotation
     private String userAgent = null;
     private Granularity granularity;
     private int contentLength = 0;
+    private String contentType = null;
     private InputStream inputStream;
 
     /**
@@ -55,11 +56,11 @@ public class ParsedRequest implements ExtractedAnnotation
         EventExtractorUtil extractorUtil
     )
     {
-        this(httpHeaders, null, eventDateTime, granularityString, peerIpAddress, extractorUtil);
+        this(httpHeaders, null, eventDateTime, granularityString, peerIpAddress, null, extractorUtil);
     }
 
     /**
-     * Constructor used by the internal API (POST only)
+     * Constructor used by the external API (GET only)
      *
      * @param httpHeaders       HTTP headers of the incoming request
      * @param inputStream       content of the POST request
@@ -74,6 +75,30 @@ public class ParsedRequest implements ExtractedAnnotation
         DateTime eventDateTime,
         String granularityString,
         String peerIpAddress,
+        EventExtractorUtil extractorUtil
+    )
+    {
+        this(httpHeaders, inputStream, eventDateTime, granularityString, peerIpAddress, null, extractorUtil);
+    }
+    
+    /**
+     * Constructor used by the internal API (POST only)
+     *
+     * @param httpHeaders       HTTP headers of the incoming request
+     * @param inputStream       content of the POST request
+     * @param eventDateTime     query value parameter (optional)
+     * @param granularityString query value parameter (optional)
+     * @param peerIpAddress     requestor (peer) IP address (optional)
+     * @param contentType       Content-Type of the POST request (optional)
+     * @param extractorUtil     implementation of EventExtractorUtil
+     */
+    public ParsedRequest(
+        HttpHeaders httpHeaders,
+        InputStream inputStream,
+        DateTime eventDateTime,
+        String granularityString,
+        String peerIpAddress,
+        String contentType,
         EventExtractorUtil extractorUtil
     )
     {
@@ -97,6 +122,7 @@ public class ParsedRequest implements ExtractedAnnotation
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
 
+        this.contentType = contentType;
         this.inputStream = inputStream;
 
         userAgent = extractorUtil.getUserAgentFromHeaders(httpHeaders);
@@ -142,6 +168,12 @@ public class ParsedRequest implements ExtractedAnnotation
     public int getContentLength()
     {
         return contentLength;
+    }
+
+    @Override
+    public String getContentType()
+    {
+        return contentType;
     }
 
     @Override

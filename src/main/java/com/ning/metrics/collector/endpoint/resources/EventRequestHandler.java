@@ -26,9 +26,11 @@ import com.ning.metrics.collector.events.processing.EventHandler;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 
 /**
  * Event handler for the HTTP GET API.
+ * also called within internal event pipeline
  */
 public class EventRequestHandler
 {
@@ -39,9 +41,9 @@ public class EventRequestHandler
     private final EventHandler eventHandler;
 
     public EventRequestHandler(
-        EventHandler eventHandler,
-        EventExtractor eventExtractor,
-        EventEndPointStats stats
+            EventHandler eventHandler,
+            EventExtractor eventExtractor,
+            EventEndPointStats stats
     )
     {
         this.eventExtractor = eventExtractor;
@@ -51,22 +53,58 @@ public class EventRequestHandler
 
     public Response handleEventRequest(String eventString, ExtractedAnnotation annotation, EventStats eventStats)
     {
-        try {
-            Event event = eventExtractor.extractEvent(eventString, annotation);
-            eventStats.recordExtracted();
+        Collection<? extends Event> events;
 
-            log.debug(String.format("Processing event %s", event));
-            return eventHandler.processEvent(event, annotation, endPointStats, eventStats);
+        try {
+            endPointStats.updateTotalEvents();
+            events = eventExtractor.extractEvent(eventString, annotation);
+            eventStats.recordExtracted();
         }
         catch (EventParsingException e) {
-            endPointStats.updateTotalEvents();
-
             log.info(String.format("Unable to process event: %s [%s]", eventString, annotation.toString()), e);
+            // If one event fail, the entire collection of events is rejected
             return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, e);
         }
-        catch (RuntimeException e) {
-            log.info(String.format("Exception while processing event: %s [%s]", eventString, annotation.toString()), e);
-            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
+
+        if (events == null) {
+            if (eventString == null) {
+                log.warn("No event type specified");
+                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, new IllegalArgumentException("Event name wasn't specified."));
+            }
+            else {
+                log.warn("No event specified");
+                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, new IllegalArgumentException("No event specified."));
+            }
         }
+
+        // We were able to parse all events
+        int failCount = 0;
+
+        for (Event event : events) {
+            try {
+                log.debug(String.format("Processing event %s", event));
+                // We ignore the Response here (see below)
+                eventHandler.processEvent(event, annotation, endPointStats, eventStats);
+            }
+            catch (RuntimeException e) {
+                failCount++;
+                log.info(String.format("Exception while processing event: %s [%s]", eventString, annotation.toString()), e);
+                // We don't care about the Response returned here, but we do care about incrementing stats about failed events
+                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
+            }
+        }
+
+        if (failCount > 0) {
+            log.warn(String.format("%d total exceptions while processing event: %s [%s]", failCount, eventString, annotation.toString()));
+        }
+
+        // Even though some events weren't processed correctly, we still return a 202.
+        // I.e. if the client sent 10 events, and we were able to process only 5 of them, we effectively
+        // drop the remaining 5 (the eventtracker library won't quarantine the original 10).
+        // Making the whole process atomic is a bit tricky and we want to avoid receiving duplicates.
+        // Also, we expect to have bad events (sent by the browser for instance). It would be suboptimal
+        // to drop the whole collection even if only a single event is bad.
+        // The only reason we won't return ACCEPTED is when the event is not parsable (see above).
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 }

@@ -32,8 +32,9 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 
-public class TestInternalEventExtractor
+public class TestBodyEventExtractor
 {
     private BodyEventExtractor extractor = null;
     private ArrayList<ThriftField> data = null;
@@ -70,15 +71,17 @@ public class TestInternalEventExtractor
             null,
             new EventExtractorUtilImpl()
         );
-        Event event = extractor.extractEvent(eventType, validRequest);
+        Collection<? extends Event> events = extractor.extractEvent(eventType, validRequest);
 
-        Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
-        ThriftEnvelopeEvent thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
+        for (Event event : events) {
+            Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
+            ThriftEnvelopeEvent thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
 
-        Assert.assertEquals(thriftEnvelopeEvent.getName(), eventType);
-        ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
-        Assert.assertEquals(envelope.getTypeName(), eventType);
-        Assert.assertEquals(envelope.getPayload(), data);
+            Assert.assertEquals(thriftEnvelopeEvent.getName(), eventType);
+            ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
+            Assert.assertEquals(envelope.getTypeName(), eventType);
+            Assert.assertEquals(envelope.getPayload(), data);
+        }
     }
 
     @Test(groups = "fast")
@@ -93,15 +96,17 @@ public class TestInternalEventExtractor
             new EventExtractorUtilImpl()
         );
 
-        Event event = extractor.extractEvent(eventType, routedRequest);
+        Collection<? extends Event> events = extractor.extractEvent(eventType, routedRequest);
 
-        Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
-        ThriftEnvelopeEvent thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
+        for (Event event : events) {
+            Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
+            ThriftEnvelopeEvent thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
 
-        Assert.assertEquals(thriftEnvelopeEvent.getName(), eventType);
-        ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
-        Assert.assertEquals(envelope.getTypeName(), eventType);
-        Assert.assertEquals(envelope.getPayload(), data);
+            Assert.assertEquals(thriftEnvelopeEvent.getName(), eventType);
+            ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
+            Assert.assertEquals(envelope.getTypeName(), eventType);
+            Assert.assertEquals(envelope.getPayload(), data);
+        }
     }
 
     @Test(groups = "fast")
