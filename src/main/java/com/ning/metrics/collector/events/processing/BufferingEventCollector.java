@@ -17,7 +17,6 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import com.google.inject.internal.Nullable;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.serialization.util.Managed;
@@ -44,7 +43,7 @@ public class BufferingEventCollector implements EventCollector
     private final AtomicInteger refreshDelayInSeconds;
     private final ScheduledExecutorService executor;
     private final TaskQueueService taskQueueService;
-    private final ActiveMQController activeMQController;
+    private final EventQueueProcessor activeMQController;
 
     private final Stats acceptanceStats = Stats.timeWindow(30, TimeUnit.MINUTES);
     private final Stats writerStats = Stats.timeWindow(30, TimeUnit.MINUTES);
@@ -55,7 +54,7 @@ public class BufferingEventCollector implements EventCollector
         @BufferingEventCollectorEventWriter EventWriter eventWriter,
         @BufferingEventCollectorExecutor ScheduledExecutorService executor,
         TaskQueueService taskQueueService,
-        @Nullable ActiveMQController activeMQController,
+        EventQueueProcessor activeMQController,
         CollectorConfig config
     )
     {
@@ -66,7 +65,7 @@ public class BufferingEventCollector implements EventCollector
         EventWriter eventWriter,
         ScheduledExecutorService executor,
         TaskQueueService taskQueueService,
-        ActiveMQController activeMQController,
+        EventQueueProcessor activeMQController,
         long maxQueueSize,
         int refreshDelayInSeconds
     )
@@ -123,7 +122,7 @@ public class BufferingEventCollector implements EventCollector
     {
         if ((activeMQController != null) && (event != null)) {
             String humanReadableMessage = event.getData().toString();
-            activeMQController.offerEvent(event.getName(), humanReadableMessage);
+            activeMQController.send(event.getName(), humanReadableMessage);
         }
 
         if (taskQueueService.getQueueSize() < maxQueueSize.get()) {

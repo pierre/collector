@@ -21,7 +21,6 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import com.google.inject.util.Providers;
 import com.ning.metrics.collector.FixedManagedJmxExportScope;
 import com.ning.metrics.collector.binder.ArrayListProvider;
 import com.ning.metrics.collector.binder.DiskSpoolEventWriterProvider;
@@ -53,14 +52,15 @@ import com.ning.metrics.collector.events.hadoop.writer.HadoopFileEventWriter;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
-import com.ning.metrics.collector.events.processing.ActiveMQController;
-import com.ning.metrics.collector.events.processing.ActiveMQControllerImpl;
-import com.ning.metrics.collector.events.processing.ActiveMQSender;
-import com.ning.metrics.collector.events.processing.ActiveMQSenderImpl;
+import com.ning.metrics.collector.events.processing.ActiveMQConnectionFactory;
 import com.ning.metrics.collector.events.processing.BufferingEventCollector;
 import com.ning.metrics.collector.events.processing.EventCollector;
 import com.ning.metrics.collector.events.processing.EventHandler;
 import com.ning.metrics.collector.events.processing.EventHandlerImpl;
+import com.ning.metrics.collector.events.processing.EventQueueConnectionFactory;
+import com.ning.metrics.collector.events.processing.EventQueueProcessor;
+import com.ning.metrics.collector.events.processing.EventQueueProcessorImpl;
+import com.ning.metrics.collector.events.processing.EventQueueStats;
 import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.collector.events.processing.TaskQueueServiceImpl;
 import com.ning.metrics.collector.util.F5PoolMemberControl;
@@ -68,6 +68,7 @@ import com.ning.metrics.collector.util.Filter;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
@@ -90,22 +91,9 @@ public class EventCollectorModule implements Module
         CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
         binder.bind(CollectorConfig.class).toInstance(config);
 
-        if (config.isActiveMQEnabled()) {
-            binder.bind(ActiveMQSender.class)
-                .to(ActiveMQSenderImpl.class)
-                .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=ActiveMQEventCollectorSender"));
-
-            binder.bind(ActiveMQController.class)
-                .to(ActiveMQControllerImpl.class)
-                .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=ActiveMQEventCollector"));
-        }
-        else {
-            binder.bind(ActiveMQSender.class)
-                .toProvider(Providers.<ActiveMQSender>of(null));
-
-            binder.bind(ActiveMQController.class)
-                .toProvider(Providers.<ActiveMQController>of(null));
-        }
+        binder.bind(EventQueueStats.class).in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=QueueStats"));
+        binder.bind(EventQueueConnectionFactory.class).to(ActiveMQConnectionFactory.class).asEagerSingleton();
+        binder.bind(EventQueueProcessor.class).to(EventQueueProcessorImpl.class).in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=EventQueueProcessor"));
 
         binder.bind(FileSystem.class)
             .toProvider(FileSystemProvider.class)

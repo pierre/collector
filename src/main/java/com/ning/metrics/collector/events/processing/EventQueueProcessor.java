@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.processing;
 
-public interface ActiveMQSender
+public interface EventQueueProcessor
 {
-    boolean sendMessage(String category, String message);
+    void send(String type, Object event);
 }
