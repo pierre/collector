@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -16,9 +16,9 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import java.util.concurrent.BlockingQueue;
-
 import org.apache.log4j.Logger;
+
+import java.util.concurrent.BlockingQueue;
 
 public class LocalQueueWorker implements Runnable
 {
@@ -48,7 +48,7 @@ public class LocalQueueWorker implements Runnable
                 return;
             }
             catch (Exception ex) {
-                logger.error("Got error while trying to send an event", ex);
+                logger.error("Got error while trying to send an event to the RT queue", ex);
                 stats.registerEventSendingErrored();
             }
         }

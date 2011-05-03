@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -16,18 +16,17 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import org.apache.activemq.AlreadyClosedException;
+import org.apache.activemq.ConnectionFailedException;
+import org.apache.log4j.Logger;
 
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
-import org.apache.activemq.AlreadyClosedException;
-import org.apache.activemq.ConnectionFailedException;
-import org.apache.log4j.Logger;
-
-import com.ning.metrics.collector.binder.config.CollectorConfig;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ActiveMQSession implements EventQueueSession
 {
@@ -54,7 +53,7 @@ public class ActiveMQSession implements EventQueueSession
     {
         if (isRunning.get()) {
             synchronized (sessionMonitor) {
-                isRunning.set(true);
+                isRunning.set(false);
                 if (publisher != null) {
                     try {
                         publisher.close();
@@ -99,23 +98,25 @@ public class ActiveMQSession implements EventQueueSession
     private boolean shouldReinit(JMSException ex)
     {
         return (ex instanceof AlreadyClosedException) ||
-               (ex instanceof javax.jms.IllegalStateException) ||
-               (ex instanceof ConnectionFailedException) ||
-               (ex.getCause() instanceof IOException);
+            (ex instanceof javax.jms.IllegalStateException) ||
+            (ex instanceof ConnectionFailedException) ||
+            (ex.getCause() instanceof IOException);
     }
 
     @Override
     public void send(Object event)
     {
-        try {
-            publisher.send(session.createTextMessage(event.toString()));
-        }
-        catch (JMSException ex) {
-            if (shouldReinit(ex)) {
-                reinit();
+        if (isRunning.get()) {
+            try {
+                publisher.send(session.createTextMessage(event.toString()));
             }
-            else {
-                logger.debug(String.format("Got error while trying to send a message to topic %s", topic));
+            catch (JMSException ex) {
+                if (shouldReinit(ex)) {
+                    reinit();
+                }
+                else {
+                    logger.debug(String.format("Got error while trying to send a message to topic %s", topic));
+                }
             }
         }
     }
