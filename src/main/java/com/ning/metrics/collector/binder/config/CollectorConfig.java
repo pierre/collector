@@ -17,6 +17,7 @@
 package com.ning.metrics.collector.binder.config;
 
 import com.sun.security.auth.module.UnixSystem;
+
 import org.skife.config.Config;
 
 public class CollectorConfig
@@ -43,20 +44,12 @@ public class CollectorConfig
         return true;
     }
 
-    // ActiveMQ host
+    // ActiveMQ uri
 
-    @Config(value = "collector.activemq.host")
-    public String getActiveMQHost()
+    @Config(value = "collector.activemq.uri")
+    public String getActiveMQUri()
     {
         return null;
-    }
-
-    // ActiveMQ port
-
-    @Config(value = "collector.activemq.port")
-    public int getActiveMQPort()
-    {
-        return 61616;
     }
 
     // ActiveMQ messages TTL in milliseconds, default 10 minutes
@@ -73,6 +66,22 @@ public class CollectorConfig
     public String getActiveMQEventsToCollect()
     {
         return null;
+    }
+
+    // Length of the internal buffer for passing events of a specific type to activemq
+
+    @Config(value = "collector.activemq.bufferLength")
+    public int getActiveMQBufferLength()
+    {
+        return 1000;
+    }
+
+    // Number of senders per category
+
+    @Config(value = "xn.collector.activemq.numSendersPerCategory")
+    public int getActiveMQNumSendersPerCategory()
+    {
+        return 1;
     }
 
     // Whether to collect scribe events

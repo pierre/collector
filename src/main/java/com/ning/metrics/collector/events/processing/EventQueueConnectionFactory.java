@@ -16,11 +16,7 @@
 
 package com.ning.metrics.collector.events.processing;
 
-public class MockActiveMQSender implements ActiveMQSender
+public interface EventQueueConnectionFactory
 {
-    @Override
-    public boolean sendMessage(String category, String message)
-    {
-        return true;
-    }
+    EventQueueConnection createConnection();
 }

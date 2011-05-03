@@ -16,39 +16,90 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import static org.testng.Assert.assertEquals;
+
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import com.ning.metrics.serialization.writer.StubScheduledExecutorService;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TestBufferingEventCollector
 {
-    private List<ScheduledCommand> flusherCommands = new ArrayList<ScheduledCommand>();
-    private List<Runnable> drainerCommands = new ArrayList<Runnable>();
-    private MockEventWriter eventWriter = null;
-    private Event event = null;
-    private BufferingEventCollector collector = null;
-    private ActiveMQControllerImpl activeMQController = null;
-    private EventStats eventStats = null;
+	private List<ScheduledCommand> flusherCommands;
+	private List<Runnable> drainerCommands;
+    private List<Object> sentEvents;
+	private MockEventWriter eventWriter;
+	private Event event;
+	private CollectorConfig config;
+	private BufferingEventCollector collector;
+	private EventQueueStats stats;
+    private EventQueueProcessorImpl msgSender;
+    private ReentrantLock sessionLock = new ReentrantLock();
+    private EventStats eventStats;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
     {
         flusherCommands = new ArrayList<ScheduledCommand>();
         drainerCommands = new ArrayList<Runnable>();
+	    sentEvents = new CopyOnWriteArrayList<Object>();
         eventWriter = new MockEventWriter();
-        activeMQController = new ActiveMQControllerImpl(new ArrayList<String>(), new MockActiveMQSender());
-        final ScheduledExecutorService executor = new StubScheduledExecutorService()
+        config = new CollectorConfig();
+		EventQueueConnectionFactory factory = new EventQueueConnectionFactory() {
+            @Override
+            public EventQueueConnection createConnection()
+            {
+                return new EventQueueConnection() {
+                    @Override
+                    public void reconnect()
+                    {}
+
+                    @Override
+                    public EventQueueSession getSessionFor(String type)
+                    {
+                        return new EventQueueSession() {
+                            @Override
+                            public void send(Object event)
+                            {
+                                sessionLock.lock();
+                                try {
+                                    sentEvents.add(event);
+                                }
+                                finally {
+                                    sessionLock.unlock();
+                                }
+                            }
+
+                            @Override
+                            public void close()
+                            {
+                            }
+                        };
+                    }
+
+                    @Override
+                    public void close()
+                    {}
+                };
+            }
+        };
+        stats = new EventQueueStats();
+		msgSender = new EventQueueProcessorImpl(config, factory, stats);
+		final ScheduledExecutorService executor = new StubScheduledExecutorService()
         {
             @Override
             public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit)
@@ -86,7 +137,7 @@ public class TestBufferingEventCollector
                 return drainerCommands.size();
             }
         },
-            activeMQController, 5, 30);
+        msgSender, 5, 30);
         eventStats = new EventStats();
     }
 
@@ -114,41 +165,96 @@ public class TestBufferingEventCollector
         Assert.assertEquals(flusherCommands.size(), 1);
     }
 
-    @Test(groups = "fast")
-    public void testActiveMQ() throws Exception
+
+    @Test(groups = "slow")
+    public void testQueue() throws Exception
     {
         startCollectorThreads();
 
         // Message type not recognized yet
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
-        Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
-        Assert.assertEquals(activeMQController.getMessagesSent(), 0);
-        Assert.assertEquals(activeMQController.getMessagesRejected(), 0);
+        Thread.sleep(100);
+        assertEquals(sentEvents.size(), 0);
+        assertEquals(stats.getIgnoredEvents(), 2);
+        assertEquals(stats.getEnqueuedEvents(), 0);
+        assertEquals(stats.getDroppedEvents(), 0);
+        assertEquals(stats.getSentEvents(), 0);
+        assertEquals(stats.getErroredEvents(), 0);
 
         // Message type now recognized
-        activeMQController.addEventTypeToCollect(event.getName());
+        msgSender.addTypeToCollect(event.getName());
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
-        Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
-        Assert.assertEquals(activeMQController.getMessagesSent(), 2);
-        Assert.assertEquals(activeMQController.getMessagesRejected(), 0);
+        Thread.sleep(100);
+        assertEquals(sentEvents.size(), 2);
+        assertEquals(stats.getIgnoredEvents(), 2);
+        assertEquals(stats.getEnqueuedEvents(), 2);
+        assertEquals(stats.getDroppedEvents(), 0);
+        assertEquals(stats.getSentEvents(), 2);
+        assertEquals(stats.getErroredEvents(), 0);
 
         // Close the firehose
-        activeMQController.disableCollection();
+        msgSender.disable();
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
-        Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
-        Assert.assertEquals(activeMQController.getMessagesSent(), 2);
-        Assert.assertEquals(activeMQController.getMessagesRejected(), 2);
+        Thread.sleep(100);
+        assertEquals(sentEvents.size(), 2);
+        assertEquals(stats.getIgnoredEvents(), 4);
+        assertEquals(stats.getEnqueuedEvents(), 2);
+        assertEquals(stats.getDroppedEvents(), 0);
+        assertEquals(stats.getSentEvents(), 2);
+        assertEquals(stats.getErroredEvents(), 0);
 
         // Re-open the firehose
-        activeMQController.enableCollection();
+        msgSender.enable();
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
-        Assert.assertEquals(activeMQController.getMessagesDisallowed(), 2);
-        Assert.assertEquals(activeMQController.getMessagesSent(), 4);
-        Assert.assertEquals(activeMQController.getMessagesRejected(), 2);
+        Thread.sleep(100);
+        assertEquals(sentEvents.size(), 4);
+        assertEquals(stats.getIgnoredEvents(), 4);
+        assertEquals(stats.getEnqueuedEvents(), 4);
+        assertEquals(stats.getDroppedEvents(), 0);
+        assertEquals(stats.getSentEvents(), 4);
+        assertEquals(stats.getErroredEvents(), 0);
+    }
+
+    @Test(groups = "slow")
+    public void testQueueOverflow() throws Exception
+    {
+        startCollectorThreads();
+
+        // Need to force sending via AMQ even without actual schema (for testing)
+        msgSender.addTypeToCollect(event.getName());
+
+        for (int idx = 0; idx < config.getActiveMQBufferLength(); idx++) {
+            collector.collectEvent(event, eventStats);
+        }
+        Thread.sleep(100);
+        assertEquals(sentEvents.size(), config.getActiveMQBufferLength());
+        assertEquals(stats.getIgnoredEvents(), 0);
+        assertEquals(stats.getEnqueuedEvents(), config.getActiveMQBufferLength());
+        assertEquals(stats.getDroppedEvents(), 0);
+        assertEquals(stats.getSentEvents(), config.getActiveMQBufferLength());
+        assertEquals(stats.getErroredEvents(), 0);
+
+        sessionLock.lock();
+        try {
+            for (int idx = 0; idx < config.getActiveMQBufferLength() + config.getActiveMQBufferLength(); idx++) {
+                collector.collectEvent(event, eventStats);
+            }
+        }
+        finally {
+            sessionLock.unlock();
+        }
+        Thread.sleep(100);
+        // the lock is queried after the take() call, so the first of the second batch of events has been read already
+        assertEquals(sentEvents.size(), config.getActiveMQBufferLength() + config.getActiveMQBufferLength() + 1);
+        assertEquals(stats.getIgnoredEvents(), 0);
+        assertEquals(stats.getEnqueuedEvents(), config.getActiveMQBufferLength() + config.getActiveMQBufferLength() + 1);
+        assertEquals(stats.getDroppedEvents(), config.getActiveMQBufferLength() - 1);
+        assertEquals(stats.getSentEvents(), config.getActiveMQBufferLength() + config.getActiveMQBufferLength() + 1);
+        assertEquals(stats.getErroredEvents(), 0);
     }
 
     @Test(groups = "fast")

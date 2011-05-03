@@ -16,13 +16,20 @@
 
 package com.ning.metrics.collector.events.processing;
 
-public interface ActiveMQController
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+
+public class ActiveMQConnectionFactory implements EventQueueConnectionFactory
 {
-    /**
-     * Given a category and a message, send the message to a topic queue
-     *
-     * @param category message category, mapped to an ActiveMQ topic
-     * @param message  human readable message to be sent
-     */
-    public void offerEvent(String category, String message);
+    private final CollectorConfig config;
+
+    public ActiveMQConnectionFactory(CollectorConfig config)
+    {
+        this.config = config;
+    }
+
+    @Override
+    public EventQueueConnection createConnection()
+    {
+        return new ActiveMQConnection(config);
+    }
 }
