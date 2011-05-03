@@ -78,7 +78,7 @@ public class CollectorConfig
 
     // Number of senders per category
 
-    @Config(value = "xn.collector.activemq.numSendersPerCategory")
+    @Config(value = "collector.activemq.numSendersPerCategory")
     public int getActiveMQNumSendersPerCategory()
     {
         return 1;
@@ -198,37 +198,37 @@ public class CollectorConfig
         return 5;
     }
 
-    @Config(value = "xn.server.ip")
+    @Config(value = "collector.server.ip")
     public String getLocalIp()
     {
         return "127.0.0.1";
     }
 
-    @Config(value = "xn.server.port")
+    @Config(value = "collector.server.port")
     public int getLocalPort()
     {
         return 8080;
     }
 
-    @Config(value = "xn.server.ssl.enabled")
+    @Config(value = "collector.server.ssl.enabled")
     public boolean isSSLEnabled()
     {
         return false;
     }
 
-    @Config(value = "xn.server.ssl.port")
+    @Config(value = "collector.server.ssl.port")
     public int getLocalSSLPort()
     {
         return 443;
     }
 
-    @Config(value = "xn.jetty.ssl.keystore")
+    @Config(value = "collector.jetty.ssl.keystore")
     public String getSSLkeystoreLocation()
     {
         return "";
     }
 
-    @Config(value = "xn.jetty.ssl.keystore.password")
+    @Config(value = "collector.jetty.ssl.keystore.password")
     public String getSSLkeystorePassword()
     {
         return "";
