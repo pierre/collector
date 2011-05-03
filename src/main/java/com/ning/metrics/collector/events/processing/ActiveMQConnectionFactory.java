@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -16,12 +16,14 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 
 public class ActiveMQConnectionFactory implements EventQueueConnectionFactory
 {
     private final CollectorConfig config;
 
+    @Inject
     public ActiveMQConnectionFactory(CollectorConfig config)
     {
         this.config = config;
