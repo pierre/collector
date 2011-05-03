@@ -51,19 +51,25 @@ public class EventRequestHandler
         this.eventHandler = eventHandler;
     }
 
+    // TODO the statistics we collect here are less relevant now that we're processing collections of events at a time
     public Response handleEventRequest(String eventString, ExtractedAnnotation annotation, EventStats eventStats)
     {
         Collection<? extends Event> events;
 
         try {
-            endPointStats.updateTotalEvents();
+            // do not update stats here, while extracting events. update when processing.
             events = eventExtractor.extractEvent(eventString, annotation);
             eventStats.recordExtracted();
         }
         catch (EventParsingException e) {
-            log.info(String.format("Unable to process event: %s [%s]", eventString, annotation.toString()), e);
-            // If one event fail, the entire collection of events is rejected
+            log.info(String.format("Unable to extract event: %s [%s]", eventString, annotation.toString()), e);
+            // If one event fails, the entire collection of events is rejected
             return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, e);
+        }
+        catch (RuntimeException e) {
+            log.info(String.format("Unable to extract event: %s [%s]", eventString, annotation.toString()), e);
+            // If one event fails, the entire collection of events is rejected
+            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
         }
 
         if (events == null) {

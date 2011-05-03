@@ -92,7 +92,7 @@ public class TestEventRequestHandler
 
         Assert.assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
 
-        Assert.assertEquals(stats.getTotalEvents(), 1);
+        Assert.assertEquals(stats.getTotalEvents(), 0); // if it can't parse the events, it can't count the total events
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
         Assert.assertEquals(stats.getFailedToParseEvents(), 1);
     }
@@ -123,7 +123,9 @@ public class TestEventRequestHandler
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
 
-        Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        // Server only returns statusCode != 202 when there is an issue extracting the events.
+        // Not when it fails to process an individual event.
+        Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
 
         Assert.assertEquals(stats.getTotalEvents(), 1);
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
@@ -139,19 +141,25 @@ public class TestEventRequestHandler
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
 
-        Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        // Server only returns statusCode != 202 when there is an issue extracting the events.
+        // Not when it fails to process an individual event.
+        Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
 
         Assert.assertEquals(stats.getTotalEvents(), 1);
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
         Assert.assertEquals(stats.getFailedToParseEvents(), 1);
     }
 
+    // TODO why would we care about this?
     @Test(groups = "fast")
     public void testHandleFailureThrowsRuntimeException() throws Exception
     {
         eventExtractor.setThrowsRuntimeException(true);
         Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
-        Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+
+        // Server only returns statusCode != 202 when there is an issue extracting the events.
+        // Not when it fails to process an individual event.
+        Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
 
         Assert.assertEquals(stats.getTotalEvents(), 0);
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
