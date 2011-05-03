@@ -150,22 +150,6 @@ public class TestEventRequestHandler
         Assert.assertEquals(stats.getFailedToParseEvents(), 1);
     }
 
-    // TODO why would we care about this?
-    @Test(groups = "fast")
-    public void testHandleFailureThrowsRuntimeException() throws Exception
-    {
-        eventExtractor.setThrowsRuntimeException(true);
-        Response response = eventRequestHandler.handleEventRequest(null, createMockRequestAnnotation(), eventStats);
-
-        // Server only returns statusCode != 202 when there is an issue extracting the events.
-        // Not when it fails to process an individual event.
-        Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
-
-        Assert.assertEquals(stats.getTotalEvents(), 0);
-        Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
-        Assert.assertEquals(stats.getFailedToParseEvents(), 1);
-    }
-
     private Event createEvent(final String description)
     {
         return new StubEvent()
