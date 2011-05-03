@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -15,6 +15,8 @@
  */
 
 package com.ning.metrics.collector.events.processing;
+
+import com.ning.metrics.serialization.util.Managed;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -51,32 +53,31 @@ public class EventQueueStats
         erroredEvents.incrementAndGet();
     }
 
-    // TODO: annotate these once we use jmxutils
-    //@Managed(description = "Number of ignored events")
+    @Managed(description = "Number of ignored events")
     public long getIgnoredEvents()
     {
         return ignoredEvents.get();
     }
 
-    //@Managed(description = "Number of locally enqueued events")
+    @Managed(description = "Number of locally enqueued events")
     public long getEnqueuedEvents()
     {
         return enqueuedEvents.get();
     }
 
-    //@Managed(description = "Number of dropped events")
+    @Managed(description = "Number of dropped events")
     public long getDroppedEvents()
     {
         return droppedEvents.get();
     }
 
-    //@Managed(description = "Number of successfully sent events")
+    @Managed(description = "Number of successfully sent events")
     public long getSentEvents()
     {
         return sentEvents.get();
     }
 
-    //@Managed(description = "Number of events that could not be sent due to an error")
+    @Managed(description = "Number of events that could not be sent due to an error")
     public long getErroredEvents()
     {
         return erroredEvents.get();

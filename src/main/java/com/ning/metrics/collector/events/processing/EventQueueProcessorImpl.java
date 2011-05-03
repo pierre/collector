@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -16,23 +16,21 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import java.util.ArrayList;
+import com.google.inject.Inject;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.util.NamedThreadFactory;
+import com.ning.metrics.serialization.util.Managed;
+import org.apache.log4j.Logger;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.log4j.Logger;
-import org.apache.thrift.transport.TTransportException;
-import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 
 public class EventQueueProcessorImpl implements EventQueueProcessor
 {
@@ -118,13 +116,13 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
-    //@Managed(description = "whether forwarding events to the queue is enabled")
+    @Managed(description = "whether forwarding events to the queue is enabled")
     public boolean isEnabled()
     {
         return enabled.get();
     }
 
-    //@Managed(description = "forwards events to the queue")
+    @Managed(description = "forwards events to the queue")
     public void enable()
     {
         if (!enabled.getAndSet(true)) {
@@ -132,7 +130,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
-    //@Managed(description = "disable forwarding of events to the queue")
+    @Managed(description = "disable forwarding of events to the queue")
     public void disable()
     {
         if (enabled.getAndSet(false)) {
@@ -140,7 +138,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
-    //@Managed(description = "add event type to collect")
+    @Managed(description = "add event type to collect")
     public void addTypeToCollect(String event)
     {
         Set<String> events = typesToCollect.get();
@@ -151,7 +149,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
-    //@Managed(description = "remove event type to collect")
+    @Managed(description = "remove event type to collect")
     public void removeTypeToCollect(String event)
     {
         Set<String> events = typesToCollect.get();
@@ -162,7 +160,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
-    //@Managed(description = "list event types allowed to collect")
+    @Managed(description = "list event types allowed to collect")
     public String getTypesToCollect()
     {
         return typesToCollect.get().toString();
