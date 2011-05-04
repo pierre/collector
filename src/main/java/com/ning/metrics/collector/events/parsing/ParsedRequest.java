@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -80,7 +80,7 @@ public class ParsedRequest implements ExtractedAnnotation
     {
         this(httpHeaders, inputStream, eventDateTime, granularityString, peerIpAddress, null, extractorUtil);
     }
-    
+
     /**
      * Constructor used by the internal API (POST only)
      *

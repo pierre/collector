@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -19,12 +19,12 @@ package com.ning.metrics.collector.events.processing;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
-import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.collector.util.Stats;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.util.Managed;
+import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

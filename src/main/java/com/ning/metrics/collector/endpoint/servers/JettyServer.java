@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -23,15 +23,14 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.modules.JettyListener;
 import com.ning.metrics.collector.endpoint.setup.SetupJULBridge;
 import org.apache.log4j.Logger;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -98,13 +97,13 @@ public class JettyServer
 
         final Server server = new Server();
 
-        Connector connector = new SocketConnector();
+        Connector connector = new SelectChannelConnector();
         connector.setHost(ip);
         connector.setPort(port);
         server.addConnector(connector);
 
         if (sslEnabled) {
-            SslSocketConnector sslConnector = new SslSocketConnector();
+            SslSelectChannelConnector sslConnector = new SslSelectChannelConnector();
             sslConnector.setPort(sslPort);
             sslConnector.setKeystore(keystoreLocation);
             sslConnector.setKeyPassword(keystorePassword);
@@ -114,7 +113,7 @@ public class JettyServer
 
         server.setStopAtShutdown(true);
 
-        Context context = new Context(server, "/", Context.SESSIONS);
+        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         context.addEventListener(new JettyListener());
 
         // Jersey insists on using java.util.logging (JUL)
@@ -123,7 +122,7 @@ public class JettyServer
 
         // Make sure Guice filter all requests
         FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
-        context.addFilter(filterHolder, "/*", Handler.DEFAULT);
+        context.addFilter(filterHolder, "/*", ServletContextHandler.NO_SESSIONS);
 
         ServletHolder sh = new ServletHolder(DefaultServlet.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");

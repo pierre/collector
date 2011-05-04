@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import org.apache.log4j.Logger;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TNonblockingServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TNonblockingServerTransport;
@@ -58,7 +59,7 @@ public class ScribeServer
         this.eventRequestHandler = eventRequestHandler;
         this.port = port;
 
-        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("CollectorTHsHaServer"));
+        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("ScribeServer"));
         executor.execute(new Runnable()
         {
             @Override
@@ -85,7 +86,7 @@ public class ScribeServer
         TNonblockingServerTransport socket = new TNonblockingServerSocket(port);
         Processor processor = new Processor(eventRequestHandler);
 
-        server = new CollectorTHsHaServer(processor, socket);
+        server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
         log.info(String.format("Starting terminal Scribe server on port %d", port));
         server.serve();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -68,7 +68,6 @@ import com.ning.metrics.collector.util.Filter;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
-
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
@@ -121,9 +120,10 @@ public class EventCollectorModule implements Module
          */
         binder.bind(TaskQueueService.class)
             .to(TaskQueueServiceImpl.class);
+
         /*
-            * ScheduledExecutorServices
-            */
+         * ScheduledExecutorServices
+         */
         binder.bind(ScheduledExecutorService.class)
             .annotatedWith(DiskSpoolFlushExecutor.class)
             .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")));
@@ -242,8 +242,8 @@ public class EventCollectorModule implements Module
             .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=EventHandler"));
 
         /*
-        * Final wiring
-        */
+         * Final wiring
+         */
         binder.bind(BufferingEventCollector.class)
             .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=BufferingEventCollector"));
 

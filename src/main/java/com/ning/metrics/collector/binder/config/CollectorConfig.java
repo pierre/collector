@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -73,7 +73,7 @@ public class CollectorConfig
     @Config(value = "collector.activemq.bufferLength")
     public int getActiveMQBufferLength()
     {
-        return 1000;
+        return 10000;
     }
 
     // Number of senders per category

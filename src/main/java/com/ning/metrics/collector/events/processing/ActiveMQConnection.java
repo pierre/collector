@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -16,14 +16,14 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.log4j.Logger;
+
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.TopicConnection;
 import javax.jms.TopicSession;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.log4j.Logger;
-
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 
 public class ActiveMQConnection implements EventQueueConnection
 {

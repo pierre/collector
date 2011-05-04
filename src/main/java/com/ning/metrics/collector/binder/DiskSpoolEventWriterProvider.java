@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -23,6 +23,7 @@ import com.ning.metrics.collector.binder.annotations.DiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventHandler;
 import com.ning.metrics.serialization.writer.EventWriter;
@@ -66,8 +67,9 @@ public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWrit
         CollectorConfig config = injector.getInstance(CollectorConfig.class);
         return new DiskSpoolEventWriter(new EventHandler()
         {
+            // TODO handler?
             @Override
-            public void handle(ObjectInputStream objectInputStream) throws ClassNotFoundException, IOException
+            public void handle(ObjectInputStream objectInputStream, CallbackHandler handler) throws ClassNotFoundException, IOException
             {
                 while (objectInputStream.read() != -1) {
                     Event event = (Event) objectInputStream.readObject();
