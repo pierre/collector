@@ -34,6 +34,7 @@ import org.codehaus.jackson.smile.SmileFactory;
 import org.codehaus.jackson.smile.SmileGenerator;
 import org.codehaus.jackson.smile.SmileParser;
 import org.joda.time.DateTime;
+import org.skife.config.ConfigurationObjectFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -65,7 +66,7 @@ public class TestDiskSpoolEventWriterProvider
             public void configure(Binder binder)
             {
                 // NOTE! Unable to set the queue for now. If tests fail, think of deleting the queue manually...
-                CollectorConfig config = new CollectorConfig();
+                CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
                 binder.bind(CollectorConfig.class).toInstance(config);
             }
         });

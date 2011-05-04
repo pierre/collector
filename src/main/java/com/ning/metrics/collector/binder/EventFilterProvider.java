@@ -35,7 +35,7 @@ public class EventFilterProvider implements Provider<PatternSetFilter>
     {
         this.fieldExtractor = fieldExtractor;
 
-        if (!patternListString.isEmpty()) {
+        if (patternListString != null && !patternListString.isEmpty()) {
             for (String str : patternListString.split(delimiter)) {
                 patternSet.add(Pattern.compile(str));
             }
@@ -45,8 +45,6 @@ public class EventFilterProvider implements Provider<PatternSetFilter>
     @Override
     public PatternSetFilter get()
     {
-        PatternSetFilter filter = new PatternSetFilter(fieldExtractor, patternSet);
-
-        return filter;
+        return new PatternSetFilter(fieldExtractor, patternSet);
     }
 }

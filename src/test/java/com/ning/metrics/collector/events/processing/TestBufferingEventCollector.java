@@ -16,15 +16,13 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import static org.testng.Assert.assertEquals;
-
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import com.ning.metrics.serialization.writer.StubScheduledExecutorService;
-
+import org.skife.config.ConfigurationObjectFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,6 +34,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static org.testng.Assert.assertEquals;
 
 public class TestBufferingEventCollector
 {
@@ -58,7 +58,7 @@ public class TestBufferingEventCollector
         drainerCommands = new ArrayList<Runnable>();
 	    sentEvents = new CopyOnWriteArrayList<Object>();
         eventWriter = new MockEventWriter();
-        config = new CollectorConfig();
+        config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
 		EventQueueConnectionFactory factory = new EventQueueConnectionFactory() {
             @Override
             public EventQueueConnection createConnection()

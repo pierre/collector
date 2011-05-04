@@ -55,6 +55,12 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         Set<String> types = (typesStr == null ? new HashSet<String>() : new HashSet<String>(Arrays.asList(typesStr.split("\\s*,\\s*"))));
 
         this.typesToCollect.set(types);
+
+        // Don't configure the connection if no AMQ URI was specified on startup
+        if (config.getActiveMQUri() == null) {
+            this.connection = null;
+            return;
+        }
         this.connection = factory.createConnection();
         ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("EventQueueProcessorImpl"));
         executor.execute(new Runnable()
@@ -77,7 +83,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
 
     public void start()
     {
-        if (enabled.get()) {
+        if (enabled.get() && connection != null) {
             connection.reconnect();
             isRunning.set(true);
         }

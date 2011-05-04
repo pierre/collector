@@ -16,101 +16,75 @@
 
 package com.ning.metrics.collector.binder.config;
 
-import com.sun.security.auth.module.UnixSystem;
-
 import org.skife.config.Config;
+import org.skife.config.Default;
+import org.skife.config.DefaultNull;
 
-public class CollectorConfig
+public interface CollectorConfig
 {
     @Config(value = "collector.dfs.block.size")
-    public long getHadoopBlockSize()
-    {
-        return 134217728; // 128M
-    }
+    @Default(value = "134217728")
+    public long getHadoopBlockSize();
 
     @Config(value = "collector.hadoop.ugi")
-    public String getHadoopUgi()
-    {
-        UnixSystem unixSystem = new UnixSystem();
-        String username = unixSystem.getUsername();
-        return String.format("%s,supergroup", username);
-    }
+    @Default(value = "nobody,nobody")
+    public String getHadoopUgi();
 
     // Whether to forward events to ActiveMQ
 
     @Config(value = "collector.activemq.enabled")
-    public boolean isActiveMQEnabled()
-    {
-        return true;
-    }
+    @Default(value = "false")
+    public boolean isActiveMQEnabled();
 
     // ActiveMQ uri
 
     @Config(value = "collector.activemq.uri")
-    public String getActiveMQUri()
-    {
-        return null;
-    }
+    @DefaultNull
+    public String getActiveMQUri();
 
     // ActiveMQ messages TTL in milliseconds, default 10 minutes
 
     @Config(value = "collector.activemq.messagesTTLmilliseconds")
-    public int getMessagesTTLMilliseconds()
-    {
-        return 600000;
-    }
+    @Default(value = "600000")
+    public int getMessagesTTLMilliseconds();
 
     // Events types to forward to ActiveMQ (comma delimited)
 
     @Config(value = "collector.activemq.events")
-    public String getActiveMQEventsToCollect()
-    {
-        return null;
-    }
+    @DefaultNull
+    public String getActiveMQEventsToCollect();
 
     // Length of the internal buffer for passing events of a specific type to activemq
 
     @Config(value = "collector.activemq.bufferLength")
-    public int getActiveMQBufferLength()
-    {
-        return 10000;
-    }
+    @Default(value = "10000")
+    public int getActiveMQBufferLength();
 
     // Number of senders per category
 
     @Config(value = "collector.activemq.numSendersPerCategory")
-    public int getActiveMQNumSendersPerCategory()
-    {
-        return 1;
-    }
+    @Default(value = "1")
+    public int getActiveMQNumSendersPerCategory();
 
     // Whether to collect scribe events
 
     @Config(value = "collector.scribe.enabled")
-    public boolean isScribeCollectionEnabled()
-    {
-        return true;
-    }
+    @Default(value = "true")
+    public boolean isScribeCollectionEnabled();
 
     // Scribe port
 
     @Config(value = "collector.scribe.port")
-    public int getScribePort()
-    {
-        return 7911;
-    }
+    @Default(value = "7911")
+    public int getScribePort();
 
     @Config(value = "collector.max-event-queue-size")
-    public long getMaxQueueSize()
-    {
-        return 200000;
-    }
+    @Default(value = "200000")
+    public long getMaxQueueSize();
 
     @Config(value = "collector.event-routes.persistent")
-    public boolean isHdfsWriterEnabled()
-    {
-        return true;
-    }
+    @Default(value = "true")
+    public boolean isHdfsWriterEnabled();
 
     //------------------- Spooling -------------------//
 
@@ -121,10 +95,8 @@ public class CollectorConfig
      * @return the maximum number of events per file
      */
     @Config(value = "collector.diskspool.flush-event-queue-size")
-    public long getFlushEventQueueSize()
-    {
-        return 10000;
-    }
+    @Default(value = "10000")
+    public long getFlushEventQueueSize();
 
     /**
      * Maxixum number of seconds before events are promoted from the temporary spooling area to the final spool queue.
@@ -132,10 +104,8 @@ public class CollectorConfig
      * @return maxixmum age of events in seconds in the temporary spool queue
      */
     @Config(value = "collector.diskspool.refresh-delay-seconds")
-    public int getRefreshDelayInSeconds()
-    {
-        return 60;
-    }
+    @Default(value = "60")
+    public int getRefreshDelayInSeconds();
 
     /**
      * Directory for the collector to buffer events before writing them to HDFS
@@ -143,10 +113,8 @@ public class CollectorConfig
      * @return the directory path
      */
     @Config(value = "collector.diskspool.path")
-    public String getSpoolDirectoryName()
-    {
-        return "/tmp/collector/diskspool";
-    }
+    @Default(value = "/tmp/collector/diskspool")
+    public String getSpoolDirectoryName();
 
     /**
      * If false, events will not be periodically sent to HDFS
@@ -154,10 +122,8 @@ public class CollectorConfig
      * @return whether to send events buffered locally
      */
     @Config(value = "collector.diskspool.enabled")
-    public boolean isFlushEnabled()
-    {
-        return true;
-    }
+    @Default(value = "true")
+    public boolean isFlushEnabled();
 
     /**
      * Delay between flushes (in seconds)
@@ -165,10 +131,8 @@ public class CollectorConfig
      * @return delay between flushes to HDFS
      */
     @Config(value = "collector.diskspool.refresh-delay-seconds")
-    public long getFlushIntervalInSeconds()
-    {
-        return 30;
-    }
+    @Default(value = "30")
+    public long getFlushIntervalInSeconds();
 
     /**
      * Type of outputter to use when spooling: NONE, FLUSH, or SYNC
@@ -176,10 +140,8 @@ public class CollectorConfig
      * @return the String representation of the SyncType
      */
     @Config(value = "collector.diskspool.synctype")
-    public String getSyncType()
-    {
-        return "NONE";
-    }
+    @Default(value = "NONE")
+    public String getSyncType();
 
     /**
      * Size of the batch for the sync type parameter
@@ -187,118 +149,80 @@ public class CollectorConfig
      * @return the number of events to buffer before calling flush or sync
      */
     @Config(value = "collector.diskspool.sync-batch-size")
-    public int getSyncBatchSize()
-    {
-        return 50;
-    }
+    @Default(value = "50")
+    public int getSyncBatchSize();
 
     @Config(value = "collector.event-end-point.rate-window-size-minutes")
-    public int getRateWindowSizeMinutes()
-    {
-        return 5;
-    }
+    @Default(value = "5")
+    public int getRateWindowSizeMinutes();
 
     @Config(value = "collector.server.ip")
-    public String getLocalIp()
-    {
-        return "127.0.0.1";
-    }
+    @Default(value = "127.0.0.1")
+    public String getLocalIp();
 
     @Config(value = "collector.server.port")
-    public int getLocalPort()
-    {
-        return 8080;
-    }
+    @Default(value = "8080")
+    public int getLocalPort();
 
     @Config(value = "collector.server.ssl.enabled")
-    public boolean isSSLEnabled()
-    {
-        return false;
-    }
+    @Default(value = "false")
+    public boolean isSSLEnabled();
 
     @Config(value = "collector.server.ssl.port")
-    public int getLocalSSLPort()
-    {
-        return 443;
-    }
+    @Default(value = "443")
+    public int getLocalSSLPort();
 
     @Config(value = "collector.jetty.ssl.keystore")
-    public String getSSLkeystoreLocation()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getSSLkeystoreLocation();
 
     @Config(value = "collector.jetty.ssl.keystore.password")
-    public String getSSLkeystorePassword()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getSSLkeystorePassword();
 
     @Config(value = "collector.temporary-event-output-directory")
-    public String getTemporaryEventOutputDirectory()
-    {
-        return "/tmp/collector/hdfs/tmp";
-    }
+    @Default(value = "/tmp/collector/hdfs/tmp")
+    public String getTemporaryEventOutputDirectory();
 
     @Config(value = "collector.event-output-directory")
-    public String getEventOutputDirectory()
-    {
-        return "/events";
-    }
+    @Default(value = "/events")
+    public String getEventOutputDirectory();
 
     @Config(value = "collector.hadoop-writer.max-writers")
-    public int getMaxHadoopWriters()
-    {
-        return 64;
-    }
+    @Default(value = "64")
+    public int getMaxHadoopWriters();
 
     @Config(value = "collector.hadoop.host")
-    public String getHfsHost()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getHfsHost();
 
     @Config(value = "collector.event-end-point.enabled")
-    public boolean isEventEndpointEnabled()
-    {
-        return true;
-    }
+    @Default(value = "true")
+    public boolean isEventEndpointEnabled();
 
     @Config(value = "collector.filters.list-delimeter")
-    public String getFilters()
-    {
-        return ",";
-    }
+    @Default(value = ",")
+    public String getFilters();
 
     @Config(value = "collector.filters.host")
-    public String getFiltersHost()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getFiltersHost();
 
     @Config(value = "collector.filters.ip")
-    public String getFiltersIp()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getFiltersIp();
 
     @Config(value = "collector.filters.useragent")
-    public String getFiltersUserAgent()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getFiltersUserAgent();
 
     @Config(value = "collector.filters.path")
-    public String getFiltersPath()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getFiltersPath();
 
     @Config(value = "collector.filters.event-type")
-    public String getFiltersEventType()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getFiltersEventType();
 
     /**
      * Default hostname to use when connecting to the load balancer
@@ -306,10 +230,8 @@ public class CollectorConfig
      * @return the hostname used to connect to the load balancer
      */
     @Config(value = "collector.f5.hostname")
-    public String getF5Hostname()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getF5Hostname();
 
     /**
      * Default username to use when connecting to the load balancer
@@ -317,10 +239,8 @@ public class CollectorConfig
      * @return the username used to connect to the load balancer
      */
     @Config(value = "collector.f5.username")
-    public String getF5Username()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getF5Username();
 
     /**
      * Default password to use when connecting to the load balancer
@@ -328,10 +248,8 @@ public class CollectorConfig
      * @return the password used to connect to the load balancer
      */
     @Config(value = "collector.f5.password")
-    public String getF5Password()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getF5Password();
 
     /**
      * Default pool name to use when connecting to the load balancer
@@ -339,8 +257,6 @@ public class CollectorConfig
      * @return the pool name used to connect to the load balancer
      */
     @Config(value = "collector.f5.poolname")
-    public String getF5PoolName()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getF5PoolName();
 }
