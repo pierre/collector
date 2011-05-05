@@ -82,6 +82,22 @@ public class ScribeEventRequestHandler implements Iface
 
         for (LogEntry entry : logEntries) {
             EventStats eventStats = new EventStats();
+
+            if (entry.getCategory() == null) {
+                log.info("Ignoring scribe entry with null category");
+                eventHandler.handleFailure(entry, eventStats);
+                // We don't want Scribe to try later if it sends messages we don't understand.
+                success = true;
+                continue;
+            }
+            else if (entry.getMessage() == null) {
+                log.info("Ignoring scribe entry with null message");
+                eventHandler.handleFailure(entry, eventStats);
+                // We don't want Scribe to try later if it sends messages we don't understand.
+                success = true;
+                continue;
+            }
+
             try {
                 log.debug(String.format("Parsing log: %s", entry));
 
@@ -104,19 +120,19 @@ public class ScribeEventRequestHandler implements Iface
                 }
             }
             catch (RuntimeException e) {
-                log.info(String.format("Ignoring malformed entry: %s", entry), e);
+                log.info(String.format("Ignoring malformed entry [%s]: %s", entry, e.getLocalizedMessage()));
                 eventHandler.handleFailure(entry, eventStats);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
             catch (TException e) {
-                log.info(String.format("Ignoring malformed Thrift: %s", entry), e);
+                log.info(String.format("Ignoring malformed Thrift [%s]: %s", entry, e.getLocalizedMessage()));
                 eventHandler.handleFailure(entry, eventStats);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
             catch (IOException e) {
-                log.info(String.format("Ignoring malformed Smile: %s", entry), e);
+                log.info(String.format("Ignoring malformed Smile [%s]: %s", entry, e.getLocalizedMessage()));
                 eventHandler.handleFailure(entry, eventStats);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;

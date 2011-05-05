@@ -30,15 +30,17 @@ public class ActiveMQConnection implements EventQueueConnection
     private static final Logger logger = Logger.getLogger(ActiveMQConnection.class);
 
     private final CollectorConfig config;
-    private final ActiveMQConnectionFactory connectionFactory;
+    private ActiveMQConnectionFactory connectionFactory = null;
     private final Object connectionMonitor = new Object();
     private TopicConnection connection;
 
     public ActiveMQConnection(CollectorConfig config)
     {
         this.config = config;
-        this.connectionFactory = new ActiveMQConnectionFactory(config.getActiveMQUri());
-        this.connectionFactory.setUseAsyncSend(true);
+        if (config.getActiveMQUri() != null) {
+            this.connectionFactory = new ActiveMQConnectionFactory(config.getActiveMQUri());
+            this.connectionFactory.setUseAsyncSend(true);
+        }
     }
 
     @Override
@@ -47,6 +49,11 @@ public class ActiveMQConnection implements EventQueueConnection
         int numTries = 0;
         int pauseInMs = 100;
         boolean connected = false;
+
+        if (connectionFactory == null) {
+            logger.warn("Asked to reconnect to AMQ but no connectionFactory was configured!");
+            return;
+        }
 
         synchronized (connectionMonitor) {
             close();

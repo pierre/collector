@@ -64,7 +64,7 @@ public class TestHadoopFileEventWriter
 
         FileSystem hadoopIsStupid = new RawLocalFileSystem();
         Configuration conf = new Configuration();
-        conf.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(), HadoopThriftEnvelopeSerialization.class.getName(), "org.apache.serialization.io.serializer.WritableSerialization");
+        conf.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(), HadoopThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
 
         hadoopIsStupid.initialize(URI.create("testy://mctesterson"), conf);
 

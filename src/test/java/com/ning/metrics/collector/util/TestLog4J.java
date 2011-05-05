@@ -44,7 +44,7 @@ public class TestLog4J
     public void testAdapter() throws Exception
     {
         final Logger logger = LoggerFactory.getLogger(TestLog4J.class.getName());
-        logger.warn("Got an IOException in internalRead!", new Exception());
+        logger.warn("Got an IOException in internalRead!", new Exception("IGNORE - Expected exception for tests"));
         Assert.assertTrue(true);
     }
 }

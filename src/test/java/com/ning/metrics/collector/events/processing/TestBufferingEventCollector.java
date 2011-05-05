@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -39,14 +40,14 @@ import static org.testng.Assert.assertEquals;
 
 public class TestBufferingEventCollector
 {
-	private List<ScheduledCommand> flusherCommands;
-	private List<Runnable> drainerCommands;
+    private List<ScheduledCommand> flusherCommands;
+    private List<Runnable> drainerCommands;
     private List<Object> sentEvents;
-	private MockEventWriter eventWriter;
-	private Event event;
-	private CollectorConfig config;
-	private BufferingEventCollector collector;
-	private EventQueueStats stats;
+    private MockEventWriter eventWriter;
+    private Event event;
+    private CollectorConfig config;
+    private BufferingEventCollector collector;
+    private EventQueueStats stats;
     private EventQueueProcessorImpl msgSender;
     private ReentrantLock sessionLock = new ReentrantLock();
     private EventStats eventStats;
@@ -56,22 +57,30 @@ public class TestBufferingEventCollector
     {
         flusherCommands = new ArrayList<ScheduledCommand>();
         drainerCommands = new ArrayList<Runnable>();
-	    sentEvents = new CopyOnWriteArrayList<Object>();
+        sentEvents = new CopyOnWriteArrayList<Object>();
         eventWriter = new MockEventWriter();
-        config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
-		EventQueueConnectionFactory factory = new EventQueueConnectionFactory() {
+
+        Properties properties = new Properties();
+        properties.setProperty("collector.activemq.enabled", "true");
+        config = new ConfigurationObjectFactory(properties).build(CollectorConfig.class);
+
+        EventQueueConnectionFactory factory = new EventQueueConnectionFactory()
+        {
             @Override
             public EventQueueConnection createConnection()
             {
-                return new EventQueueConnection() {
+                return new EventQueueConnection()
+                {
                     @Override
                     public void reconnect()
-                    {}
+                    {
+                    }
 
                     @Override
                     public EventQueueSession getSessionFor(String type)
                     {
-                        return new EventQueueSession() {
+                        return new EventQueueSession()
+                        {
                             @Override
                             public void send(Object event)
                             {
@@ -93,13 +102,14 @@ public class TestBufferingEventCollector
 
                     @Override
                     public void close()
-                    {}
+                    {
+                    }
                 };
             }
         };
         stats = new EventQueueStats();
-		msgSender = new EventQueueProcessorImpl(config, factory, stats);
-		final ScheduledExecutorService executor = new StubScheduledExecutorService()
+        msgSender = new EventQueueProcessorImpl(config, factory, stats);
+        final ScheduledExecutorService executor = new StubScheduledExecutorService()
         {
             @Override
             public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit)
@@ -137,7 +147,7 @@ public class TestBufferingEventCollector
                 return drainerCommands.size();
             }
         },
-        msgSender, 5, 30);
+            msgSender, 5, 30);
         eventStats = new EventStats();
     }
 

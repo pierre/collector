@@ -34,11 +34,11 @@ public class MockEventExtractor implements EventExtractor
     public Collection<Event> extractEvent(String eventName, ExtractedAnnotation annotation) throws EventParsingException
     {
         if (throwsEventParseException) {
-            throw new EventParsingException();
+            throw new EventParsingException("IGNORE - Expected exception for tests");
         }
 
         if (throwsRuntimeException) {
-            throw new RuntimeException();
+            throw new RuntimeException("IGNORE - Expected exception for tests");
         }
 
         LinkedList<Event> events = new LinkedList<Event>();

@@ -38,13 +38,13 @@ public class MockEventHandler implements EventHandler
         stats.updateTotalEvents();
 
         if (throwExceptionBeforeEvent) {
-            throw new RuntimeException();
+            throw new RuntimeException("IGNORE - Expected exception for tests");
         }
 
         processedEventList.add(event);
 
         if (throwExceptionAfterEvent) {
-            throw new RuntimeException();
+            throw new RuntimeException("IGNORE - Expected exception for tests");
         }
 
         stats.updateSuccessfulEvents();
