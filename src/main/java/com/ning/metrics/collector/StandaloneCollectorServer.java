@@ -29,6 +29,7 @@ import com.ning.metrics.collector.util.F5PoolMemberControl;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.guice.MBeanModule;
 
 import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
@@ -55,6 +56,7 @@ public class StandaloneCollectorServer
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
         injector = Guice.createInjector(
+            new MBeanModule(),               /* Used to trigger registration of mbeans exported via ExportBuilder */
             new AbstractModule()             /* For jmxutils */
             {
                 @Override
