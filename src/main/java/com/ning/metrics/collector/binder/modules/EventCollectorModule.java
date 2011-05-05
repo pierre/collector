@@ -66,7 +66,6 @@ import com.ning.metrics.collector.util.Filter;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
-import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.apache.hadoop.fs.FileSystem;
 import org.skife.config.ConfigurationObjectFactory;
 import org.weakref.jmx.guice.ExportBuilder;
@@ -111,7 +110,7 @@ public class EventCollectorModule implements Module
         builder.export(DiskSpoolEventWriter.class).as("com.ning.metrics.collector:name=DiskSpoolEventWriter");
 
         binder.bind(EventWriter.class).annotatedWith(BufferingEventCollectorEventWriter.class).toProvider(ThresholdEventWriterProvider.class).asEagerSingleton();
-        builder.export(ThresholdEventWriter.class).as("com.ning.metrics.collector:name=ThresholdEventWriter");
+        builder.export(EventWriter.class).annotatedWith(BufferingEventCollectorEventWriter.class).as("com.ning.metrics.collector:name=ThresholdEventWriter");
 
         /*
          * TaskQueue
