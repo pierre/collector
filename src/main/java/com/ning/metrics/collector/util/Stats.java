@@ -16,9 +16,9 @@
 
 package com.ning.metrics.collector.util;
 
-import com.ning.metrics.serialization.util.Managed;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
+import org.weakref.jmx.Managed;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;

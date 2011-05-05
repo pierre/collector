@@ -17,13 +17,13 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.collector.binder.annotations.ScribeStats;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.Managed;
 import scribe.thrift.LogEntry;
 
 public class ScribeEventHandlerImpl implements ScribeEventHandler

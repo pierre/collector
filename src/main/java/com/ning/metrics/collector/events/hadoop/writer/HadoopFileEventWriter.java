@@ -20,13 +20,13 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.hadoop.TBooleanWritable;
-import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.weakref.jmx.Managed;
 
 import java.io.IOException;
 import java.util.ArrayDeque;

@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import com.ning.metrics.serialization.util.Managed;
+import org.weakref.jmx.Managed;
 
 import java.util.concurrent.atomic.AtomicLong;
 

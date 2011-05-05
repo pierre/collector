@@ -18,10 +18,8 @@ package com.ning.metrics.collector.binder.modules;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import com.ning.metrics.collector.FixedManagedJmxExportScope;
 import com.ning.metrics.collector.binder.ArrayListProvider;
 import com.ning.metrics.collector.binder.DiskSpoolEventWriterProvider;
 import com.ning.metrics.collector.binder.EventEndPointStatsProvider;
@@ -68,9 +66,11 @@ import com.ning.metrics.collector.util.Filter;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
+import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
+import org.weakref.jmx.guice.ExportBuilder;
+import org.weakref.jmx.guice.MBeanModule;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -81,8 +81,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class EventCollectorModule implements Module
 {
-    private static final Logger log = Logger.getLogger(EventCollectorModule.class);
-
     @SuppressWarnings("unchecked")
     @Override
     public void configure(Binder binder)
@@ -90,46 +88,43 @@ public class EventCollectorModule implements Module
         CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
         binder.bind(CollectorConfig.class).toInstance(config);
 
-        binder.bind(EventQueueStats.class).in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=QueueStats"));
-        binder.bind(EventQueueConnectionFactory.class).to(ActiveMQConnectionFactory.class).asEagerSingleton();
-        binder.bind(EventQueueProcessor.class).to(EventQueueProcessorImpl.class).in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=EventQueueProcessor"));
+        // JMX exporter
+        ExportBuilder builder = MBeanModule.newExporter(binder);
 
-        binder.bind(FileSystem.class)
-            .toProvider(FileSystemProvider.class)
-            .asEagerSingleton();
+        binder.bind(EventQueueStats.class).asEagerSingleton();
+        builder.export(EventQueueStats.class).as("com.ning.metrics.collector:name=QueueStats");
+
+        binder.bind(EventQueueConnectionFactory.class).to(ActiveMQConnectionFactory.class).asEagerSingleton();
+
+        binder.bind(EventQueueProcessor.class).to(EventQueueProcessorImpl.class).asEagerSingleton();
+        builder.export(EventQueueProcessorImpl.class).as("com.ning.metrics.collector:name=EventQueueProcessor");
+
+        binder.bind(FileSystem.class).toProvider(FileSystemProvider.class).asEagerSingleton();
 
         /*
          * EventWriters
          */
-        binder.bind(EventWriter.class)
-            .annotatedWith(HdfsEventWriter.class)
-            .to(HadoopFileEventWriter.class)
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=HadoopFileEventWriter"));
+        binder.bind(EventWriter.class).annotatedWith(HdfsEventWriter.class).to(HadoopFileEventWriter.class).asEagerSingleton();
+        builder.export(HadoopFileEventWriter.class).as("com.ning.metrics.collector:name=HadoopFileEventWriter");
 
-        binder.bind(DiskSpoolEventWriter.class)
-            .toProvider(DiskSpoolEventWriterProvider.class)
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=DiskSpoolEventWriter"));
+        binder.bind(DiskSpoolEventWriter.class).toProvider(DiskSpoolEventWriterProvider.class).asEagerSingleton();
+        builder.export(DiskSpoolEventWriter.class).as("com.ning.metrics.collector:name=DiskSpoolEventWriter");
 
-        binder.bind(EventWriter.class)
-            .annotatedWith(BufferingEventCollectorEventWriter.class)
-            .toProvider(ThresholdEventWriterProvider.class)
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=ThresholdEventWriter"));
+        binder.bind(EventWriter.class).annotatedWith(BufferingEventCollectorEventWriter.class).toProvider(ThresholdEventWriterProvider.class).asEagerSingleton();
+        builder.export(ThresholdEventWriter.class).as("com.ning.metrics.collector:name=ThresholdEventWriter");
 
         /*
          * TaskQueue
          */
-        binder.bind(TaskQueueService.class)
-            .to(TaskQueueServiceImpl.class);
+        binder.bind(TaskQueueService.class).to(TaskQueueServiceImpl.class);
 
         /*
          * ScheduledExecutorServices
          */
-        binder.bind(ScheduledExecutorService.class)
-            .annotatedWith(DiskSpoolFlushExecutor.class)
+        binder.bind(ScheduledExecutorService.class).annotatedWith(DiskSpoolFlushExecutor.class)
             .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")));
 
-        binder.bind(ScheduledExecutorService.class)
-            .annotatedWith(BufferingEventCollectorExecutor.class)
+        binder.bind(ScheduledExecutorService.class).annotatedWith(BufferingEventCollectorExecutor.class)
             .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("tmp to spool promoter")));
 
         /*
@@ -137,34 +132,27 @@ public class EventCollectorModule implements Module
          */
         String filterListDelimiter = config.getFilters();
 
-        binder.bind(Filter.class)
-            .annotatedWith(EventEndpointRequestFilter.class)
-            .to(OrFilter.class);
+        binder.bind(Filter.class).annotatedWith(EventEndpointRequestFilter.class).to(OrFilter.class);
 
-        binder.bind(Filter.class)
-            .annotatedWith(Names.named("host"))
-            .toProvider(new EventFilterProvider(FieldExtractors.HOST, config.getFiltersHost(), filterListDelimiter))
-            .in(new FixedManagedJmxExportScope("com.ning.metrics.collector.filters:name=Host"));
+        binder.bind(Filter.class).annotatedWith(Names.named("host"))
+            .toProvider(new EventFilterProvider(FieldExtractors.HOST, config.getFiltersHost(), filterListDelimiter)).asEagerSingleton();
+        builder.export(Filter.class).annotatedWith(Names.named("host")).as("com.ning.metrics.collector.filters:name=Host");
 
-        binder.bind(Filter.class)
-            .annotatedWith(Names.named("ip"))
-            .toProvider(new EventFilterProvider(FieldExtractors.IP, config.getFiltersIp(), filterListDelimiter))
-            .in(new FixedManagedJmxExportScope("com.ning.metrics.collector.filters:name=IP"));
+        binder.bind(Filter.class).annotatedWith(Names.named("ip"))
+            .toProvider(new EventFilterProvider(FieldExtractors.IP, config.getFiltersIp(), filterListDelimiter)).asEagerSingleton();
+        builder.export(Filter.class).annotatedWith(Names.named("ip")).as("com.ning.metrics.collector.filters:name=IP");
 
-        binder.bind(Filter.class)
-            .annotatedWith(Names.named("user-agent"))
-            .toProvider(new EventFilterProvider(FieldExtractors.USERAGENT, config.getFiltersUserAgent(), filterListDelimiter))
-            .in(new FixedManagedJmxExportScope("com.ning.metrics.collector.filters:name=UserAgent"));
+        binder.bind(Filter.class).annotatedWith(Names.named("user-agent"))
+            .toProvider(new EventFilterProvider(FieldExtractors.USERAGENT, config.getFiltersUserAgent(), filterListDelimiter)).asEagerSingleton();
+        builder.export(Filter.class).annotatedWith(Names.named("user-agent")).as("com.ning.metrics.collector.filters:name=UserAgent");
 
-        binder.bind(Filter.class)
-            .annotatedWith(Names.named("path"))
-            .toProvider(new EventFilterProvider(FieldExtractors.PATH, config.getFiltersPath(), filterListDelimiter))
-            .in(new FixedManagedJmxExportScope("com.ning.metrics.collector.filters:name=Path"));
+        binder.bind(Filter.class).annotatedWith(Names.named("path"))
+            .toProvider(new EventFilterProvider(FieldExtractors.PATH, config.getFiltersPath(), filterListDelimiter)).asEagerSingleton();
+        builder.export(Filter.class).annotatedWith(Names.named("path")).as("com.ning.metrics.collector.filters:name=Path");
 
-        binder.bind(Filter.class)
-            .annotatedWith(Names.named("event-type"))
-            .toProvider(new EventFilterProvider(FieldExtractors.EVENT_TYPE, config.getFiltersEventType(), filterListDelimiter))
-            .in(new FixedManagedJmxExportScope("com.ning.metrics.collector.filters:name=EventType"));
+        binder.bind(Filter.class).annotatedWith(Names.named("event-type"))
+            .toProvider(new EventFilterProvider(FieldExtractors.EVENT_TYPE, config.getFiltersEventType(), filterListDelimiter)).asEagerSingleton();
+        builder.export(Filter.class).annotatedWith(Names.named("event-type")).as("com.ning.metrics.collector.filters:name=EventType");
 
         binder.bind(new TypeLiteral<List<Filter>>()
         {
@@ -181,76 +169,55 @@ public class EventCollectorModule implements Module
         /*
          * Request handlers
          */
-        binder.bind(EventRequestHandler.class)
-            .annotatedWith(ExternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(
-                QueryParameterEventExtractor.class,
-                Names.named("base10"),
-                ExternalEventEndPointStats.class
-            ))
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=ExternalEventHandler"));
+        binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
+            .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base10"), ExternalEventEndPointStats.class)).asEagerSingleton();
+        builder.export(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
+            .as("com.ning.metrics.collector:name=ExternalEventHandler");
 
-        binder.bind(ThriftEnvelopeEventParser.class)
-            .annotatedWith(Names.named("base64"))
-            .toProvider(new ThriftEnvelopeEventParserProvider(Base64NumberConverter.class))
-            .in(Scopes.SINGLETON);
+        binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base64"))
+            .toProvider(new ThriftEnvelopeEventParserProvider(Base64NumberConverter.class)).asEagerSingleton();
 
-        binder.bind(QueryParameterEventExtractor.class)
-            .annotatedWith(Names.named("base64"))
-            .toProvider(new ExternalEventExtractorProvider(Names.named("base64")))
-            .in(Scopes.SINGLETON);
+        binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
+            .toProvider(new ExternalEventExtractorProvider(Names.named("base64"))).asEagerSingleton();
 
-        binder.bind(ThriftEnvelopeEventParser.class)
-            .annotatedWith(Names.named("base10"))
-            .toProvider(new ThriftEnvelopeEventParserProvider(DecimalNumberConverter.class))
-            .in(Scopes.SINGLETON);
+        binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base10"))
+            .toProvider(new ThriftEnvelopeEventParserProvider(DecimalNumberConverter.class)).asEagerSingleton();
 
-        binder.bind(QueryParameterEventExtractor.class)
-            .annotatedWith(Names.named("base10"))
-            .toProvider(new ExternalEventExtractorProvider(Names.named("base10")))
-            .in(Scopes.SINGLETON);
+        binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
+            .toProvider(new ExternalEventExtractorProvider(Names.named("base10"))).asEagerSingleton();
 
-        binder.bind(EventRequestHandler.class)
-            .annotatedWith(Base64ExternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(
-                QueryParameterEventExtractor.class,
-                Names.named("base64"),
-                ExternalEventEndPointStats.class
-            ))
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=Base64ExternalEventHandler"));
+        binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
+            .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base64"), ExternalEventEndPointStats.class)).asEagerSingleton();
+        builder.export(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
+            .as("com.ning.metrics.collector:name=Base64ExternalEventHandler");
 
-        binder.bind(EventRequestHandler.class)
-            .annotatedWith(InternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(
-                BodyEventExtractor.class,
-                InternalEventEndPointStats.class
-            ))
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=InternalEventHandler"));
+        binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
+            .toProvider(new EventRequestHandlerProvider(BodyEventExtractor.class, InternalEventEndPointStats.class)).asEagerSingleton();
+        builder.export(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
+            .as("com.ning.metrics.collector:name=InternalEventHandler");
 
-        binder.bind(EventEndPointStats.class)
-            .annotatedWith(ExternalEventEndPointStats.class)
-            .toProvider(EventEndPointStatsProvider.class)
-            .in(new FixedManagedJmxExportScope("com.ning.metrics.collector:name=ExternalEventEndPointStats"));
+        binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
+            .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
+        builder.export(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
+            .as("com.ning.metrics.collector:name=ExternalEventEndPointStats");
 
-        binder.bind(EventEndPointStats.class)
-            .annotatedWith(InternalEventEndPointStats.class)
-            .toProvider(EventEndPointStatsProvider.class)
-            .in(new FixedManagedJmxExportScope("com.ning.metrics.collector:name=InternalEventEndPointStats"));
+        binder.bind(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
+            .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
+        builder.export(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
+            .as("com.ning.metrics.collector:name=InternalEventEndPointStats");
 
-        binder.bind(EventHandler.class)
-            .to(EventHandlerImpl.class)
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=EventHandler"));
+        binder.bind(EventHandler.class).to(EventHandlerImpl.class).asEagerSingleton();
+        builder.export(EventHandlerImpl.class).as("com.ning.metrics.collector:name=EventHandler");
 
         /*
          * Final wiring
          */
-        binder.bind(BufferingEventCollector.class)
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=BufferingEventCollector"));
+        binder.bind(BufferingEventCollector.class).asEagerSingleton();
+        builder.export(BufferingEventCollector.class).as("com.ning.metrics.collector:name=BufferingEventCollector");
 
-        binder.bind(EventCollector.class)
-            .to(BufferingEventCollector.class);
+        binder.bind(EventCollector.class).to(BufferingEventCollector.class);
 
-        binder.bind(F5PoolMemberControl.class)
-            .in(new FixedManagedJmxExportScope(log, "com.ning.metrics.collector:name=F5poolMemberControl"));
+        binder.bind(F5PoolMemberControl.class).asEagerSingleton();
+        builder.export(F5PoolMemberControl.class).as("com.ning.metrics.collector:name=F5poolMemberControl");
     }
 }

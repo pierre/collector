@@ -18,15 +18,15 @@ package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
-import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.util.Filter;
+import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.Managed;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;

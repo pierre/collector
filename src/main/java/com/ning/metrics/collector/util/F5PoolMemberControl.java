@@ -18,7 +18,6 @@ package com.ning.metrics.collector.util;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.serialization.util.Managed;
 import iControl.CommonEnabledState;
 import iControl.CommonIPPortDefinition;
 import iControl.CommonStatistic;
@@ -34,6 +33,7 @@ import iControl.LocalLBPoolMemberMemberStatistics;
 import org.apache.axis.AxisFault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.Managed;
 
 import java.util.ArrayList;
 

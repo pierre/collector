@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.ServletModule;
@@ -29,6 +30,8 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.apache.log4j.Logger;
 
+import javax.management.MBeanServer;
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,9 +55,16 @@ public class StandaloneCollectorServer
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
         injector = Guice.createInjector(
+            new AbstractModule()             /* For jmxutils */
+            {
+                @Override
+                protected void configure()
+                {
+                    bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
+                }
+            },
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
             new OpenSourceCollectorModule(), /* Open-Source version of certain interfaces */
-
             new ServletModule()              /* Optional, provide the Jetty endpoint */
             {
                 @Override
@@ -64,7 +74,6 @@ public class StandaloneCollectorServer
                     serve("*").with(GuiceContainer.class, params);
                 }
             },
-
             new ScribeModule()              /* Optional, provide the Scribe endpoint */
         );
 

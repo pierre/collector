@@ -23,9 +23,9 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.util.Managed;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.Managed;
 
 import java.io.IOException;
 import java.util.concurrent.RejectedExecutionException;
