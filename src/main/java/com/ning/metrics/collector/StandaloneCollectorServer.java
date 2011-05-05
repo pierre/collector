@@ -19,6 +19,7 @@ package com.ning.metrics.collector;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.binder.modules.EventCollectorModule;
 import com.ning.metrics.collector.binder.modules.OpenSourceCollectorModule;
@@ -55,7 +56,8 @@ public class StandaloneCollectorServer
         final Map<String, String> params = new HashMap<String, String>();
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
-        injector = Guice.createInjector(
+        // Stage.PRODUCTION is mandatory for jmxutils
+        injector = Guice.createInjector(Stage.PRODUCTION,
             new MBeanModule(),               /* Used to trigger registration of mbeans exported via ExportBuilder */
             new AbstractModule()             /* For jmxutils */
             {
