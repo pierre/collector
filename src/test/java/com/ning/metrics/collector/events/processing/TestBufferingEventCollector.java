@@ -240,7 +240,7 @@ public class TestBufferingEventCollector
         for (int idx = 0; idx < config.getActiveMQBufferLength(); idx++) {
             collector.collectEvent(event, eventStats);
         }
-        Thread.sleep(100);
+        Thread.sleep(config.getActiveMQBufferLength() / 10);
         assertEquals(sentEvents.size(), config.getActiveMQBufferLength());
         assertEquals(stats.getIgnoredEvents(), 0);
         assertEquals(stats.getEnqueuedEvents(), config.getActiveMQBufferLength());
@@ -257,7 +257,7 @@ public class TestBufferingEventCollector
         finally {
             sessionLock.unlock();
         }
-        Thread.sleep(100);
+        Thread.sleep(config.getActiveMQBufferLength() / 10);
         // the lock is queried after the take() call, so the first of the second batch of events has been read already
         assertEquals(sentEvents.size(), config.getActiveMQBufferLength() + config.getActiveMQBufferLength() + 1);
         assertEquals(stats.getIgnoredEvents(), 0);
