@@ -17,9 +17,8 @@
 package com.ning.metrics.collector.binder;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Provider;
-import com.ning.metrics.collector.binder.annotations.DiskSpoolFlushExecutor;
+import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
@@ -35,36 +34,25 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWriter>
 {
-    private final Injector injector;
     private final EventWriter hadoopEventWriter;
     private final ScheduledExecutorService executor;
+    private final CollectorConfig config;
 
     @Inject
     public DiskSpoolEventWriterProvider(
-        Injector injector,
         @HdfsEventWriter EventWriter hadoopEventWriter,
-        @DiskSpoolFlushExecutor ScheduledExecutorService executor
+        @HdfsDiskSpoolFlushExecutor ScheduledExecutorService executor,
+        CollectorConfig config
     )
     {
-        this.injector = injector;
         this.hadoopEventWriter = hadoopEventWriter;
         this.executor = executor;
+        this.config = config;
     }
 
-    /**
-     * Provides an instance of {@code T}. Must never return {@code null}.
-     *
-     * @throws com.google.inject.OutOfScopeException
-     *          when an attempt is made to access a scoped object while the scope
-     *          in question is not currently active
-     * @throws com.google.inject.ProvisionException
-     *          if an instance cannot be provided. Such exceptions include messages
-     *          and throwables to describe why provision failed.
-     */
     @Override
     public DiskSpoolEventWriter get()
     {
-        CollectorConfig config = injector.getInstance(CollectorConfig.class);
         return new DiskSpoolEventWriter(new EventHandler()
         {
             // TODO handler?
@@ -91,6 +79,7 @@ public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWrit
             {
                 return hadoopEventWriter.toString();
             }
-        }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), executor, SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes());
+        }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), executor,
+            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes());
     }
 }

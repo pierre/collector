@@ -82,6 +82,7 @@ public class JettyServer
             {
                 try {
                     start();
+                    // Will be shut down automatically, see below
                 }
                 catch (Exception e) {
                     log.warn("Unable to start the Jetty server", e);

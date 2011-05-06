@@ -21,8 +21,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.modules.EventCollectorModule;
+import com.ning.metrics.collector.binder.modules.FiltersModule;
+import com.ning.metrics.collector.binder.modules.HdfsModule;
 import com.ning.metrics.collector.binder.modules.OpenSourceCollectorModule;
+import com.ning.metrics.collector.binder.modules.RealTimeQueueModule;
+import com.ning.metrics.collector.binder.modules.RequestHandlersModule;
 import com.ning.metrics.collector.binder.modules.ScribeModule;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.endpoint.servers.ScribeServer;
@@ -30,6 +35,8 @@ import com.ning.metrics.collector.util.F5PoolMemberControl;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.apache.log4j.Logger;
+import org.skife.config.ConfigurationObjectFactory;
+import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
 import javax.management.MBeanServer;
@@ -56,19 +63,32 @@ public class StandaloneCollectorServer
         final Map<String, String> params = new HashMap<String, String>();
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
+        final CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
+
         // Stage.PRODUCTION is mandatory for jmxutils
         injector = Guice.createInjector(Stage.PRODUCTION,
             new MBeanModule(),               /* Used to trigger registration of mbeans exported via ExportBuilder */
-            new AbstractModule()             /* For jmxutils */
+            new AbstractModule()
             {
                 @Override
                 protected void configure()
                 {
+                    bind(CollectorConfig.class).toInstance(config);
                     bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
+
+                    // JMX exporter
+                    ExportBuilder builder = MBeanModule.newExporter(binder());
+
+                    bind(F5PoolMemberControl.class).asEagerSingleton();
+                    builder.export(F5PoolMemberControl.class).as("com.ning.metrics.collector:name=F5poolMemberControl");
                 }
             },
+            new RequestHandlersModule(),
+            new HdfsModule(),                /* Wiring for Hadoop */
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
             new OpenSourceCollectorModule(), /* Open-Source version of certain interfaces */
+            new RealTimeQueueModule(),       /* AMQ integration */
+            new FiltersModule(config),       /* Provide filters for the HTTP API */
             new ServletModule()              /* Optional, provide the Jetty endpoint */
             {
                 @Override

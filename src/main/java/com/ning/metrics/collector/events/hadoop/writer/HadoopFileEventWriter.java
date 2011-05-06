@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+/**
+ * HDFS EventWriter for the serialization-writer library
+ */
 @SuppressWarnings("serial")
 public class HadoopFileEventWriter implements EventWriter
 {
@@ -242,14 +245,12 @@ public class HadoopFileEventWriter implements EventWriter
     public long getSecondsSinceLastUpdate()
     {
         DateTime now = new DateTime();
-        long secondsSinceLastUpdate = (now.getMillis() - lastFlushed.getMillis()) / 1000;
 
-        return secondsSinceLastUpdate;
+        return (now.getMillis() - lastFlushed.getMillis()) / 1000;
     }
 
     public String toString()
     {
         return String.format("HDFS File Writer [%s] [%s]", fs.getUri(), baseDirectory);
     }
-
 }
