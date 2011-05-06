@@ -20,5 +20,5 @@ import java.util.concurrent.ExecutorService;
 
 public interface TaskQueueService extends ExecutorService
 {
-	public int getQueueSize();
+    public int getQueueSize();
 }

@@ -63,14 +63,6 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
             public void run()
             {
                 start();
-                Runtime.getRuntime().addShutdownHook(new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        EventQueueProcessorImpl.this.stop();
-                    }
-                });
             }
         });
     }
@@ -83,6 +75,13 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
+    @Override
+    public boolean isRunning()
+    {
+        return isRunning.get();
+    }
+
+    @Override
     public void stop()
     {
         if (isRunning.getAndSet(false)) {

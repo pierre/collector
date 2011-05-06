@@ -18,5 +18,9 @@ package com.ning.metrics.collector.events.processing;
 
 public interface EventQueueProcessor
 {
+    boolean isRunning();
+
+    void stop();
+
     void send(String type, Object event);
 }

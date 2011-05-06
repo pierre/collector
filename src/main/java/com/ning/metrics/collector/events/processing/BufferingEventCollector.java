@@ -78,10 +78,31 @@ public class BufferingEventCollector implements EventCollector
         this.activeMQController = activeMQController;
     }
 
+    /**
+     * Shutdown the EventCollector. In practice, the collector will continue accepting requests (HTTP or Thrift),
+     * but events won't be accepted anymore.
+     * This stops:
+     * the AMQ hook
+     * the workers queue of disk write operations
+     * the flusher which promotes files from the temporary area to the final area
+     * <p/>
+     *
+     * @throws InterruptedException if we are interrupted while waiting for the queue of workers to be shutdown
+     */
     public void shutdown() throws InterruptedException
     {
+        // Disable AMQ hook
+        activeMQController.stop();
+
+        // Stop accepting incoming events
         taskQueueService.shutdown();
         taskQueueService.awaitTermination(15, TimeUnit.SECONDS);
+
+        // Stop the periodic flusher
+        executor.shutdown();
+        executor.awaitTermination(15, TimeUnit.SECONDS);
+
+        // Promote files to the final area
         performOperation(new DiskOperation()
         {
             @Override
@@ -148,6 +169,7 @@ public class BufferingEventCollector implements EventCollector
                 });
             }
             catch (RejectedExecutionException e) {
+                // shutdown called
                 return false;
             }
 
@@ -169,6 +191,8 @@ public class BufferingEventCollector implements EventCollector
     /**
      * Perform a disk operation. On failure, rollback (put the file in the quarantine area).
      * This needs to be synchronized, since the eventWriter keeps track of the current file being worked on.
+     * <p/>
+     * TODO: is this still needed with the new serialization-writer library?
      *
      * @param operation DiskOperation to perform
      */
