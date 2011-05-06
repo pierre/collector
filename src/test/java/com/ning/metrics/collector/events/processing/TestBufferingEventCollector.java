@@ -119,6 +119,19 @@ public class TestBufferingEventCollector
 
                 return null;
             }
+
+            @Override
+            public void shutdown()
+            {
+                flusherCommands.clear();
+            }
+
+            @Override
+            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
+            {
+                // no-op
+                return true;
+            }
         };
         event = new StubEvent();
         collector = new BufferingEventCollector(eventWriter, executor, new StubTaskQueueService()
