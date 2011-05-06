@@ -93,7 +93,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
             collector.shutdown();
         }
         catch (InterruptedException e) {
-            log.warn("Interrupted while trying to shutdown the main collector thread");
+            log.warn("Interrupted while trying to shutdown the main collector thread", e);
         }
 
         // Stop the periodic flusher from local disk to HDFS
@@ -101,7 +101,15 @@ public class EventCollectorProvider implements Provider<EventCollector>
             hdfsWriter.shutdown();
         }
         catch (InterruptedException e) {
-            log.warn("Interrupted while trying to shutdown the HDFS flusher");
+            log.warn("Interrupted while trying to shutdown the HDFS flusher", e);
+        }
+
+        // Commit the current file
+        try {
+            hdfsWriter.forceCommit();
+        }
+        catch (IOException e) {
+            log.warn("IOExeption while committing current file", e);
         }
 
         // Give quarantined events a last chance
@@ -112,7 +120,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
             hdfsWriter.flush();
         }
         catch (IOException e) {
-            log.warn("IOException while flushing last files to HFDS");
+            log.warn("IOException while flushing last files to HFDS", e);
         }
     }
 }
