@@ -16,10 +16,6 @@
 
 package com.ning.metrics.collector.binder;
 
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
@@ -60,19 +56,9 @@ public class TestDiskSpoolEventWriterProvider
     {
         createSmilePayload();
 
-        Injector injector = Guice.createInjector(new Module()
-        {
-            @Override
-            public void configure(Binder binder)
-            {
-                // NOTE! Unable to set the queue for now. If tests fail, think of deleting the queue manually...
-                CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
-                binder.bind(CollectorConfig.class).toInstance(config);
-            }
-        });
+        CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
 
         writer = new DiskSpoolEventWriterProvider(
-            injector,
             new EventWriter()
             {
                 @Override
@@ -113,7 +99,8 @@ public class TestDiskSpoolEventWriterProvider
                 {
                 }
             },
-            new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("spool to HDFS promoter"))
+            new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("spool to HDFS promoter")),
+            config
         ).get();
     }
 
