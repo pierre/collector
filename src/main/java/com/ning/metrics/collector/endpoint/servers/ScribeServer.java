@@ -43,18 +43,12 @@ public class ScribeServer
     private static final Logger log = Logger.getLogger(ScribeServer.class);
 
     @Inject
-    public ScribeServer(
-        Iface eventRequestHandler,
-        CollectorConfig config
-    ) throws TTransportException
+    public ScribeServer(Iface eventRequestHandler, CollectorConfig config) throws TTransportException
     {
         this(eventRequestHandler, config.getScribePort());
     }
 
-    public ScribeServer(
-        Iface eventRequestHandler,
-        int port
-    ) throws TTransportException
+    public ScribeServer(Iface eventRequestHandler, int port) throws TTransportException
     {
         this.eventRequestHandler = eventRequestHandler;
         this.port = port;
@@ -67,6 +61,15 @@ public class ScribeServer
             {
                 try {
                     start();
+
+                    Runtime.getRuntime().addShutdownHook(new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            shutdown();
+                        }
+                    });
                 }
                 catch (TTransportException e) {
                     log.warn("Unable to start the Scribe server", e);
@@ -89,18 +92,6 @@ public class ScribeServer
         server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
         log.info(String.format("Starting terminal Scribe server on port %d", port));
         server.serve();
-
-        /*
-         * Add in a shutdown hook
-         */
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
-            @Override
-            public void run()
-            {
-                shutdown();
-            }
-        });
     }
 
     /**
