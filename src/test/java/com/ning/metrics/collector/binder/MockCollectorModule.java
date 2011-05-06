@@ -29,7 +29,6 @@ import com.ning.metrics.collector.events.processing.StubEventQueueProcessor;
 import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.collector.events.processing.TaskQueueServiceImpl;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventHandler;
@@ -40,11 +39,8 @@ import com.ning.metrics.serialization.writer.SyncType;
 import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.skife.config.ConfigurationObjectFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -160,12 +156,6 @@ public class MockCollectorModule extends AbstractModule
                 @Override
                 public void handle(ObjectInputStream objectInputStream, CallbackHandler handler) throws ClassNotFoundException, IOException
                 {
-                    while (objectInputStream.read() != -1) {
-                        Event event = (Event) objectInputStream.readObject();
-                        hdfsEventWriter.write(event);
-                    }
-
-                    objectInputStream.close();
                     hdfsEventWriter.forceCommit();
                     hdfsEventWriter.flush();
                 }
@@ -196,17 +186,16 @@ public class MockCollectorModule extends AbstractModule
             this.delegate = eventHandler;
         }
 
+        /**
+         * We need to override the flush method as we don't want to deal with files
+         *
+         * @throws IOException generic IOException
+         */
         @Override
         public void flush() throws IOException
         {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream outStream = new ObjectOutputStream(out);
-            new StubEvent().writeExternal(outStream);
-            outStream.flush();
-            outStream.close();
-
             try {
-                delegate.handle(new ObjectInputStream(new ByteArrayInputStream(out.toByteArray())), new CallbackHandler()
+                delegate.handle(null, new CallbackHandler()
                 {
                     @Override
                     public void onError(Throwable t, Event event)
