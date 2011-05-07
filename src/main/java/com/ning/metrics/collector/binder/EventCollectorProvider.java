@@ -88,6 +88,9 @@ public class EventCollectorProvider implements Provider<EventCollector>
 
     protected static void mainCollectorShutdownHook(BufferingEventCollector collector, DiskSpoolEventWriter hdfsWriter)
     {
+        log.info("Starting main shutdown sequence");
+
+        log.info("Stop accepting new events");
         // Stop accepting events and flush all events in memory to disk
         try {
             collector.shutdown();
@@ -96,6 +99,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
             log.warn("Interrupted while trying to shutdown the main collector thread", e);
         }
 
+        log.info("Shut down the writers service");
         // Stop the periodic flusher from local disk to HDFS
         try {
             hdfsWriter.shutdown();
@@ -104,6 +108,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
             log.warn("Interrupted while trying to shutdown the HDFS flusher", e);
         }
 
+        log.info("Flush current open file to disk");
         // Commit the current file
         try {
             hdfsWriter.forceCommit();
@@ -112,9 +117,11 @@ public class EventCollectorProvider implements Provider<EventCollector>
             log.warn("IOExeption while committing current file", e);
         }
 
+        log.info("Promote quarantined files to final spool area");
         // Give quarantined events a last chance
         hdfsWriter.processQuarantinedFiles();
 
+        log.info("Flush all local files to HDFS");
         // Flush events to HDFS
         try {
             hdfsWriter.flush();
@@ -122,5 +129,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
         catch (IOException e) {
             log.warn("IOException while flushing last files to HFDS", e);
         }
+
+        log.info("Main shutdown sequence has terminated");
     }
 }
