@@ -21,6 +21,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
+import com.ning.metrics.collector.binder.ProfiledInterceptor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.modules.EventCollectorModule;
 import com.ning.metrics.collector.binder.modules.FiltersModule;
@@ -34,7 +35,9 @@ import com.ning.metrics.collector.endpoint.servers.ScribeServer;
 import com.ning.metrics.collector.util.F5PoolMemberControl;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.log4j.Logger;
+import org.perf4j.aop.Profiled;
 import org.skife.config.ConfigurationObjectFactory;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
@@ -43,6 +46,9 @@ import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.inject.matcher.Matchers.annotatedWith;
+import static com.google.inject.matcher.Matchers.any;
 
 /**
  * If you are writing your own Main class, make sure to match the name since
@@ -79,6 +85,11 @@ public class StandaloneCollectorServer
                     // JMX exporter
                     ExportBuilder builder = MBeanModule.newExporter(binder());
 
+                    // Perf4j Stuff
+                    MethodInterceptor interceptor = new ProfiledInterceptor();
+                    bindInterceptor(any(), annotatedWith(Profiled.class), interceptor);
+
+                    // F5 slb stuff
                     bind(F5PoolMemberControl.class).asEagerSingleton();
                     builder.export(F5PoolMemberControl.class).as("com.ning.metrics.collector:name=F5poolMemberControl");
                 }

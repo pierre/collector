@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
 import java.io.IOException;
@@ -110,6 +111,7 @@ public class HadoopFileEventWriter implements EventWriter
      * @throws IOException if the write is not successful
      * @see com.ning.metrics.serialization.smile.SmileEnvelopeEventsToSmileBucketEvents to bundle properly Smile events
      */
+    @Profiled(tag = "jmx", message = "Write event to HDFS")
     public synchronized void write(Event event) throws IOException
     {
         for (FileError fileError : fileErrorList) {

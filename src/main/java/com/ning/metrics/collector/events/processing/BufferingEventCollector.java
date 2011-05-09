@@ -25,6 +25,7 @@ import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
+import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
 import java.io.IOException;
@@ -139,6 +140,7 @@ public class BufferingEventCollector implements EventCollector
     }
 
     @Override
+    @Profiled(tag = "jmx", message = "Time to collect an event")
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {
         if ((activeMQController != null) && (event != null)) {
