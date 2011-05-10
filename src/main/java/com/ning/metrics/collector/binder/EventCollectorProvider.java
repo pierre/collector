@@ -123,12 +123,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
 
         log.info("Flush all local files to HDFS");
         // Flush events to HDFS
-        try {
-            hdfsWriter.flush();
-        }
-        catch (IOException e) {
-            log.warn("IOException while flushing last files to HFDS", e);
-        }
+        hdfsWriter.flush();
 
         log.info("Main shutdown sequence has terminated");
     }

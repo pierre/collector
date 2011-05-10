@@ -86,6 +86,6 @@ public class TestEventCollectorProvider
         assertEquals(bufferingEventWriter.getCommittedEventList().size(), 1);
 
         assertTrue(hdfsExecutor.isTerminated()); // Writer executor
-        assertEquals(((MockEventWriter) hdfsEventWriter).getNumberOfFlushedEvents(), 1);
+        assertEquals(((MockEventWriter) hdfsEventWriter).getFlushedEventList().size(), 1);
     }
 }

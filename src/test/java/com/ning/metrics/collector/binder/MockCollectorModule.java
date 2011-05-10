@@ -38,6 +38,7 @@ import com.ning.metrics.serialization.writer.StubScheduledExecutorService;
 import com.ning.metrics.serialization.writer.SyncType;
 import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.skife.config.ConfigurationObjectFactory;
+import org.testng.Assert;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -192,7 +193,7 @@ public class MockCollectorModule extends AbstractModule
          * @throws IOException generic IOException
          */
         @Override
-        public void flush() throws IOException
+        public void flush()
         {
             try {
                 delegate.handle(null, new CallbackHandler()
@@ -209,7 +210,10 @@ public class MockCollectorModule extends AbstractModule
                 });
             }
             catch (ClassNotFoundException e) {
-                throw new IOException(e);
+                Assert.fail(e.getLocalizedMessage());
+            }
+            catch (IOException e) {
+                Assert.fail(e.getLocalizedMessage());
             }
         }
     }
