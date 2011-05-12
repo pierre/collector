@@ -16,29 +16,33 @@
 
 package com.ning.metrics.collector.events.hadoop.writer;
 
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 
-/**
- * Encapsulate errors on HadoopOutputChunk I/O operations
- */
-class FileError
+public class TestFileError
 {
-    private final String filename;
-    private final IOException exception;
+    private static final String PATH = "/events/foo.thrift";
+    private static final IOException EXCEPTION = new IOException();
+    FileError error;
 
-    FileError(String filename, IOException exception)
+    @BeforeMethod(alwaysRun = true)
+    public void setUp() throws Exception
     {
-        this.filename = filename;
-        this.exception = exception;
+        error = new FileError(PATH, EXCEPTION);
     }
 
-    public String getFilename()
+    @Test(groups = "fast")
+    public void testGetFilename() throws Exception
     {
-        return filename;
+        Assert.assertEquals(error.getFilename(), PATH);
     }
 
-    public IOException getException()
+    @Test(groups = "fast")
+    public void testGetException() throws Exception
     {
-        return exception;
+        Assert.assertEquals(error.getException(), EXCEPTION);
     }
 }
