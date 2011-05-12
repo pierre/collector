@@ -22,6 +22,9 @@ import org.apache.hadoop.io.SequenceFile;
 
 import java.io.IOException;
 
+/**
+ * This class takes care of renaming files in HDFS
+ */
 class HadoopOutputChunk
 {
     private final Path sourcePath;
@@ -36,6 +39,11 @@ class HadoopOutputChunk
         this.writer = writer;
     }
 
+    /**
+     * Close the underlying writer
+     *
+     * @throws IOException generic IOException
+     */
     public void close() throws IOException
     {
         if (!isClosed) {
@@ -44,6 +52,12 @@ class HadoopOutputChunk
         }
     }
 
+    /**
+     * Rename sourcePath to destinationPath. Parents don't have to exist (they will be created if they don't).
+     *
+     * @param fileSystem Filesystem object to operate on
+     * @throws IOException generic IOException
+     */
     public void commit(FileSystem fileSystem) throws IOException
     {
         Path destinationDir = destinationPath.getParent();
@@ -57,6 +71,12 @@ class HadoopOutputChunk
         }
     }
 
+    /**
+     * Delete both sourcePath and destinationPath
+     *
+     * @param fileSystem FileSystem object to operate on
+     * @throws IOException generic IOException
+     */
     public void rollback(FileSystem fileSystem) throws IOException
     {
         deleteIfExists(sourcePath, fileSystem);
