@@ -107,7 +107,7 @@ public class MockCollectorModule extends AbstractModule
             }
 
             @Override
-            public void send(String type, Object event)
+            public void send(Event event)
             {
             }
         });

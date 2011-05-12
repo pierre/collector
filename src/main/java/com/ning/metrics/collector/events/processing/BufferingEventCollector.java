@@ -143,8 +143,7 @@ public class BufferingEventCollector implements EventCollector
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {
         if ((activeMQController != null) && (event != null)) {
-            String humanReadableMessage = event.getData().toString();
-            activeMQController.send(event.getName(), humanReadableMessage);
+            activeMQController.send(event);
         }
 
         if (taskQueueService.getQueueSize() < maxQueueSize.get()) {

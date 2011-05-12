@@ -259,4 +259,40 @@ public interface CollectorConfig
     @Config(value = "collector.f5.poolname")
     @DefaultNull
     public String getF5PoolName();
+
+    /**
+     * Goodwill hostname. This is used for the ActiveMQ integration.
+     *
+     * @return Goodwill hostname
+     */
+    @Config(value = "collector.goodwill.host")
+    @Default(value = "127.0.0.1")
+    public String getGoodwillHost();
+
+    /**
+     * Goodwill port. This is used for the ActiveMQ integration.
+     *
+     * @return Goodwill port
+     */
+    @Config(value = "collector.goodwill.port")
+    @Default(value = "8080")
+    public int getGoodwillPort();
+
+    /**
+     * Whether the Goodwill integration is enabled. If so, events will be sent as Json to AMQ.
+     *
+     * @return true if Goodwill integration is enabled, false otherwise
+     */
+    @Config(value = "collector.goodwill.enabled")
+    @Default(value = "false")
+    public boolean isGoodwillEnabled();
+
+    /**
+     * How often to refresh the cache from Goodwill, in seconds
+     *
+     * @return true if Goodwill integration is enabled, false otherwise
+     */
+    @Config(value = "collector.goodwill.enabled")
+    @Default(value = "90")
+    public int getGoodwillCacheTimeout();
 }

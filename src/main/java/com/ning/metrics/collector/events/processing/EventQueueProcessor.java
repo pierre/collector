@@ -16,11 +16,13 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.serialization.event.Event;
+
 public interface EventQueueProcessor
 {
     boolean isRunning();
 
     void stop();
 
-    void send(String type, Object event);
+    void send(Event event);
 }

@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.serialization.event.Event;
+
 public class StubEventQueueProcessor implements EventQueueProcessor
 {
     @Override
@@ -31,7 +33,7 @@ public class StubEventQueueProcessor implements EventQueueProcessor
     }
 
     @Override
-    public void send(String type, Object event)
+    public void send(Event event)
     {
         throw new UnsupportedOperationException();
     }
