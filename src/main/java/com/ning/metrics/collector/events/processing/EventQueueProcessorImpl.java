@@ -224,20 +224,26 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         switch (goodwillSchemaField.getType()) {
             case BOOLEAN:
                 root.put(goodwillSchemaField.getName(), dataItem.getBoolean());
+                break;
             case BYTE:
                 root.put(goodwillSchemaField.getName(), dataItem.getByte());
+                break;
             case SHORT:
             case INTEGER:
                 root.put(goodwillSchemaField.getName(), dataItem.getInteger());
+                break;
             case LONG:
                 root.put(goodwillSchemaField.getName(), dataItem.getLong());
+                break;
             case DOUBLE:
                 root.put(goodwillSchemaField.getName(), dataItem.getDouble());
+                break;
             case DATE:
             case IP:
             case STRING:
             default:
                 root.put(goodwillSchemaField.getName(), dataItem.getString());
+                break;
         }
     }
 
