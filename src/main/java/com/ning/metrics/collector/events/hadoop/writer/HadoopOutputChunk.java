@@ -25,14 +25,14 @@ import java.io.IOException;
 class HadoopOutputChunk
 {
     private final Path sourcePath;
-    private final Path desintationPath;
+    private final Path destinationPath;
     private final SequenceFile.Writer writer;
     private boolean isClosed = false;
 
-    HadoopOutputChunk(Path sourcePath, Path desintationPath, SequenceFile.Writer writer)
+    HadoopOutputChunk(Path sourcePath, Path destinationPath, SequenceFile.Writer writer)
     {
         this.sourcePath = sourcePath;
-        this.desintationPath = desintationPath;
+        this.destinationPath = destinationPath;
         this.writer = writer;
     }
 
@@ -46,21 +46,21 @@ class HadoopOutputChunk
 
     public void commit(FileSystem fileSystem) throws IOException
     {
-        Path destinationDir = desintationPath.getParent();
+        Path destinationDir = destinationPath.getParent();
 
         // parent directory has to exist for a hdfs rename to succeed
-        if (!fileSystem.exists(destinationDir) && !fileSystem.mkdirs(desintationPath.getParent())) {
+        if (!fileSystem.exists(destinationDir) && !fileSystem.mkdirs(destinationPath.getParent())) {
             throw new IOException(String.format("Unable to make destination directory %s (does the parent directory exist?)", destinationDir));
         }
-        if (!fileSystem.rename(sourcePath, desintationPath)) {
-            throw new IOException(String.format("Unable to rename %s to %s", sourcePath, desintationPath));
+        if (!fileSystem.rename(sourcePath, destinationPath)) {
+            throw new IOException(String.format("Unable to rename %s to %s", sourcePath, destinationPath));
         }
     }
 
     public void rollback(FileSystem fileSystem) throws IOException
     {
         deleteIfExists(sourcePath, fileSystem);
-        deleteIfExists(desintationPath, fileSystem);
+        deleteIfExists(destinationPath, fileSystem);
     }
 
     private void deleteIfExists(Path path, FileSystem fileSystem) throws IOException
@@ -78,6 +78,6 @@ class HadoopOutputChunk
     @Override
     public String toString()
     {
-        return String.format("%s : %s -> %s", HadoopOutputChunk.class, sourcePath, desintationPath);
+        return String.format("%s : %s -> %s", HadoopOutputChunk.class, sourcePath, destinationPath);
     }
 }
