@@ -31,6 +31,7 @@ import com.ning.metrics.serialization.thrift.ThriftField;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ThriftEnvelopeEventParser implements EventParser
 {
@@ -111,7 +112,7 @@ public class ThriftEnvelopeEventParser implements EventParser
 
     private ThriftField getAnnotatedValue(short id, Token token, ExtractedAnnotation annotation)
     {
-        String function = token.getValue().toLowerCase();
+        String function = token.getValue().toLowerCase(Locale.US);
         if ("date".equals(function)) {
             return ThriftField.createThriftField(annotation.getDateTime().getMillis(), id);
         }

@@ -22,6 +22,7 @@ import org.joda.time.DateTime;
 
 import javax.ws.rs.core.HttpHeaders;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +37,7 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
             return Granularity.HOURLY;
         }
 
-        return Granularity.valueOf(granularityString.toUpperCase());
+        return Granularity.valueOf(granularityString.toUpperCase(Locale.US));
     }
 
     @Override
