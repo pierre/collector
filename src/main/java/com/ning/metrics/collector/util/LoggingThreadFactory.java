@@ -39,42 +39,41 @@ public class LoggingThreadFactory implements ThreadFactory
 
     public Thread newThread(final Runnable runnable)
     {
-        Runnable wrapped = new Runnable()
-        {
-            public void run()
-            {
-                try {
-                    runnable.run();
-                }
-                catch (RuntimeException e) {
-                    log.error(String.format("Thread %s ended abnormally with an exception", Thread.currentThread().getName()), e);
-                    throw e;
-                }
-                catch (Error e) {
-                    log.error(String.format("Thread %s ended abnormally with an exception", Thread.currentThread().getName()), e);
-                    throw e;
-                }
+        Runnable wrapped = new LoggingRunnable(runnable);
 
-                if (log.isDebugEnabled()) {
-                    boolean interrupted = Thread.interrupted();
-                    log.debug(String.format("Thread %s finished executing", Thread.currentThread().getName()));
-                    if (interrupted) {
-                        Thread.currentThread().interrupt();
-                    }
+        return delegate.newThread(wrapped);
+    }
+
+    private static class LoggingRunnable implements Runnable
+    {
+        private final Runnable runnable;
+
+        public LoggingRunnable(Runnable runnable)
+        {
+            this.runnable = runnable;
+        }
+
+        public void run()
+        {
+            try {
+                runnable.run();
+            }
+            catch (RuntimeException e) {
+                log.error(String.format("Thread %s ended abnormally with an exception", Thread.currentThread().getName()), e);
+                throw e;
+            }
+            catch (Error e) {
+                log.error(String.format("Thread %s ended abnormally with an exception", Thread.currentThread().getName()), e);
+                throw e;
+            }
+
+            if (log.isDebugEnabled()) {
+                boolean interrupted = Thread.interrupted();
+                log.debug(String.format("Thread %s finished executing", Thread.currentThread().getName()));
+                if (interrupted) {
+                    Thread.currentThread().interrupt();
                 }
             }
-        };
-
-        Thread thread = delegate.newThread(wrapped);
-
-//		thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
-//		{
-//			public void uncaughtException(Thread thread, Throwable e)
-//			{
-//				log.error(String.format("Thread %s ended abnormally with an exception", thread.getName()), e);
-//			}
-//		});
-
-        return thread;
+        }
     }
 }
