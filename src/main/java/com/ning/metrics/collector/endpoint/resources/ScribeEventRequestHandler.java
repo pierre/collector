@@ -190,8 +190,7 @@ public class ScribeEventRequestHandler implements Iface
         }
     }
 
-    private Event extractThriftEnvelopeEvent(String category, String message)
-        throws TException
+    private Event extractThriftEnvelopeEvent(String category, String message) throws TException
     {
         Event event;
         String[] payload = StringUtils.split(message, ":");
@@ -237,7 +236,7 @@ public class ScribeEventRequestHandler implements Iface
                 event = ThriftToThriftEnvelopeEvent.extractEvent(category, new DateTime(eventDateTime), thrift);
             }
         }
-        catch (Exception e) {
+        catch (TException e) {
             log.debug("Event doesn't look like a Thrift, assuming plain text");
             if (eventDateTime == null) {
                 event = StringToThriftEnvelopeEvent.extractEvent(category, payload[1]);
