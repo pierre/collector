@@ -25,55 +25,54 @@ import org.testng.annotations.Test;
 
 public class TestEventRate
 {
-	@Test(groups = "fast")
-	public void testZeroEndRate() throws Exception
-	{
-		MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
-		EventRate rate = createRate(theDate, 5);
+    @Test(groups = "fast")
+    public void testZeroEndRate() throws Exception
+    {
+        MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
+        EventRate rate = createRate(theDate, 5);
 
-		rate.increment();
-		rate.increment();
-		theDate.addMinutes(4);
-		Assert.assertEquals(rate.getRate(), 2);
-		theDate.addMinutes(1);
-		Assert.assertEquals(rate.getRate(), 0);
-	}
+        rate.increment();
+        rate.increment();
+        theDate.addMinutes(4);
+        Assert.assertEquals(rate.getRate(), 2);
+        theDate.addMinutes(1);
+        Assert.assertEquals(rate.getRate(), 0);
+    }
 
-	@Test(groups = "fast")
-	public void testZeroInitRate() throws Exception
-	{
-		MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
-		EventRate rate = createRate(theDate, 5);
+    @Test(groups = "fast")
+    public void testZeroInitRate() throws Exception
+    {
+        MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
+        EventRate rate = createRate(theDate, 5);
 
-		Assert.assertEquals(rate.getRate(), 0);
-	}
+        Assert.assertEquals(rate.getRate(), 0);
+    }
 
-	@Test(groups = "fast")
-	public void testNormalRateChange() throws Exception
-	{
-		MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
-		EventRate rate = createRate(theDate, 5);
+    @Test(groups = "fast")
+    public void testNormalRateChange() throws Exception
+    {
+        MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
+        EventRate rate = createRate(theDate, 5);
 
-		rate.increment();
-		rate.increment();
-		theDate.addMinutes(4);
-		Assert.assertEquals(rate.getRate(), 2);
-		rate.increment();
-		Assert.assertEquals(rate.getRate(), 3);
-		theDate.addMinutes(1);
-		Assert.assertEquals(rate.getRate(), 1);
-	}
+        rate.increment();
+        rate.increment();
+        theDate.addMinutes(4);
+        Assert.assertEquals(rate.getRate(), 2);
+        rate.increment();
+        Assert.assertEquals(rate.getRate(), 3);
+        theDate.addMinutes(1);
+        Assert.assertEquals(rate.getRate(), 1);
+    }
 
-	private EventRate createRate(final MutableDateTime theDate, int minutes)
-	{
-		EventRate rate = new EventRate(Period.minutes(minutes))
-		{
-			@Override
-			protected DateTime getNow()
-			{
-				return theDate.toDateTime();
-			}
-		};
-		return rate;
-	}
+    private EventRate createRate(final MutableDateTime theDate, int minutes)
+    {
+        return new EventRate(Period.minutes(minutes))
+        {
+            @Override
+            protected DateTime getNow()
+            {
+                return theDate.toDateTime();
+            }
+        };
+    }
 }
