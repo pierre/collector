@@ -16,16 +16,15 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.serialization.event.SmileBucketEvent;
-import com.ning.metrics.serialization.smile.JsonStreamToSmileBucketEvent;
-import com.ning.metrics.serialization.smile.SmileBucketDeserializer;
-import com.ning.metrics.serialization.thrift.ThriftFieldListParser;
 import com.ning.metrics.collector.events.parsing.EventParsingException;
 import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.SmileBucketEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.smile.JsonStreamToSmileBucketEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
+import com.ning.metrics.serialization.thrift.ThriftFieldListParser;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.MediaType;
@@ -42,13 +41,12 @@ public class BodyEventExtractor implements EventExtractor
     public Collection<? extends Event> extractEvent(String eventType, ExtractedAnnotation annotation) throws EventParsingException
     {
         if (eventType != null) {
-
-            log.debug(String.format("receiving event of type %s, content-type %s", eventType, annotation.getContentType()));
-
             if (annotation == null) {
                 log.warn("Null annotation");
                 throw new EventParsingException("Null annotation");
             }
+
+            log.debug(String.format("receiving event of type %s, content-type %s", eventType, annotation.getContentType()));
 
             // contentType defaults to ning/thrift, for backwards compatibility
             if (annotation.getContentType() == null || annotation.getContentType().equals("ning/thrift")) {
@@ -66,9 +64,9 @@ public class BodyEventExtractor implements EventExtractor
 
                 Vector<ThriftEnvelopeEvent> v = new Vector<ThriftEnvelopeEvent>(1);
                 v.add(0, new ThriftEnvelopeEvent(
-                        annotation.getDateTime(),
-                        new ThriftEnvelope(eventType, thriftFieldList),
-                        annotation.getBucketGranularity()
+                    annotation.getDateTime(),
+                    new ThriftEnvelope(eventType, thriftFieldList),
+                    annotation.getBucketGranularity()
                 ));
                 return v;
             }
