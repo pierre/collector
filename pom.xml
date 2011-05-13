@@ -558,6 +558,7 @@
                 <configuration>
                     <threshold>Low</threshold>
                     <effort>Max</effort>
+                    <excludeFilterFile>src/main/resources/findbugsExcludeFilter.xml</excludeFilterFile>
                 </configuration>
             </plugin>
             <plugin>
