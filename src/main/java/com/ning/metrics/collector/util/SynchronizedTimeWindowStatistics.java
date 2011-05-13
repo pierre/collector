@@ -89,7 +89,7 @@ public class SynchronizedTimeWindowStatistics extends DescriptiveStatistics
 
     private void flushOlderThan(long time)
     {
-        Long oldestQueuedTime = 0L;
+        Long oldestQueuedTime;
         while ((oldestQueuedTime = queuedTimes.peek()) != null && oldestQueuedTime < time) {
             queuedTimes.remove();
         }
