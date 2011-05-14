@@ -36,7 +36,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class EventCollectorModule implements Module
 {
-    @SuppressWarnings("unchecked")
     @Override
     public void configure(Binder binder)
     {
