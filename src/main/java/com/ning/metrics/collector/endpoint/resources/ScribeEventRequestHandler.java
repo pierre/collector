@@ -214,8 +214,9 @@ public class ScribeEventRequestHandler implements Iface
         // Assume a ThriftEnvelopeEvent from the eventtracker (uses Java serialization).
         // This is bigger on the wire, but the interface is portable. Serialize using TBinaryProtocol
         // if you care about size (see below).
+        ObjectInputStream objectInputStream = null;
         try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(thrift)));
+            objectInputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(thrift)));
             event = new ThriftEnvelopeEvent();
             event.readExternal(objectInputStream);
 
@@ -225,6 +226,16 @@ public class ScribeEventRequestHandler implements Iface
         }
         catch (Exception e) {
             log.debug(String.format("Payload is not a ThriftEvent: %s", e.getLocalizedMessage()));
+        }
+        finally {
+            try {
+                if (objectInputStream != null) {
+                    objectInputStream.close();
+                }
+            }
+            catch (IOException e) {
+                log.warn("Unable to close stream when deserializing thrift events", e);
+            }
         }
 
         // Not a ThriftEvent, probably native Thrift serialization (TBinaryProtocol)
