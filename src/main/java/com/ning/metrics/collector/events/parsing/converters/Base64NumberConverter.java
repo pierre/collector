@@ -47,7 +47,7 @@ public class Base64NumberConverter implements NumberConverter
 
     private static long decode(char[] input)
     {
-        long value = 0;
+        long value = 0L;
         boolean isNegative = false;
         int i = 0;
 

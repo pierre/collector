@@ -22,9 +22,9 @@ package com.ning.metrics.collector.endpoint;
 public class EventStats
 {
     private final long receivedTimeStamp;
-    private long acceptedTimeStamp;
+    private long acceptedTimeStamp = 0L;
 
-    private long extractedTimeStamp;
+    private long extractedTimeStamp = 0L;
 
     public EventStats()
     {

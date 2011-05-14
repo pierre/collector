@@ -58,7 +58,7 @@ public class ThriftEnvelopeEventParser implements EventParser
         try {
             Tokenizer tokenizer = new UrlDecodingTokenizer(new SplitTokenizer(input, TOKEN_SEPARATOR));
             List<ThriftField> payload = new ArrayList<ThriftField>();
-            short id = 1;
+            short id = (short) 1;
 
             while (tokenizer.hasNext()) {
                 Token token = tokenizer.next();

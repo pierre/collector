@@ -32,7 +32,7 @@ public class ActiveMQConnection implements EventQueueConnection
     private final CollectorConfig config;
     private ActiveMQConnectionFactory connectionFactory = null;
     private final Object connectionMonitor = new Object();
-    private TopicConnection connection;
+    private TopicConnection connection = null;
 
     public ActiveMQConnection(CollectorConfig config)
     {

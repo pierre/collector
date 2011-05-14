@@ -37,7 +37,7 @@ public class ActiveMQSession implements EventQueueSession
     private final String topic;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final Object sessionMonitor = new Object();
-    private TopicSession session;
+    private TopicSession session = null;
     private TopicPublisher publisher;
 
     public ActiveMQSession(CollectorConfig config, ActiveMQConnection connection, String topic)
