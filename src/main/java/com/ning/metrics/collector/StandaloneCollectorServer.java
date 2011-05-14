@@ -26,7 +26,7 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.modules.EventCollectorModule;
 import com.ning.metrics.collector.binder.modules.FiltersModule;
 import com.ning.metrics.collector.binder.modules.HdfsModule;
-import com.ning.metrics.collector.binder.modules.RealTimeQueueModule;
+import com.ning.metrics.collector.realtime.RealTimeQueueModule;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
 import com.ning.metrics.collector.binder.modules.ScribeModule;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;

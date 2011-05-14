@@ -21,6 +21,7 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEven
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.EventWriter;

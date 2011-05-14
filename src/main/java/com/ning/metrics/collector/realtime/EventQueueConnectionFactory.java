@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime;
 
 public interface EventQueueConnectionFactory
 {

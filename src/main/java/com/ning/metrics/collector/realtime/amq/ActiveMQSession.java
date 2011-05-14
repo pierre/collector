@@ -14,9 +14,10 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime.amq;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.realtime.EventQueueSession;
 import org.apache.activemq.AlreadyClosedException;
 import org.apache.activemq.ConnectionFailedException;
 import org.apache.log4j.Logger;
@@ -28,7 +29,7 @@ import javax.jms.TopicSession;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ActiveMQSession implements EventQueueSession
+class ActiveMQSession implements EventQueueSession
 {
     private static final Logger logger = Logger.getLogger(ActiveMQSession.class);
 
@@ -40,7 +41,7 @@ public class ActiveMQSession implements EventQueueSession
     private TopicSession session = null;
     private TopicPublisher publisher;
 
-    public ActiveMQSession(CollectorConfig config, ActiveMQConnection connection, String topic)
+    public ActiveMQSession(final CollectorConfig config, final ActiveMQConnection connection, final String topic)
     {
         this.config = config;
         this.connection = connection;
@@ -95,16 +96,16 @@ public class ActiveMQSession implements EventQueueSession
         }
     }
 
-    private boolean shouldReinit(JMSException ex)
+    private boolean shouldReinit(final JMSException ex)
     {
-        return (ex instanceof AlreadyClosedException) ||
-            (ex instanceof javax.jms.IllegalStateException) ||
-            (ex instanceof ConnectionFailedException) ||
-            (ex.getCause() instanceof IOException);
+        return ex instanceof AlreadyClosedException ||
+            ex instanceof javax.jms.IllegalStateException ||
+            ex instanceof ConnectionFailedException ||
+            ex.getCause() instanceof IOException;
     }
 
     @Override
-    public void send(Object event)
+    public void send(final Object event)
     {
         if (isRunning.get()) {
             try {

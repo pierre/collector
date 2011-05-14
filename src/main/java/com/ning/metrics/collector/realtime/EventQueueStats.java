@@ -14,12 +14,15 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime;
 
 import org.weakref.jmx.Managed;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Needs to be public for JMX
+ */
 public class EventQueueStats
 {
     private final AtomicLong ignoredEvents = new AtomicLong(0);
@@ -82,6 +85,4 @@ public class EventQueueStats
     {
         return erroredEvents.get();
     }
-
-
 }

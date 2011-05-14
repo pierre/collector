@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,14 +60,14 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     private CachingGoodwillAccessor goodwillAccessor = null;
 
     @Inject
-    public EventQueueProcessorImpl(CollectorConfig config, EventQueueConnectionFactory factory, EventQueueStats stats)
+    public EventQueueProcessorImpl(final CollectorConfig config, final EventQueueConnectionFactory factory, final EventQueueStats stats)
     {
         this.config = config;
         this.stats = stats;
         this.enabled.set(config.isActiveMQEnabled());
 
-        String typesStr = config.getActiveMQEventsToCollect();
-        Set<String> types = (typesStr == null ? new HashSet<String>() : new HashSet<String>(Arrays.asList(typesStr.split("\\s*,\\s*"))));
+        final String typesStr = config.getActiveMQEventsToCollect();
+        final Set<String> types = typesStr == null ? new HashSet<String>() : new HashSet<String>(Arrays.asList(typesStr.split("\\s*,\\s*")));
 
         this.typesToCollect.set(types);
 
@@ -76,7 +76,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
 
         this.connection = factory.createConnection();
-        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("EventQueueProcessorImpl"));
+        final Executor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("EventQueueProcessorImpl"));
         executor.execute(new Runnable()
         {
             @Override
@@ -105,7 +105,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     public void stop()
     {
         if (isRunning.getAndSet(false)) {
-            for (LocalQueueAndWorkers queue : queuesPerCategory.values()) {
+            for (final LocalQueueAndWorkers queue : queuesPerCategory.values()) {
                 queue.close();
             }
             queuesPerCategory.clear();
@@ -114,10 +114,10 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     }
 
     @Override
-    public void send(Event event)
+    public void send(final Event event)
     {
         if (event != null && isRunning.get() && typesToCollect.get().contains(event.getName())) {
-            String type = event.getName();
+            final String type = event.getName();
             LocalQueueAndWorkers queue = queuesPerCategory.get(type);
 
             if (queue == null) {
@@ -143,12 +143,12 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
      * @param event event to format
      * @return Object suited for AMQ
      */
-    private Object getMessageForActiveMQ(Event event)
+    private Object getMessageForActiveMQ(final Event event)
     {
         String amqMessage = null;
 
         if (goodwillAccessor != null) {
-            GoodwillSchema schema = goodwillAccessor.getSchema(event.getName());
+            final GoodwillSchema schema = goodwillAccessor.getSchema(event.getName());
             if (schema != null) {
                 amqMessage = eventToJson(event, schema);
             }
@@ -169,7 +169,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
      * @param schema Goodwill schema
      * @return String (Json) representation of the event
      */
-    private String eventToJson(Event event, GoodwillSchema schema)
+    private String eventToJson(final Event event, final GoodwillSchema schema)
     {
         if (event.getData() instanceof JsonNode) {
             // Probably a Smile event, nothing to do
@@ -194,12 +194,12 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         else if (event.getData() instanceof ThriftEnvelope) {
             // Thrift!
             try {
-                ThriftEnvelope envelope = (ThriftEnvelope) event.getData();
+                final ThriftEnvelope envelope = (ThriftEnvelope) event.getData();
                 short i = 1;
-                ObjectNode root = JsonNodeFactory.instance.objectNode();
+                final ObjectNode root = JsonNodeFactory.instance.objectNode();
 
-                for (ThriftField field : envelope.getPayload()) {
-                    GoodwillSchemaField goodwillSchemaField = schema.getFieldByPosition(i);
+                for (final ThriftField field : envelope.getPayload()) {
+                    final GoodwillSchemaField goodwillSchemaField = schema.getFieldByPosition(i);
                     if (goodwillSchemaField == null) {
                         throw new IOException(String.format("Unable to find schema field for %s", field));
                     }
@@ -219,7 +219,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         return event.getData().toString();
     }
 
-    private void addToRoot(ObjectNode root, DataItem dataItem, GoodwillSchemaField goodwillSchemaField)
+    private void addToRoot(final ObjectNode root, final DataItem dataItem, final GoodwillSchemaField goodwillSchemaField)
     {
         switch (goodwillSchemaField.getType()) {
             case BOOLEAN:
@@ -270,9 +270,9 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     }
 
     @Managed(description = "add event type to collect")
-    public void addTypeToCollect(String event)
+    public void addTypeToCollect(final String event)
     {
-        Set<String> events = typesToCollect.get();
+        final Set<String> events = typesToCollect.get();
 
         if (events.add(event)) {
             typesToCollect.set(events);
@@ -281,9 +281,9 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     }
 
     @Managed(description = "remove event type to collect")
-    public void removeTypeToCollect(String event)
+    public void removeTypeToCollect(final String event)
     {
-        Set<String> events = typesToCollect.get();
+        final Set<String> events = typesToCollect.get();
 
         if (events.remove(event)) {
             typesToCollect.set(events);

@@ -14,11 +14,13 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime;
 
 public interface EventQueueConnection
 {
     EventQueueSession getSessionFor(String type);
+
     void reconnect();
+
     void close();
 }

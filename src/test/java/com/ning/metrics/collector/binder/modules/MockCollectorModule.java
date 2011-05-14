@@ -25,7 +25,7 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.providers.EventCollectorProvider;
 import com.ning.metrics.collector.events.processing.BufferingEventCollector;
 import com.ning.metrics.collector.events.processing.EventCollector;
-import com.ning.metrics.collector.events.processing.EventQueueProcessor;
+import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.events.processing.StubEventQueueProcessor;
 import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.collector.events.processing.TaskQueueServiceImpl;

@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +27,7 @@ class LocalQueueWorker implements Runnable
     private final EventQueueSession processor;
     private final EventQueueStats stats;
 
-    public LocalQueueWorker(BlockingQueue<Object> msgQueue, EventQueueSession processor, EventQueueStats stats)
+    public LocalQueueWorker(final BlockingQueue<Object> msgQueue, final EventQueueSession processor, final EventQueueStats stats)
     {
         this.eventQueue = msgQueue;
         this.processor = processor;
@@ -38,7 +38,7 @@ class LocalQueueWorker implements Runnable
     {
         while (true) {
             try {
-                Object event = eventQueue.take();
+                final Object event = eventQueue.take();
 
                 processor.send(event);
                 stats.registerEventSent();

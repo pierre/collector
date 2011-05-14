@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.serialization.event.Event;
 
 public class StubEventQueueProcessor implements EventQueueProcessor

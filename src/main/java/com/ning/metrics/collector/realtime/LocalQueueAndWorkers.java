@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
@@ -32,7 +32,7 @@ class LocalQueueAndWorkers
     private final ExecutorService executor;
     private final EventQueueStats stats;
 
-    public LocalQueueAndWorkers(CollectorConfig config, String type, EventQueueSession processor, EventQueueStats stats)
+    public LocalQueueAndWorkers(final CollectorConfig config, final String type, final EventQueueSession processor, final EventQueueStats stats)
     {
         this.queue = new LinkedBlockingQueue<Object>(config.getActiveMQBufferLength());
         this.processor = processor;
@@ -57,7 +57,7 @@ class LocalQueueAndWorkers
         queue.clear();
     }
 
-    public void offer(Object event)
+    public void offer(final Object event)
     {
         if (queue.offer(event)) {
             stats.registerEventEnqueued();

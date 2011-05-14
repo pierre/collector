@@ -14,17 +14,19 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime.amq;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.realtime.EventQueueConnection;
+import com.ning.metrics.collector.realtime.EventQueueConnectionFactory;
 
 public class ActiveMQConnectionFactory implements EventQueueConnectionFactory
 {
     private final CollectorConfig config;
 
     @Inject
-    public ActiveMQConnectionFactory(CollectorConfig config)
+    public ActiveMQConnectionFactory(final CollectorConfig config)
     {
         this.config = config;
     }

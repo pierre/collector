@@ -14,10 +14,15 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime;
 
-public interface EventQueueSession
+import com.ning.metrics.serialization.event.Event;
+
+public interface EventQueueProcessor
 {
-    public void send(Object event);
-    public void close();
+    boolean isRunning();
+
+    void stop();
+
+    void send(Event event);
 }

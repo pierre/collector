@@ -14,15 +14,11 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.realtime;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.collector.events.processing.ActiveMQConnectionFactory;
-import com.ning.metrics.collector.events.processing.EventQueueConnectionFactory;
-import com.ning.metrics.collector.events.processing.EventQueueProcessor;
-import com.ning.metrics.collector.events.processing.EventQueueProcessorImpl;
-import com.ning.metrics.collector.events.processing.EventQueueStats;
+import com.ning.metrics.collector.realtime.amq.ActiveMQConnectionFactory;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 

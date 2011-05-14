@@ -18,6 +18,11 @@ package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.realtime.EventQueueConnection;
+import com.ning.metrics.collector.realtime.EventQueueConnectionFactory;
+import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
+import com.ning.metrics.collector.realtime.EventQueueSession;
+import com.ning.metrics.collector.realtime.EventQueueStats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.MockEventWriter;

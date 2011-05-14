@@ -14,9 +14,11 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.realtime.amq;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.realtime.EventQueueConnection;
+import com.ning.metrics.collector.realtime.EventQueueSession;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.log4j.Logger;
 
@@ -25,7 +27,7 @@ import javax.jms.Session;
 import javax.jms.TopicConnection;
 import javax.jms.TopicSession;
 
-public class ActiveMQConnection implements EventQueueConnection
+class ActiveMQConnection implements EventQueueConnection
 {
     private static final Logger logger = Logger.getLogger(ActiveMQConnection.class);
 
@@ -34,7 +36,7 @@ public class ActiveMQConnection implements EventQueueConnection
     private final Object connectionMonitor = new Object();
     private TopicConnection connection = null;
 
-    public ActiveMQConnection(CollectorConfig config)
+    public ActiveMQConnection(final CollectorConfig config)
     {
         this.config = config;
         if (config.getActiveMQUri() != null) {
@@ -82,7 +84,7 @@ public class ActiveMQConnection implements EventQueueConnection
     }
 
     @Override
-    public EventQueueSession getSessionFor(String type)
+    public EventQueueSession getSessionFor(final String type)
     {
         return new ActiveMQSession(config, this, type);
     }

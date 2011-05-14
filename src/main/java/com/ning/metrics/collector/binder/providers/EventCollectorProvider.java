@@ -23,7 +23,7 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExec
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.events.processing.BufferingEventCollector;
 import com.ning.metrics.collector.events.processing.EventCollector;
-import com.ning.metrics.collector.events.processing.EventQueueProcessor;
+import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
