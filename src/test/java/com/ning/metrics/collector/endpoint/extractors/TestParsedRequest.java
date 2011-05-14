@@ -14,9 +14,9 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
+import com.ning.metrics.collector.endpoint.MockHttpHeaders;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;

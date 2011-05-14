@@ -14,13 +14,12 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
-import com.ning.metrics.collector.endpoint.extractors.QueryParameterEventExtractor;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 
 import java.lang.annotation.Annotation;

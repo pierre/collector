@@ -32,7 +32,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-public class BodyEventExtractor implements EventExtractor
+/**
+ * Stream-based API (POST).
+ * Serialization is done in the eventtracker library. The shared code for serialization/deserialization
+ * is in the com.ning:metrics.serialization-* libraries.
+ */
+class BodyEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(BodyEventExtractor.class);
 

@@ -25,9 +25,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- * API versions 1 and 2: query parameters-based API (via GET)
+ * API versions 1 and 2: query parameters-based API (via GET).
+ * The lower level extraction business happens in EventParser.
+ *
+ * @see EventParser
  */
-public class QueryParameterEventExtractor implements EventExtractor
+class QueryParameterEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
     private final EventParser thriftEventParser;

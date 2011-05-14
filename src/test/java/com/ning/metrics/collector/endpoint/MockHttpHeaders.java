@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-class MockHttpHeaders implements HttpHeaders
+public class MockHttpHeaders implements HttpHeaders
 {
     private MultivaluedMap<String, String> headers = new InBoundHeaders();
 

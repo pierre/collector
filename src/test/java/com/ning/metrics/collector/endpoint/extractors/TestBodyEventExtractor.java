@@ -14,11 +14,9 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.extractors.BodyEventExtractor;
-import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
-import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
+import com.ning.metrics.collector.endpoint.MockHttpHeaders;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;

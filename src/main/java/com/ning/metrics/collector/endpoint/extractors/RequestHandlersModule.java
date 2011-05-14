@@ -14,23 +14,20 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
-import com.ning.metrics.collector.binder.providers.EventEndPointStatsProvider;
-import com.ning.metrics.collector.binder.providers.EventRequestHandlerProvider;
-import com.ning.metrics.collector.binder.providers.ExternalEventExtractorProvider;
-import com.ning.metrics.collector.binder.providers.ThriftEnvelopeEventParserProvider;
 import com.ning.metrics.collector.binder.annotations.Base64ExternalEventRequestHandler;
 import com.ning.metrics.collector.binder.annotations.ExternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
 import com.ning.metrics.collector.binder.annotations.InternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
+import com.ning.metrics.collector.binder.providers.EventEndPointStatsProvider;
+import com.ning.metrics.collector.binder.providers.EventRequestHandlerProvider;
+import com.ning.metrics.collector.binder.providers.ThriftEnvelopeEventParserProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.extractors.BodyEventExtractor;
-import com.ning.metrics.collector.endpoint.extractors.QueryParameterEventExtractor;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;

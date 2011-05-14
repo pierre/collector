@@ -28,7 +28,7 @@ public class MockEventExtractor implements EventExtractor
     private Event event = null;
 
     @Override
-    public Collection<Event> extractEvent(ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<Event> extractEvent(final ExtractedAnnotation annotation) throws EventParsingException
     {
         if (throwsEventParseException) {
             throw new EventParsingException("IGNORE - Expected exception for tests");
@@ -38,22 +38,22 @@ public class MockEventExtractor implements EventExtractor
             throw new RuntimeException("IGNORE - Expected exception for tests");
         }
 
-        LinkedList<Event> events = new LinkedList<Event>();
+        final Collection<Event> events = new LinkedList<Event>();
         events.add(event);
         return events;
     }
 
-    public void setEvent(Event event)
+    public void setEvent(final Event event)
     {
         this.event = event;
     }
 
-    public void setThrowsEventParseException(boolean throwsEventParseException)
+    public void setThrowsEventParseException(final boolean throwsEventParseException)
     {
         this.throwsEventParseException = throwsEventParseException;
     }
 
-    public void setThrowsRuntimeException(boolean throwsRuntimeException)
+    public void setThrowsRuntimeException(final boolean throwsRuntimeException)
     {
         this.throwsRuntimeException = throwsRuntimeException;
     }

@@ -26,6 +26,9 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class to decode HTTP headers
+ */
 class EventExtractorUtil
 {
     private static final Pattern REFERRER_PATTERN = Pattern.compile("^https?://([^/]+)(.*?)");
