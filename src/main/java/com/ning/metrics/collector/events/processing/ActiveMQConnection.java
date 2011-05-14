@@ -67,7 +67,7 @@ public class ActiveMQConnection implements EventQueueConnection
                 catch (JMSException ex) {
                     logger.warn("Got error while trying to connect to activemq");
                     try {
-                        Thread.sleep(pauseInMs);
+                        Thread.sleep((long) pauseInMs);
                     }
                     catch (InterruptedException innerEx) {
                         Thread.currentThread().interrupt();

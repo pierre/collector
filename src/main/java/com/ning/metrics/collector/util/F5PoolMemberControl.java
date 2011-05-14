@@ -248,7 +248,7 @@ public class F5PoolMemberControl
     public String[] addPoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
-        final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, memberPort);
+        final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, (long) memberPort);
 
         String[] poolNames = {poolName};
         CommonIPPortDefinition[] definitions = {definition};
@@ -301,7 +301,7 @@ public class F5PoolMemberControl
     public String[] enablePoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
-        final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, memberPort);
+        final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, (long) memberPort);
 
         log.info(String.format("Enabling %s to pool %s (hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
 
@@ -343,7 +343,7 @@ public class F5PoolMemberControl
     public String[] disablePoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
-        final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, memberPort);
+        final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, (long) memberPort);
 
         log.info(String.format("Setting session state to DISABLED for %s in pool %s (hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
         setSessionState(m_interfaces, definition, poolName, CommonEnabledState.STATE_DISABLED);
@@ -352,9 +352,9 @@ public class F5PoolMemberControl
         CommonIPPortDefinition[] memberDefinitions = {definition};
         CommonIPPortDefinition[][] membersDefinitions = {memberDefinitions};
 
-        long cur_connections = 1;
+        long cur_connections = 1L;
         final String[] poolNames = {poolName};
-        while (cur_connections > 0) {
+        while (cur_connections > 0L) {
             LocalLBPoolMemberMemberStatistics[] memberStatistics;
             try {
                 memberStatistics = m_interfaces.getLocalLBPoolMember().get_statistics(poolNames, membersDefinitions);
@@ -379,13 +379,13 @@ public class F5PoolMemberControl
                 CommonStatisticType type = stats.getType();
                 CommonULong64 value64 = stats.getValue();
 
-                if (type == CommonStatisticType.STATISTIC_SERVER_SIDE_CURRENT_CONNECTIONS) {
+                if (type.equals(CommonStatisticType.STATISTIC_SERVER_SIDE_CURRENT_CONNECTIONS)) {
                     cur_connections = value64.getLow();
                     log.info(String.format("Current connections: %s (%s in pool %s, hostname: %s, username: %s)", cur_connections, memberAddress, poolName, hostname, username));
                 }
             }
             Thread.currentThread();
-            Thread.sleep(1000);
+            Thread.sleep(1000L);
         }
 
         log.info(String.format("Setting monitor state to DISABLED for %s in pool %s (hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
