@@ -18,7 +18,7 @@ package com.ning.metrics.collector.binder.modules;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.collector.binder.EventEndPointStatsProvider;
+import com.ning.metrics.collector.binder.providers.EventEndPointStatsProvider;
 import com.ning.metrics.collector.binder.annotations.ScribeStats;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.resources.ScribeEventRequestHandler;

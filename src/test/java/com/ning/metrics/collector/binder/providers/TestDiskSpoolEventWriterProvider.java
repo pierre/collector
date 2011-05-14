@@ -14,9 +14,10 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder;
+package com.ning.metrics.collector.binder.providers;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.binder.providers.DiskSpoolEventWriterProvider;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.Granularity;

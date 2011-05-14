@@ -18,8 +18,8 @@ package com.ning.metrics.collector.binder.modules;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.collector.binder.EventCollectorProvider;
-import com.ning.metrics.collector.binder.ThresholdEventWriterProvider;
+import com.ning.metrics.collector.binder.providers.EventCollectorProvider;
+import com.ning.metrics.collector.binder.providers.ThresholdEventWriterProvider;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.events.processing.BufferingEventCollector;

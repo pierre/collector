@@ -18,8 +18,8 @@ package com.ning.metrics.collector.binder.modules;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.collector.binder.DiskSpoolEventWriterProvider;
-import com.ning.metrics.collector.binder.FileSystemProvider;
+import com.ning.metrics.collector.binder.providers.DiskSpoolEventWriterProvider;
+import com.ning.metrics.collector.binder.providers.FileSystemProvider;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.events.hadoop.writer.HadoopFileEventWriter;

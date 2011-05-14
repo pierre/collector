@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder;
+package com.ning.metrics.collector.binder.modules;
 
 import com.google.inject.AbstractModule;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
@@ -22,6 +22,7 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExec
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.binder.providers.EventCollectorProvider;
 import com.ning.metrics.collector.events.processing.BufferingEventCollector;
 import com.ning.metrics.collector.events.processing.EventCollector;
 import com.ning.metrics.collector.events.processing.EventQueueProcessor;

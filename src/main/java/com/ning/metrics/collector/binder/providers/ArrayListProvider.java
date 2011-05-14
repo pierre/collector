@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder;
+package com.ning.metrics.collector.binder.providers;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
