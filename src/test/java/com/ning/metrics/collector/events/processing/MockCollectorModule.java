@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.AbstractModule;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
@@ -22,13 +22,7 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExec
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.binder.providers.EventCollectorProvider;
-import com.ning.metrics.collector.events.processing.BufferingEventCollector;
-import com.ning.metrics.collector.events.processing.EventCollector;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
-import com.ning.metrics.collector.events.processing.StubEventQueueProcessor;
-import com.ning.metrics.collector.events.processing.TaskQueueService;
-import com.ning.metrics.collector.events.processing.TaskQueueServiceImpl;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
@@ -49,9 +43,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MockCollectorModule extends AbstractModule
 {
-    private MockEventWriter diskSpoolWriter = new MockEventWriter();
-    private ThresholdEventWriter thresholdEventWriter = new ThresholdEventWriter(diskSpoolWriter, 2, 300);
-    private MockEventWriter hdfsEventWriter = new MockEventWriter();
+    private final MockEventWriter diskSpoolWriter = new MockEventWriter();
+    private final EventWriter thresholdEventWriter = new ThresholdEventWriter(diskSpoolWriter, 2, 300);
+    private final MockEventWriter hdfsEventWriter = new MockEventWriter();
 
     @Override
     protected void configure()
@@ -65,7 +59,7 @@ public class MockCollectorModule extends AbstractModule
             public AtomicBoolean isShutdown = new AtomicBoolean(false);
 
             @Override
-            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
+            public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException
             {
                 return true;
             }
@@ -108,7 +102,7 @@ public class MockCollectorModule extends AbstractModule
             }
 
             @Override
-            public void send(Event event)
+            public void send(final Event event)
             {
             }
         });
@@ -120,12 +114,12 @@ public class MockCollectorModule extends AbstractModule
 
         bind(EventCollector.class).toProvider(EventCollectorProvider.class).asEagerSingleton();
 
-        ScheduledExecutorService hdfsService = new StubScheduledExecutorService()
+        final ScheduledExecutorService hdfsService = new StubScheduledExecutorService()
         {
             public AtomicBoolean isShutdown = new AtomicBoolean(false);
 
             @Override
-            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
+            public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException
             {
                 return true;
             }
@@ -156,7 +150,7 @@ public class MockCollectorModule extends AbstractModule
             new MockDiskSpoolEventWriter(new EventHandler()
             {
                 @Override
-                public void handle(ObjectInputStream objectInputStream, CallbackHandler handler) throws ClassNotFoundException, IOException
+                public void handle(final ObjectInputStream objectInputStream, final CallbackHandler handler) throws ClassNotFoundException, IOException
                 {
                     hdfsEventWriter.forceCommit();
                     hdfsEventWriter.flush();
@@ -182,7 +176,7 @@ public class MockCollectorModule extends AbstractModule
 
         private final EventHandler delegate;
 
-        public MockDiskSpoolEventWriter(EventHandler eventHandler, String spoolPath, boolean flushEnabled, long flushIntervalInSeconds, ScheduledExecutorService executor, SyncType syncType, int syncBatchSize, int rateWindowSizeMinutes)
+        public MockDiskSpoolEventWriter(final EventHandler eventHandler, final String spoolPath, final boolean flushEnabled, final long flushIntervalInSeconds, final ScheduledExecutorService executor, final SyncType syncType, final int syncBatchSize, final int rateWindowSizeMinutes)
         {
             super(eventHandler, spoolPath, flushEnabled, flushIntervalInSeconds, executor, syncType, syncBatchSize, rateWindowSizeMinutes);
             this.delegate = eventHandler;
@@ -198,12 +192,12 @@ public class MockCollectorModule extends AbstractModule
                 delegate.handle(null, new CallbackHandler()
                 {
                     @Override
-                    public void onError(Throwable t, Event event)
+                    public void onError(final Throwable t, final Event event)
                     {
                     }
 
                     @Override
-                    public void onSuccess(Event event)
+                    public void onSuccess(final Event event)
                     {
                     }
                 });

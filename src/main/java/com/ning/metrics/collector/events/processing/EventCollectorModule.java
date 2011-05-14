@@ -14,18 +14,13 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.collector.binder.providers.EventCollectorProvider;
-import com.ning.metrics.collector.binder.providers.ThresholdEventWriterProvider;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
-import com.ning.metrics.collector.events.processing.BufferingEventCollector;
-import com.ning.metrics.collector.events.processing.EventCollector;
-import com.ning.metrics.collector.events.processing.TaskQueueService;
-import com.ning.metrics.collector.events.processing.TaskQueueServiceImpl;
+import com.ning.metrics.collector.binder.providers.ThresholdEventWriterProvider;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.weakref.jmx.guice.ExportBuilder;

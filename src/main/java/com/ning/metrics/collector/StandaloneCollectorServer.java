@@ -23,7 +23,7 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.binder.ProfiledInterceptor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.binder.modules.EventCollectorModule;
+import com.ning.metrics.collector.events.processing.EventCollectorModule;
 import com.ning.metrics.collector.binder.modules.FiltersModule;
 import com.ning.metrics.collector.binder.modules.HdfsModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueModule;

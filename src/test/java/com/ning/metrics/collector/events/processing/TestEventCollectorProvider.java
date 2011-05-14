@@ -14,17 +14,14 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
-import com.ning.metrics.collector.binder.modules.MockCollectorModule;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.processing.BufferingEventCollector;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
-import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;

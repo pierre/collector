@@ -14,17 +14,14 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.events.processing.BufferingEventCollector;
-import com.ning.metrics.collector.events.processing.EventCollector;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
-import com.ning.metrics.collector.events.processing.TaskQueueService;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
@@ -32,7 +29,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class EventCollectorProvider implements Provider<EventCollector>
+class EventCollectorProvider implements Provider<EventCollector>
 {
     private static final Logger log = Logger.getLogger(EventCollectorProvider.class);
 
@@ -68,7 +65,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
      * we need to carefully control the lifecycle of the shutdown hook.
      *
      * @return EventCollector instance
-     * @see DiskSpoolEventWriterProvider
+     * @see com.ning.metrics.collector.binder.providers.DiskSpoolEventWriterProvider
      */
     @Override
     public EventCollector get()
