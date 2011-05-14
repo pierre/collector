@@ -31,12 +31,12 @@ public class EventRequestHandlerProvider implements Provider<EventRequestHandler
 {
     private final Key<? extends EventExtractor> eventExtractorKey;
     private final Key<EventEndPointStats> eventEndPointStatsKey;
-    private Injector injector = null;
+    private Injector injector;
 
     public EventRequestHandlerProvider(
-        Class<? extends EventExtractor> eventExtractorClazz,
-        Annotation eventExtractorAnnotation,
-        Class<? extends Annotation> eventEndPointStatsAnnotation
+        final Class<? extends EventExtractor> eventExtractorClazz,
+        final Annotation eventExtractorAnnotation,
+        final Class<? extends Annotation> eventEndPointStatsAnnotation
     )
     {
         eventExtractorKey = Key.get(eventExtractorClazz, eventExtractorAnnotation);
@@ -45,8 +45,8 @@ public class EventRequestHandlerProvider implements Provider<EventRequestHandler
 
 
     public EventRequestHandlerProvider(
-        Class<? extends EventExtractor> eventExtractorClazz,
-        Class<? extends Annotation> eventEndPointStatsAnnotation
+        final Class<? extends EventExtractor> eventExtractorClazz,
+        final Class<? extends Annotation> eventEndPointStatsAnnotation
     )
     {
         eventExtractorKey = Key.get(eventExtractorClazz);
@@ -54,7 +54,7 @@ public class EventRequestHandlerProvider implements Provider<EventRequestHandler
     }
 
     @Inject
-    public void configure(Injector injector)
+    public void configure(final Injector injector)
     {
         this.injector = injector;
     }
@@ -62,9 +62,9 @@ public class EventRequestHandlerProvider implements Provider<EventRequestHandler
     @Override
     public EventRequestHandler get()
     {
-        EventHandler eventHandler = injector.getInstance(EventHandler.class);
-        EventExtractor eventExtractor = injector.getInstance(eventExtractorKey);
-        EventEndPointStats stats = injector.getInstance(eventEndPointStatsKey);
+        final EventHandler eventHandler = injector.getInstance(EventHandler.class);
+        final EventExtractor eventExtractor = injector.getInstance(eventExtractorKey);
+        final EventEndPointStats stats = injector.getInstance(eventEndPointStatsKey);
 
         return new EventRequestHandler(eventHandler, eventExtractor, stats);
     }

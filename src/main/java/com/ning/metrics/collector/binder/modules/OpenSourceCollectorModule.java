@@ -30,7 +30,7 @@ public class OpenSourceCollectorModule implements Module
      * Contributes bindings and other configurations to a {@code Binder}.
      */
     @Override
-    public void configure(Binder binder)
+    public void configure(final Binder binder)
     {
         binder.bind(EventExtractorUtil.class).to(EventExtractorUtilImpl.class);
     }

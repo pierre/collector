@@ -32,10 +32,10 @@ public class FileSystemProvider implements Provider<FileSystem>
     private final FileSystem fileSystem;
 
     @Inject
-    public FileSystemProvider(CollectorConfig collectorConfig) throws IOException
+    public FileSystemProvider(final CollectorConfig collectorConfig) throws IOException
     {
-        String hfsHost = collectorConfig.getHfsHost();
-        Configuration hadoopConfig = new Configuration();
+        final String hfsHost = collectorConfig.getHfsHost();
+        final Configuration hadoopConfig = new Configuration();
 
         if (hfsHost.isEmpty()) {
             // Local filesystem, for testing

@@ -27,21 +27,21 @@ import java.lang.annotation.Annotation;
 
 public class ExternalEventExtractorProvider implements Provider<QueryParameterEventExtractor>
 {
-    private Injector injector = null;
+    private Injector injector;
     private final Key<ThriftEnvelopeEventParser> thriftEnvelopeEventParserKey;
 
-    public ExternalEventExtractorProvider(Annotation thriftEnvelopeEventParserAnnotation)
+    public ExternalEventExtractorProvider(final Annotation thriftEnvelopeEventParserAnnotation)
     {
         thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
     }
 
-    public ExternalEventExtractorProvider(Class<? extends Annotation> thriftEnvelopeEventParserAnnotation)
+    public ExternalEventExtractorProvider(final Class<? extends Annotation> thriftEnvelopeEventParserAnnotation)
     {
         thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
     }
 
     @Inject
-    public void configure(Injector injector)
+    public void configure(final Injector injector)
     {
         this.injector = injector;
     }

@@ -41,18 +41,18 @@ public class FiltersModule implements Module
     private final CollectorConfig config;
 
     @Inject
-    public FiltersModule(CollectorConfig config)
+    public FiltersModule(final CollectorConfig config)
     {
         this.config = config;
     }
 
     @Override
-    public void configure(Binder binder)
+    public void configure(final Binder binder)
     {
         // JMX exporter
-        ExportBuilder builder = MBeanModule.newExporter(binder);
+        final ExportBuilder builder = MBeanModule.newExporter(binder);
 
-        String filterListDelimiter = config.getFilters();
+        final String filterListDelimiter = config.getFilters();
 
         binder.bind(Filter.class).annotatedWith(EventEndpointRequestFilter.class).to(OrFilter.class);
 

@@ -27,28 +27,28 @@ import java.util.List;
 
 public class ArrayListProvider<T> implements Provider<List<T>>
 {
-    private Injector injector = null;
+    private Injector injector;
     private final List<Key<? extends T>> injectables = new ArrayList<Key<? extends T>>();
 
     @Inject
-    public void configure(Injector injector)
+    public void configure(final Injector injector)
     {
         this.injector = injector;
     }
 
-    public ArrayListProvider<T> add(Class<? extends T> toBeIncluded)
+    public ArrayListProvider<T> add(final Class<? extends T> toBeIncluded)
     {
         injectables.add(Key.get(toBeIncluded));
         return this;
     }
 
-    public ArrayListProvider<T> add(Class<? extends Annotation> annotation, Class<? extends T> toBeIncluded)
+    public ArrayListProvider<T> add(final Class<? extends Annotation> annotation, final Class<? extends T> toBeIncluded)
     {
         injectables.add(Key.get(toBeIncluded, annotation));
         return this;
     }
 
-    public ArrayListProvider<T> add(Annotation annotation, Class<? extends T> toBeIncluded)
+    public ArrayListProvider<T> add(final Annotation annotation, final Class<? extends T> toBeIncluded)
     {
         injectables.add(Key.get(toBeIncluded, annotation));
         return this;
@@ -57,8 +57,8 @@ public class ArrayListProvider<T> implements Provider<List<T>>
     @Override
     public List<T> get()
     {
-        List<T> retVal = new ArrayList<T>();
-        for (Key<? extends T> injectable : injectables) {
+        final List<T> retVal = new ArrayList<T>();
+        for (final Key<? extends T> injectable : injectables) {
             retVal.add(injector.getInstance(injectable));
         }
         return retVal;

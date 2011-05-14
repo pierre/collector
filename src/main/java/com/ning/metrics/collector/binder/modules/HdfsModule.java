@@ -39,9 +39,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class HdfsModule implements Module
 {
     @Override
-    public void configure(Binder binder)
+    public void configure(final Binder binder)
     {   // JMX exporter
-        ExportBuilder builder = MBeanModule.newExporter(binder);
+        final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         // The ThresholdEventWriter, controlled by the front-end EventCollector, delegates to this DiskSpoolEventWriter
         // @see DiskSpoolEventWriterProvider

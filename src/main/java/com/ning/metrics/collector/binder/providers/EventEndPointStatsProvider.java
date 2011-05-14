@@ -26,7 +26,7 @@ public class EventEndPointStatsProvider implements Provider<EventEndPointStats>
     private final CollectorConfig config;
 
     @Inject
-    public EventEndPointStatsProvider(CollectorConfig config)
+    public EventEndPointStatsProvider(final CollectorConfig config)
     {
         this.config = config;
     }

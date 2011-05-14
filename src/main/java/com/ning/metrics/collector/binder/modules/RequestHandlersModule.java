@@ -43,10 +43,10 @@ import org.weakref.jmx.guice.MBeanModule;
 public class RequestHandlersModule implements Module
 {
     @Override
-    public void configure(Binder binder)
+    public void configure(final Binder binder)
     {
         // JMX exporter
-        ExportBuilder builder = MBeanModule.newExporter(binder);
+        final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base10"), ExternalEventEndPointStats.class)).asEagerSingleton();

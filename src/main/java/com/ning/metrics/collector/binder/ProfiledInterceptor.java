@@ -24,10 +24,10 @@ import org.perf4j.aop.Profiled;
 
 public class ProfiledInterceptor implements MethodInterceptor
 {
-    public Object invoke(MethodInvocation invocation) throws Throwable
+    public Object invoke(final MethodInvocation invocation) throws Throwable
     {
-        Profiled profiled = invocation.getMethod().getAnnotation(Profiled.class);
-        StopWatch stopWatch = new LoggingStopWatch(profiled.tag(), profiled.message());
+        final Profiled profiled = invocation.getMethod().getAnnotation(Profiled.class);
+        final StopWatch stopWatch = new LoggingStopWatch(profiled.tag(), profiled.message());
 
         try {
             return invocation.proceed();

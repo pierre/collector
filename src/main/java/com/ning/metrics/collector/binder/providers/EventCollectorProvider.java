@@ -45,12 +45,12 @@ public class EventCollectorProvider implements Provider<EventCollector>
 
     @Inject
     public EventCollectorProvider(
-        @BufferingEventCollectorEventWriter EventWriter eventWriter,
-        @BufferingEventCollectorExecutor ScheduledExecutorService executor,
-        TaskQueueService taskQueueService,
-        EventQueueProcessor activeMQController,
-        CollectorConfig config,
-        DiskSpoolEventWriter hdfsWriter
+        @BufferingEventCollectorEventWriter final EventWriter eventWriter,
+        @BufferingEventCollectorExecutor final ScheduledExecutorService executor,
+        final TaskQueueService taskQueueService,
+        final EventQueueProcessor activeMQController,
+        final CollectorConfig config,
+        final DiskSpoolEventWriter hdfsWriter
     )
     {
         this.eventWriter = eventWriter;
@@ -86,7 +86,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
         return collector;
     }
 
-    static void mainCollectorShutdownHook(BufferingEventCollector collector, DiskSpoolEventWriter hdfsWriter)
+    static void mainCollectorShutdownHook(final BufferingEventCollector collector, final DiskSpoolEventWriter hdfsWriter)
     {
         log.info("Starting main shutdown sequence");
 

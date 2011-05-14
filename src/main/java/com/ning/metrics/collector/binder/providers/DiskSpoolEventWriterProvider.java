@@ -40,9 +40,9 @@ public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWrit
 
     @Inject
     public DiskSpoolEventWriterProvider(
-        @HdfsEventWriter EventWriter hadoopEventWriter,
-        @HdfsDiskSpoolFlushExecutor ScheduledExecutorService executor,
-        CollectorConfig config
+        @HdfsEventWriter final EventWriter hadoopEventWriter,
+        @HdfsDiskSpoolFlushExecutor final ScheduledExecutorService executor,
+        final CollectorConfig config
     )
     {
         this.hadoopEventWriter = hadoopEventWriter;
@@ -57,10 +57,10 @@ public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWrit
         {
             // TODO handler?
             @Override
-            public void handle(ObjectInputStream objectInputStream, CallbackHandler handler) throws ClassNotFoundException, IOException
+            public void handle(final ObjectInputStream objectInputStream, final CallbackHandler handler) throws ClassNotFoundException, IOException
             {
                 while (objectInputStream.read() != -1) {
-                    Event event = (Event) objectInputStream.readObject();
+                    final Event event = (Event) objectInputStream.readObject();
                     hadoopEventWriter.write(event);
                 }
 

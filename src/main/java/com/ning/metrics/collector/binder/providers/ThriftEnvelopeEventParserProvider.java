@@ -25,16 +25,16 @@ import com.ning.metrics.collector.events.parsing.converters.NumberConverter;
 
 public class ThriftEnvelopeEventParserProvider implements Provider<ThriftEnvelopeEventParser>
 {
-    private Injector injector = null;
+    private Injector injector;
     private final Key<? extends NumberConverter> numberConverterKey;
 
-    public ThriftEnvelopeEventParserProvider(Class<? extends NumberConverter> numberConverterClazz)
+    public ThriftEnvelopeEventParserProvider(final Class<? extends NumberConverter> numberConverterClazz)
     {
         numberConverterKey = Key.get(numberConverterClazz);
     }
 
     @Inject
-    public void configure(Injector injector)
+    public void configure(final Injector injector)
     {
         this.injector = injector;
     }
@@ -42,7 +42,7 @@ public class ThriftEnvelopeEventParserProvider implements Provider<ThriftEnvelop
     @Override
     public ThriftEnvelopeEventParser get()
     {
-        NumberConverter numberConverter = injector.getInstance(numberConverterKey);
+        final NumberConverter numberConverter = injector.getInstance(numberConverterKey);
 
         return new ThriftEnvelopeEventParser(numberConverter);
     }

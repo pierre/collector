@@ -31,12 +31,12 @@ public class EventFilterProvider implements Provider<PatternSetFilter>
     private final Set<Pattern> patternSet = new HashSet<Pattern>();
 
     @Inject
-    public EventFilterProvider(FieldExtractor fieldExtractor, String patternListString, String delimiter)
+    public EventFilterProvider(final FieldExtractor fieldExtractor, final String patternListString, final String delimiter)
     {
         this.fieldExtractor = fieldExtractor;
 
         if (patternListString != null && !patternListString.isEmpty()) {
-            for (String str : patternListString.split(delimiter)) {
+            for (final String str : patternListString.split(delimiter)) {
                 patternSet.add(Pattern.compile(str));
             }
         }

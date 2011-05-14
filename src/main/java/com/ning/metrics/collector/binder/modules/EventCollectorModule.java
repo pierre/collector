@@ -37,10 +37,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class EventCollectorModule implements Module
 {
     @Override
-    public void configure(Binder binder)
+    public void configure(final Binder binder)
     {
         // JMX exporter
-        ExportBuilder builder = MBeanModule.newExporter(binder);
+        final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         binder.bind(EventWriter.class).annotatedWith(BufferingEventCollectorEventWriter.class).toProvider(ThresholdEventWriterProvider.class).asEagerSingleton();
         builder.export(EventWriter.class).annotatedWith(BufferingEventCollectorEventWriter.class).as("com.ning.metrics.collector:name=ThresholdEventWriter");

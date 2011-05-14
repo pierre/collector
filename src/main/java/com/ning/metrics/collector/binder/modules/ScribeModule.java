@@ -34,9 +34,9 @@ public class ScribeModule implements Module
      * Contributes bindings and other configurations to a {@code Binder}.
      */
     @Override
-    public void configure(Binder binder)
+    public void configure(final Binder binder)
     {
-        ExportBuilder builder = MBeanModule.newExporter(binder);
+        final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         binder.bind(scribe.Iface.class).to(ScribeEventRequestHandler.class);
 
