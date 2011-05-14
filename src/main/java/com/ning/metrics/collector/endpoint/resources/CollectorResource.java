@@ -24,7 +24,7 @@ import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
-import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -52,7 +52,7 @@ public class CollectorResource
         @QueryParam("date") final String eventDateTimeString,
         @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
         @Context final HttpHeaders httpHeaders,
-        @Context final ServletRequest request
+        @Context final HttpServletRequest request
     )
     {
         final EventStats eventStats = new EventStats();
