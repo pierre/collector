@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class Ip
 {
-    final static Pattern DOT = Pattern.compile("\\.");
+    private final static Pattern DOT = Pattern.compile("\\.");
 
     public static int ipToInt(String ip)
     {

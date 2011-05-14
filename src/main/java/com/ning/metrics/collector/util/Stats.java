@@ -58,7 +58,7 @@ public class Stats
      * @param startNanos the reference time in nanoseconds (use System.nanoTime()) to fetch
      * @return the number of milliseconds
      */
-    public static double millisElapsedSince(long startNanos)
+    private static double millisElapsedSince(long startNanos)
     {
         return (System.nanoTime() - startNanos) / 1e6;
     }
@@ -121,7 +121,7 @@ public class Stats
      * @param millis
      * @param size   magnitude of operation, i.e., bytes or items processed
      */
-    public void record(double millis, long size)
+    void record(double millis, long size)
     {
         count.incrementAndGet();
         this.size.addAndGet(size);
