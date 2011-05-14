@@ -114,7 +114,7 @@ public class TestDiskSpoolEventWriterProvider
         }
     }
 
-    public void createSmilePayload() throws IOException
+    void createSmilePayload() throws IOException
     {
         // Use same configuration as SmileEnvelopeEvent
         SmileFactory f = new SmileFactory();
