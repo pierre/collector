@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 public class BodyEventExtractor implements EventExtractor
@@ -38,7 +39,7 @@ public class BodyEventExtractor implements EventExtractor
     private static final Logger log = Logger.getLogger(BodyEventExtractor.class);
 
     @Override
-    public Collection<? extends Event> extractEvent(String eventType, ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<? extends Event> extractEvent(final String eventType, final ExtractedAnnotation annotation) throws EventParsingException
     {
         if (eventType != null) {
             if (annotation == null) {
@@ -50,7 +51,7 @@ public class BodyEventExtractor implements EventExtractor
 
             // contentType defaults to ning/thrift, for backwards compatibility
             if (annotation.getContentType() == null || annotation.getContentType().equals("ning/thrift")) {
-                ArrayList<ThriftField> thriftFieldList;
+                final ArrayList<ThriftField> thriftFieldList;
 
                 try {
                     thriftFieldList = new ThriftFieldListParser().parse(annotation.getContentLength(), annotation.getInputStream());
@@ -62,7 +63,7 @@ public class BodyEventExtractor implements EventExtractor
                     throw new EventParsingException(String.format("Parse exception while trying to parse event from post body"), e);
                 }
 
-                Vector<ThriftEnvelopeEvent> v = new Vector<ThriftEnvelopeEvent>(1);
+                final List<ThriftEnvelopeEvent> v = new Vector<ThriftEnvelopeEvent>(1);
                 v.add(0, new ThriftEnvelopeEvent(
                     annotation.getDateTime(),
                     new ThriftEnvelope(eventType, thriftFieldList),
@@ -71,7 +72,7 @@ public class BodyEventExtractor implements EventExtractor
                 return v;
             }
             else if (annotation.getContentType().equals(MediaType.APPLICATION_JSON) || annotation.getContentType().equals("application/json+smile")) {
-                Collection<SmileBucketEvent> smileEvents;
+                final Collection<SmileBucketEvent> smileEvents;
 
                 try {
                     // JsonStreamToSmileBucketEvent extracts Json or Smile

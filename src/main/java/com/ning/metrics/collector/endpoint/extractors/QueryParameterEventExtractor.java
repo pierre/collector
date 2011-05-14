@@ -34,21 +34,21 @@ public class QueryParameterEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
     private final EventParser thriftEventParser;
-    private static final LinkedList<Event> v = new LinkedList<Event>();
+    private static final Collection<Event> v = new LinkedList<Event>();
 
     @Inject
-    public QueryParameterEventExtractor(EventParser thriftEventParser)
+    public QueryParameterEventExtractor(final EventParser thriftEventParser)
     {
         this.thriftEventParser = thriftEventParser;
     }
 
     @Override
-    public Collection<? extends Event> extractEvent(String event, ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<? extends Event> extractEvent(final String event, final ExtractedAnnotation annotation) throws EventParsingException
     {
         if (event != null) {
             log.debug(String.format("Query parameter to process: %s", event));
-            String type = event.substring(0, event.indexOf(","));
-            String eventTypeString = event.substring(event.indexOf(",") + 1);
+            final String type = event.substring(0, event.indexOf(","));
+            final String eventTypeString = event.substring(event.indexOf(",") + 1);
 
             log.debug(String.format("Event type [%s], event string [%s]", type, eventTypeString));
 
