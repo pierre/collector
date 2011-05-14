@@ -18,21 +18,18 @@ package com.ning.metrics.collector.binder.modules;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.collector.binder.providers.EventEndPointStatsProvider;
 import com.ning.metrics.collector.binder.annotations.ScribeStats;
+import com.ning.metrics.collector.binder.providers.EventEndPointStatsProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.resources.ScribeEventRequestHandler;
 import com.ning.metrics.collector.events.processing.ScribeEventHandler;
 import com.ning.metrics.collector.events.processing.ScribeEventHandlerImpl;
-import org.apache.log4j.Logger;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
-import scribe.thrift.scribe.Iface;
+import scribe.thrift.scribe;
 
 public class ScribeModule implements Module
 {
-    private static final Logger log = Logger.getLogger(ScribeModule.class);
-
     /**
      * Contributes bindings and other configurations to a {@code Binder}.
      */
@@ -41,7 +38,7 @@ public class ScribeModule implements Module
     {
         ExportBuilder builder = MBeanModule.newExporter(binder);
 
-        binder.bind(Iface.class).to(ScribeEventRequestHandler.class);
+        binder.bind(scribe.Iface.class).to(ScribeEventRequestHandler.class);
 
         binder.bind(EventEndPointStats.class).annotatedWith(ScribeStats.class).toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
         builder.export(EventEndPointStats.class).as("com.ning.metrics.collector:name=ScribeEventEndPointStats");
