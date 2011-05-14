@@ -16,13 +16,11 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
 
 import javax.ws.rs.core.HttpHeaders;
 
@@ -33,7 +31,6 @@ public class TestParsedRequest
     private String userAgent = null;
     private String referer = null;
     private String ip = null;
-    private EventExtractorUtilImpl extractorUtil = null;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
@@ -43,7 +40,6 @@ public class TestParsedRequest
         userAgent = "the-user-agent";
         referer = String.format("http://%s%s", host, path);
         ip = "167.1.2.3";
-        extractorUtil = new EventExtractorUtilImpl();
     }
 
     @Test(groups = "fast")
@@ -94,7 +90,7 @@ public class TestParsedRequest
     public void testParseDateExplicit() throws Exception
     {
         HttpHeaders httpHeaders = createDummyHeaders();
-        ParsedRequest parsedRequest = new ParsedRequest(httpHeaders, new DateTime("2001-02-03"), null, null, extractorUtil);
+        ParsedRequest parsedRequest = new ParsedRequest(httpHeaders, new DateTime("2001-02-03"), null, null);
         Assert.assertEquals(parsedRequest.getDateTime(), new DateTime("2001-02-03"));
     }
 
@@ -114,6 +110,6 @@ public class TestParsedRequest
     private ParsedRequest createParsedRequestWithNoQueryParameter()
     {
         HttpHeaders httpHeaders = createDummyHeaders();
-        return new ParsedRequest(httpHeaders, null, null, null, extractorUtil);
+        return new ParsedRequest(httpHeaders, null, null, null);
     }
 }

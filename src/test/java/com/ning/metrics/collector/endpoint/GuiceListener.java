@@ -21,6 +21,7 @@ import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.MockEventExtractor;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 import com.ning.metrics.collector.events.processing.EventHandler;

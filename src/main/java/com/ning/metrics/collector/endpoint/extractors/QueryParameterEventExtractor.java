@@ -21,8 +21,6 @@ import org.apache.log4j.Logger;
 
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventParser;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 
 import java.util.Collection;
 import java.util.LinkedList;

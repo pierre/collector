@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.parsing;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
@@ -23,21 +23,21 @@ import java.io.InputStream;
 
 public interface ExtractedAnnotation
 {
-    public DateTime getDateTime();
+    DateTime getDateTime();
 
-    public String getReferrerHost();
+    String getReferrerHost();
 
-    public String getReferrerPath();
+    String getReferrerPath();
 
-    public String getIpAddress();
+    String getIpAddress();
 
-    public String getUserAgent();
+    String getUserAgent();
 
-    public Granularity getBucketGranularity();
+    Granularity getBucketGranularity();
 
-    public int getContentLength();
+    int getContentLength();
 
-    public InputStream getInputStream();
+    InputStream getInputStream();
 
-    public String getContentType();
+    String getContentType();
 }

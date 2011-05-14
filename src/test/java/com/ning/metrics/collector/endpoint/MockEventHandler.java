@@ -16,8 +16,8 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.events.processing.EventHandler;
 
 import javax.ws.rs.core.Response;

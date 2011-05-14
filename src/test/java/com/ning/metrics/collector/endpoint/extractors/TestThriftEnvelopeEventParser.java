@@ -14,8 +14,9 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.parsing;
+package com.ning.metrics.collector.endpoint.extractors;
 
+import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
 import com.ning.metrics.collector.util.Ip;

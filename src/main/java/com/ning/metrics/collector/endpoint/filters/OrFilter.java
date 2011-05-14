@@ -18,7 +18,7 @@ package com.ning.metrics.collector.endpoint.filters;
 
 import com.google.inject.Inject;
 
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import com.ning.metrics.collector.util.Filter;
 
 import java.util.List;

@@ -26,7 +26,6 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.modules.EventCollectorModule;
 import com.ning.metrics.collector.binder.modules.FiltersModule;
 import com.ning.metrics.collector.binder.modules.HdfsModule;
-import com.ning.metrics.collector.binder.modules.OpenSourceCollectorModule;
 import com.ning.metrics.collector.binder.modules.RealTimeQueueModule;
 import com.ning.metrics.collector.binder.modules.RequestHandlersModule;
 import com.ning.metrics.collector.binder.modules.ScribeModule;
@@ -97,7 +96,6 @@ public class StandaloneCollectorServer
             new RequestHandlersModule(),
             new HdfsModule(),                /* Wiring for Hadoop */
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
-            new OpenSourceCollectorModule(), /* Open-Source version of certain interfaces */
             new RealTimeQueueModule(),       /* AMQ integration */
             new FiltersModule(config),       /* Provide filters for the HTTP API */
             new ServletModule()              /* Optional, provide the Jetty endpoint */

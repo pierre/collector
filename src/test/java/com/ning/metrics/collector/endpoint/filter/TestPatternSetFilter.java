@@ -16,12 +16,12 @@
 
 package com.ning.metrics.collector.endpoint.filter;
 
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.ning.metrics.collector.endpoint.filters.FieldExtractor;
 import com.ning.metrics.collector.endpoint.filters.PatternSetFilter;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.collector.util.Filter;
 
 import java.util.Collections;

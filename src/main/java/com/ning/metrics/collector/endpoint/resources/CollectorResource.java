@@ -19,8 +19,7 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
+import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
@@ -39,16 +38,11 @@ import javax.ws.rs.core.Response;
 public class CollectorResource
 {
     private final EventRequestHandler requestHandler;
-    private final EventExtractorUtil extractorUtil;
 
     @Inject
-    public CollectorResource(
-        @ExternalEventRequestHandler final EventRequestHandler requestHandler,
-        final EventExtractorUtil extractorUtil
-    )
+    public CollectorResource(@ExternalEventRequestHandler final EventRequestHandler requestHandler)
     {
         this.requestHandler = requestHandler;
-        this.extractorUtil = extractorUtil;
     }
 
     @GET
@@ -62,6 +56,6 @@ public class CollectorResource
     {
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, request.getRemoteAddr(), extractorUtil), eventStats);
+        return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, request.getRemoteAddr()), eventStats);
     }
 }

@@ -16,8 +16,6 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.SmileBucketEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;

@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.endpoint.filters;
 
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 
 public enum FieldExtractors implements FieldExtractor
 {

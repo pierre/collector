@@ -17,6 +17,8 @@
 package com.ning.metrics.collector.events.parsing;
 
 import com.google.inject.Inject;
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import com.ning.metrics.collector.events.parsing.converters.BooleanConverter;
 import com.ning.metrics.collector.events.parsing.converters.ByteConverter;
 import com.ning.metrics.collector.events.parsing.converters.DoubleConverter;

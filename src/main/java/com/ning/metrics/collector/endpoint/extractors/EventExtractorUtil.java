@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.parsing;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.ning.metrics.serialization.event.Granularity;
 import org.apache.commons.lang.StringUtils;
@@ -26,12 +26,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EventExtractorUtilImpl implements EventExtractorUtil
+class EventExtractorUtil
 {
     private static final Pattern REFERRER_PATTERN = Pattern.compile("^https?://([^/]+)(.*?)");
 
-    @Override
-    public Granularity granularityFromString(String granularityString)
+    public Granularity granularityFromString(final String granularityString)
     {
         if (StringUtils.isBlank(granularityString)) {
             return Granularity.HOURLY;
@@ -40,8 +39,7 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         return Granularity.valueOf(granularityString.toUpperCase(Locale.US));
     }
 
-    @Override
-    public DateTime dateFromDateTime(DateTime eventDateTime)
+    public DateTime dateFromDateTime(final DateTime eventDateTime)
     {
         if (eventDateTime != null) {
             return eventDateTime;
@@ -51,8 +49,7 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         }
     }
 
-    @Override
-    public int contentLengthFromHeaders(HttpHeaders httpHeaders) throws NumberFormatException
+    public int contentLengthFromHeaders(final HttpHeaders httpHeaders) throws NumberFormatException
     {
         if (httpHeaders == null) {
             return 0;
@@ -60,7 +57,7 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
 
         final List<String> contentLengths = httpHeaders.getRequestHeader("Content-Length");
         if (contentLengths != null) {
-            for (String contentLengthHeader : contentLengths) {
+            for (final String contentLengthHeader : contentLengths) {
                 if (contentLengthHeader != null) {
                     return Integer.parseInt(contentLengthHeader);
                 }
@@ -70,19 +67,18 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         return 0;
     }
 
-    @Override
-    public String ipAddressFromHeaders(HttpHeaders httpHeaders)
+    public String ipAddressFromHeaders(final HttpHeaders httpHeaders)
     {
         if (httpHeaders == null) {
             return null;
         }
 
-        List<String> headerValues = httpHeaders.getRequestHeader("X-Forwarded-For");
+        final List<String> headerValues = httpHeaders.getRequestHeader("X-Forwarded-For");
 
         if (headerValues != null) {
-            for (String value : headerValues) {
+            for (final String value : headerValues) {
                 if (!StringUtils.isEmpty(value)) {
-                    for (String requestor : value.split(",")) {
+                    for (final String requestor : value.split(",")) {
                         if (!StringUtils.isEmpty(requestor)) {
                             return requestor.trim();
                         }
@@ -94,8 +90,7 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         return null;
     }
 
-    @Override
-    public String getUserAgentFromHeaders(HttpHeaders httpHeaders)
+    public String getUserAgentFromHeaders(final HttpHeaders httpHeaders)
     {
         if (httpHeaders == null) {
             return null;
@@ -104,7 +99,7 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         final List<String> userAgents = httpHeaders.getRequestHeader("User-Agent");
 
         if (userAgents != null) {
-            for (String userAgenTmp : userAgents) {
+            for (final String userAgenTmp : userAgents) {
                 if (!userAgenTmp.equals("")) {
                     return userAgenTmp;
                 }
@@ -114,10 +109,9 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         return null;
     }
 
-    @Override
-    public String getReferrerHostFromHeaders(HttpHeaders httpHeaders)
+    public String getReferrerHostFromHeaders(final HttpHeaders httpHeaders)
     {
-        Matcher matcher = extractReferrer(httpHeaders);
+        final Matcher matcher = extractReferrer(httpHeaders);
         if (matcher == null) {
             return null;
         }
@@ -126,10 +120,9 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         }
     }
 
-    @Override
-    public String getReferrerPathFromHeaders(HttpHeaders httpHeaders)
+    public String getReferrerPathFromHeaders(final HttpHeaders httpHeaders)
     {
-        Matcher matcher = extractReferrer(httpHeaders);
+        final Matcher matcher = extractReferrer(httpHeaders);
         if (matcher == null) {
             return null;
         }
@@ -138,7 +131,7 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
         }
     }
 
-    private Matcher extractReferrer(HttpHeaders httpHeaders)
+    private Matcher extractReferrer(final HttpHeaders httpHeaders)
     {
         if (httpHeaders == null) {
             return null;
@@ -148,9 +141,9 @@ public class EventExtractorUtilImpl implements EventExtractorUtil
 
         if (referrers != null) {
             for (int i = 0, referrersSize = referrers.size(); i < referrersSize; i++) {
-                String referrer = referrers.get(i);
+                final String referrer = referrers.get(i);
                 if (referrer != null) {
-                    Matcher matcher = REFERRER_PATTERN.matcher(referrer);
+                    final Matcher matcher = REFERRER_PATTERN.matcher(referrer);
                     if (matcher.matches()) {
                         return matcher;
                     }

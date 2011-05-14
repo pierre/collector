@@ -14,12 +14,12 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 
 import java.util.Collection;
 import java.util.LinkedList;

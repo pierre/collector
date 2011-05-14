@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.parsing;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.ning.metrics.serialization.event.Granularity;
 import org.apache.log4j.Logger;
@@ -28,6 +28,7 @@ import java.io.InputStream;
 public class ParsedRequest implements ExtractedAnnotation
 {
     private static final Logger log = Logger.getLogger(ParsedRequest.class);
+    private static final EventExtractorUtil eventExtractorUtil = new EventExtractorUtil();
 
     private final DateTime eventDateTime;
     private String ipAddress;
@@ -46,17 +47,15 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param eventDateTime     query value parameter (optional)
      * @param granularityString query value parameter (optional)
      * @param peerIpAddress     requestor (peer) IP address (optional)
-     * @param extractorUtil     implementation of EventExtractorUtil
      */
     public ParsedRequest(
-        HttpHeaders httpHeaders,
-        DateTime eventDateTime,
-        String granularityString,
-        String peerIpAddress,
-        EventExtractorUtil extractorUtil
+        final HttpHeaders httpHeaders,
+        final DateTime eventDateTime,
+        final String granularityString,
+        final String peerIpAddress
     )
     {
-        this(httpHeaders, null, eventDateTime, granularityString, peerIpAddress, null, extractorUtil);
+        this(httpHeaders, null, eventDateTime, granularityString, peerIpAddress, null);
     }
 
     /**
@@ -67,18 +66,16 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param eventDateTime     query value parameter (optional)
      * @param granularityString query value parameter (optional)
      * @param peerIpAddress     requestor (peer) IP address (optional)
-     * @param extractorUtil     implementation of EventExtractorUtil
      */
     public ParsedRequest(
-        HttpHeaders httpHeaders,
-        InputStream inputStream,
-        DateTime eventDateTime,
-        String granularityString,
-        String peerIpAddress,
-        EventExtractorUtil extractorUtil
+        final HttpHeaders httpHeaders,
+        final InputStream inputStream,
+        final DateTime eventDateTime,
+        final String granularityString,
+        final String peerIpAddress
     )
     {
-        this(httpHeaders, inputStream, eventDateTime, granularityString, peerIpAddress, null, extractorUtil);
+        this(httpHeaders, inputStream, eventDateTime, granularityString, peerIpAddress, null);
     }
 
     /**
@@ -90,32 +87,30 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param granularityString query value parameter (optional)
      * @param peerIpAddress     requestor (peer) IP address (optional)
      * @param contentType       Content-Type of the POST request (optional)
-     * @param extractorUtil     implementation of EventExtractorUtil
      */
     public ParsedRequest(
-        HttpHeaders httpHeaders,
-        InputStream inputStream,
-        DateTime eventDateTime,
-        String granularityString,
-        String peerIpAddress,
-        String contentType,
-        EventExtractorUtil extractorUtil
+        final HttpHeaders httpHeaders,
+        final InputStream inputStream,
+        final DateTime eventDateTime,
+        final String granularityString,
+        final String peerIpAddress,
+        final String contentType
     )
     {
-        this.eventDateTime = extractorUtil.dateFromDateTime(eventDateTime);
+        this.eventDateTime = eventExtractorUtil.dateFromDateTime(eventDateTime);
 
-        granularity = extractorUtil.granularityFromString(granularityString);
+        granularity = eventExtractorUtil.granularityFromString(granularityString);
 
-        referrerHost = extractorUtil.getReferrerHostFromHeaders(httpHeaders);
-        referrerPath = extractorUtil.getReferrerPathFromHeaders(httpHeaders);
+        referrerHost = eventExtractorUtil.getReferrerHostFromHeaders(httpHeaders);
+        referrerPath = eventExtractorUtil.getReferrerPathFromHeaders(httpHeaders);
 
-        ipAddress = extractorUtil.ipAddressFromHeaders(httpHeaders);
+        ipAddress = eventExtractorUtil.ipAddressFromHeaders(httpHeaders);
         if (ipAddress == null) {
             ipAddress = peerIpAddress;
         }
 
         try {
-            contentLength = extractorUtil.contentLengthFromHeaders(httpHeaders);
+            contentLength = eventExtractorUtil.contentLengthFromHeaders(httpHeaders);
         }
         catch (NumberFormatException e) {
             log.warn(String.format("Illegal Content-Length header"), e);
@@ -125,7 +120,7 @@ public class ParsedRequest implements ExtractedAnnotation
         this.contentType = contentType;
         this.inputStream = inputStream;
 
-        userAgent = extractorUtil.getUserAgentFromHeaders(httpHeaders);
+        userAgent = eventExtractorUtil.getUserAgentFromHeaders(httpHeaders);
     }
 
     @Override

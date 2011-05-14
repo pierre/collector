@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.events.parsing;
 
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 

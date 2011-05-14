@@ -17,9 +17,8 @@
 package com.ning.metrics.collector.endpoint;
 
 import com.ning.metrics.collector.endpoint.extractors.BodyEventExtractor;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
+import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
@@ -68,8 +67,7 @@ public class TestBodyEventExtractor
             new ByteArrayInputStream(payload),
             null,
             null,
-            null,
-            new EventExtractorUtilImpl()
+            null
         );
         Collection<? extends Event> events = extractor.extractEvent(eventType, validRequest);
 
@@ -92,8 +90,7 @@ public class TestBodyEventExtractor
             new ByteArrayInputStream(payload),
             null,
             null,
-            null,
-            new EventExtractorUtilImpl()
+            null
         );
 
         Collection<? extends Event> events = extractor.extractEvent(eventType, routedRequest);
@@ -117,8 +114,7 @@ public class TestBodyEventExtractor
             null,
             null,
             null,
-            null,
-            new EventExtractorUtilImpl()
+            null
         );
         Assert.assertEquals(extractor.extractEvent(null, missingNameRequest), null);
     }
@@ -131,8 +127,7 @@ public class TestBodyEventExtractor
             null,
             null,
             null,
-            null,
-            new EventExtractorUtilImpl()
+            null
         );
 
         try {
@@ -153,8 +148,7 @@ public class TestBodyEventExtractor
             new ByteArrayInputStream(invalidBytes),
             null,
             null,
-            null,
-            new EventExtractorUtilImpl()
+            null
         );
 
         try {
@@ -174,8 +168,7 @@ public class TestBodyEventExtractor
             new ByteArrayInputStream(payload),
             null,
             null,
-            null,
-            new EventExtractorUtilImpl()
+            null
         );
 
         try {
@@ -197,8 +190,7 @@ public class TestBodyEventExtractor
             new ByteArrayInputStream(payload),
             null,
             null,
-            "1.2.3.4",
-            new EventExtractorUtilImpl()
+            "1.2.3.4"
         );
 
         Assert.assertEquals(request.getIpAddress(), "1.2.3.4");

@@ -16,15 +16,14 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.collector.endpoint.extractors.MockEventExtractor;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
+import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.StubEvent;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
-import com.ning.metrics.serialization.event.StubEvent;
 
 import javax.ws.rs.core.Response;
 
@@ -171,6 +170,6 @@ public class TestEventRequestHandler
      */
     private ParsedRequest createMockRequestAnnotation()
     {
-        return new ParsedRequest(new MockHttpHeaders(), null, null, null, null, new EventExtractorUtilImpl());
+        return new ParsedRequest(new MockHttpHeaders(), null, null, null, null);
     }
 }

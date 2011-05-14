@@ -14,24 +14,19 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.endpoint.extractors;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
-
-/**
- * Holds specific bindings for the Open-Source version.
- */
-public class OpenSourceCollectorModule implements Module
+@SuppressWarnings("serial")
+public class EventParsingException extends Exception
 {
-    /**
-     * Contributes bindings and other configurations to a {@code Binder}.
-     */
-    @Override
-    public void configure(final Binder binder)
+
+    public EventParsingException(final String message)
     {
-        binder.bind(EventExtractorUtil.class).to(EventExtractorUtilImpl.class);
+        super(message);
+    }
+
+    public EventParsingException(final String message, final Throwable cause)
+    {
+        super(message, cause);
     }
 }

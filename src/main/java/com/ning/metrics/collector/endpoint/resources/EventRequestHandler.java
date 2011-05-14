@@ -19,9 +19,9 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import com.ning.metrics.collector.events.processing.EventHandler;
 import org.apache.log4j.Logger;
 
