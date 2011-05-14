@@ -22,68 +22,68 @@ import org.skife.config.DefaultNull;
 
 public interface CollectorConfig
 {
-    @Config(value = "collector.dfs.block.size")
-    @Default(value = "134217728")
+    @Config("collector.dfs.block.size")
+    @Default("134217728")
     public long getHadoopBlockSize();
 
-    @Config(value = "collector.hadoop.ugi")
-    @Default(value = "nobody,nobody")
+    @Config("collector.hadoop.ugi")
+    @Default("nobody,nobody")
     public String getHadoopUgi();
 
     // Whether to forward events to ActiveMQ
 
-    @Config(value = "collector.activemq.enabled")
-    @Default(value = "false")
+    @Config("collector.activemq.enabled")
+    @Default("false")
     public boolean isActiveMQEnabled();
 
     // ActiveMQ uri
 
-    @Config(value = "collector.activemq.uri")
+    @Config("collector.activemq.uri")
     @DefaultNull
     public String getActiveMQUri();
 
     // ActiveMQ messages TTL in milliseconds, default 10 minutes
 
-    @Config(value = "collector.activemq.messagesTTLmilliseconds")
-    @Default(value = "600000")
+    @Config("collector.activemq.messagesTTLmilliseconds")
+    @Default("600000")
     public int getMessagesTTLMilliseconds();
 
     // Events types to forward to ActiveMQ (comma delimited)
 
-    @Config(value = "collector.activemq.events")
+    @Config("collector.activemq.events")
     @DefaultNull
     public String getActiveMQEventsToCollect();
 
     // Length of the internal buffer for passing events of a specific type to activemq
 
-    @Config(value = "collector.activemq.bufferLength")
-    @Default(value = "10000")
+    @Config("collector.activemq.bufferLength")
+    @Default("10000")
     public int getActiveMQBufferLength();
 
     // Number of senders per category
 
-    @Config(value = "collector.activemq.numSendersPerCategory")
-    @Default(value = "1")
+    @Config("collector.activemq.numSendersPerCategory")
+    @Default("1")
     public int getActiveMQNumSendersPerCategory();
 
     // Whether to collect scribe events
 
-    @Config(value = "collector.scribe.enabled")
-    @Default(value = "true")
+    @Config("collector.scribe.enabled")
+    @Default("true")
     public boolean isScribeCollectionEnabled();
 
     // Scribe port
 
-    @Config(value = "collector.scribe.port")
-    @Default(value = "7911")
+    @Config("collector.scribe.port")
+    @Default("7911")
     public int getScribePort();
 
-    @Config(value = "collector.max-event-queue-size")
-    @Default(value = "200000")
+    @Config("collector.max-event-queue-size")
+    @Default("200000")
     public long getMaxQueueSize();
 
-    @Config(value = "collector.event-routes.persistent")
-    @Default(value = "true")
+    @Config("collector.event-routes.persistent")
+    @Default("true")
     public boolean isHdfsWriterEnabled();
 
     //------------------- Spooling -------------------//
@@ -94,8 +94,8 @@ public interface CollectorConfig
      *
      * @return the maximum number of events per file
      */
-    @Config(value = "collector.diskspool.flush-event-queue-size")
-    @Default(value = "10000")
+    @Config("collector.diskspool.flush-event-queue-size")
+    @Default("10000")
     public long getFlushEventQueueSize();
 
     /**
@@ -103,8 +103,8 @@ public interface CollectorConfig
      *
      * @return maxixmum age of events in seconds in the temporary spool queue
      */
-    @Config(value = "collector.diskspool.refresh-delay-seconds")
-    @Default(value = "60")
+    @Config("collector.diskspool.refresh-delay-seconds")
+    @Default("60")
     public int getRefreshDelayInSeconds();
 
     /**
@@ -112,8 +112,8 @@ public interface CollectorConfig
      *
      * @return the directory path
      */
-    @Config(value = "collector.diskspool.path")
-    @Default(value = "/tmp/collector/diskspool")
+    @Config("collector.diskspool.path")
+    @Default("/tmp/collector/diskspool")
     public String getSpoolDirectoryName();
 
     /**
@@ -121,8 +121,8 @@ public interface CollectorConfig
      *
      * @return whether to send events buffered locally
      */
-    @Config(value = "collector.diskspool.enabled")
-    @Default(value = "true")
+    @Config("collector.diskspool.enabled")
+    @Default("true")
     public boolean isFlushEnabled();
 
     /**
@@ -130,8 +130,8 @@ public interface CollectorConfig
      *
      * @return delay between flushes to HDFS
      */
-    @Config(value = "collector.diskspool.refresh-delay-seconds")
-    @Default(value = "30")
+    @Config("collector.diskspool.refresh-delay-seconds")
+    @Default("30")
     public long getFlushIntervalInSeconds();
 
     /**
@@ -139,8 +139,8 @@ public interface CollectorConfig
      *
      * @return the String representation of the SyncType
      */
-    @Config(value = "collector.diskspool.synctype")
-    @Default(value = "NONE")
+    @Config("collector.diskspool.synctype")
+    @Default("NONE")
     public String getSyncType();
 
     /**
@@ -148,79 +148,79 @@ public interface CollectorConfig
      *
      * @return the number of events to buffer before calling flush or sync
      */
-    @Config(value = "collector.diskspool.sync-batch-size")
-    @Default(value = "50")
+    @Config("collector.diskspool.sync-batch-size")
+    @Default("50")
     public int getSyncBatchSize();
 
-    @Config(value = "collector.event-end-point.rate-window-size-minutes")
-    @Default(value = "5")
+    @Config("collector.event-end-point.rate-window-size-minutes")
+    @Default("5")
     public int getRateWindowSizeMinutes();
 
-    @Config(value = "collector.server.ip")
-    @Default(value = "127.0.0.1")
+    @Config("collector.server.ip")
+    @Default("127.0.0.1")
     public String getLocalIp();
 
-    @Config(value = "collector.server.port")
-    @Default(value = "8080")
+    @Config("collector.server.port")
+    @Default("8080")
     public int getLocalPort();
 
-    @Config(value = "collector.server.ssl.enabled")
-    @Default(value = "false")
+    @Config("collector.server.ssl.enabled")
+    @Default("false")
     public boolean isSSLEnabled();
 
-    @Config(value = "collector.server.ssl.port")
-    @Default(value = "443")
+    @Config("collector.server.ssl.port")
+    @Default("443")
     public int getLocalSSLPort();
 
-    @Config(value = "collector.jetty.ssl.keystore")
+    @Config("collector.jetty.ssl.keystore")
     @DefaultNull
     public String getSSLkeystoreLocation();
 
-    @Config(value = "collector.jetty.ssl.keystore.password")
+    @Config("collector.jetty.ssl.keystore.password")
     @DefaultNull
     public String getSSLkeystorePassword();
 
-    @Config(value = "collector.temporary-event-output-directory")
-    @Default(value = "/tmp/collector/hdfs/tmp")
+    @Config("collector.temporary-event-output-directory")
+    @Default("/tmp/collector/hdfs/tmp")
     public String getTemporaryEventOutputDirectory();
 
-    @Config(value = "collector.event-output-directory")
-    @Default(value = "/events")
+    @Config("collector.event-output-directory")
+    @Default("/events")
     public String getEventOutputDirectory();
 
-    @Config(value = "collector.hadoop-writer.max-writers")
-    @Default(value = "64")
+    @Config("collector.hadoop-writer.max-writers")
+    @Default("64")
     public int getMaxHadoopWriters();
 
-    @Config(value = "collector.hadoop.host")
+    @Config("collector.hadoop.host")
     @DefaultNull
     public String getHfsHost();
 
-    @Config(value = "collector.event-end-point.enabled")
-    @Default(value = "true")
+    @Config("collector.event-end-point.enabled")
+    @Default("true")
     public boolean isEventEndpointEnabled();
 
-    @Config(value = "collector.filters.list-delimeter")
-    @Default(value = ",")
+    @Config("collector.filters.list-delimeter")
+    @Default(",")
     public String getFilters();
 
-    @Config(value = "collector.filters.host")
+    @Config("collector.filters.host")
     @DefaultNull
     public String getFiltersHost();
 
-    @Config(value = "collector.filters.ip")
+    @Config("collector.filters.ip")
     @DefaultNull
     public String getFiltersIp();
 
-    @Config(value = "collector.filters.useragent")
+    @Config("collector.filters.useragent")
     @DefaultNull
     public String getFiltersUserAgent();
 
-    @Config(value = "collector.filters.path")
+    @Config("collector.filters.path")
     @DefaultNull
     public String getFiltersPath();
 
-    @Config(value = "collector.filters.event-type")
+    @Config("collector.filters.event-type")
     @DefaultNull
     public String getFiltersEventType();
 
@@ -229,7 +229,7 @@ public interface CollectorConfig
      *
      * @return the hostname used to connect to the load balancer
      */
-    @Config(value = "collector.f5.hostname")
+    @Config("collector.f5.hostname")
     @DefaultNull
     public String getF5Hostname();
 
@@ -238,7 +238,7 @@ public interface CollectorConfig
      *
      * @return the username used to connect to the load balancer
      */
-    @Config(value = "collector.f5.username")
+    @Config("collector.f5.username")
     @DefaultNull
     public String getF5Username();
 
@@ -247,7 +247,7 @@ public interface CollectorConfig
      *
      * @return the password used to connect to the load balancer
      */
-    @Config(value = "collector.f5.password")
+    @Config("collector.f5.password")
     @DefaultNull
     public String getF5Password();
 
@@ -256,7 +256,7 @@ public interface CollectorConfig
      *
      * @return the pool name used to connect to the load balancer
      */
-    @Config(value = "collector.f5.poolname")
+    @Config("collector.f5.poolname")
     @DefaultNull
     public String getF5PoolName();
 
@@ -265,8 +265,8 @@ public interface CollectorConfig
      *
      * @return Goodwill hostname
      */
-    @Config(value = "collector.goodwill.host")
-    @Default(value = "127.0.0.1")
+    @Config("collector.goodwill.host")
+    @Default("127.0.0.1")
     public String getGoodwillHost();
 
     /**
@@ -274,8 +274,8 @@ public interface CollectorConfig
      *
      * @return Goodwill port
      */
-    @Config(value = "collector.goodwill.port")
-    @Default(value = "8080")
+    @Config("collector.goodwill.port")
+    @Default("8080")
     public int getGoodwillPort();
 
     /**
@@ -283,8 +283,8 @@ public interface CollectorConfig
      *
      * @return true if Goodwill integration is enabled, false otherwise
      */
-    @Config(value = "collector.goodwill.enabled")
-    @Default(value = "false")
+    @Config("collector.goodwill.enabled")
+    @Default("false")
     public boolean isGoodwillEnabled();
 
     /**
@@ -292,7 +292,7 @@ public interface CollectorConfig
      *
      * @return true if Goodwill integration is enabled, false otherwise
      */
-    @Config(value = "collector.goodwill.enabled")
-    @Default(value = "90")
+    @Config("collector.goodwill.enabled")
+    @Default("90")
     public int getGoodwillCacheTimeout();
 }
