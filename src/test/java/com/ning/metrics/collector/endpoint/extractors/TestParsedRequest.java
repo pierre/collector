@@ -17,6 +17,7 @@
 package com.ning.metrics.collector.endpoint.extractors;
 
 import com.ning.metrics.collector.endpoint.MockHttpHeaders;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;

@@ -18,9 +18,9 @@ package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
-import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
-import com.ning.metrics.collector.util.Filter;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
+import com.ning.metrics.collector.endpoint.filters.Filter;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
 import org.testng.Assert;

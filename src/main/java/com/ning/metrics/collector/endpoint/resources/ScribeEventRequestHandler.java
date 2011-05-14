@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ScribeEventRequestHandler implements Iface
+class ScribeEventRequestHandler implements Iface
 {
     private static final Charset CHARSET = Charset.forName("ISO-8859-1");
 

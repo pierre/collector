@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.extractors;
+package com.ning.metrics.collector.endpoint;
 
 import com.ning.metrics.serialization.event.Granularity;
 import org.apache.commons.lang.StringUtils;

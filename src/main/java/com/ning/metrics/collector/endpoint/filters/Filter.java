@@ -14,9 +14,9 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.util;
+package com.ning.metrics.collector.endpoint.filters;
 
 public interface Filter<T>
 {
-    public boolean passesFilter(String eventName, T input);
+    boolean passesFilter(String eventName, T input);
 }

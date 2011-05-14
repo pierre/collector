@@ -14,20 +14,16 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.endpoint.filters;
 
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import com.ning.metrics.collector.binder.providers.ArrayListProvider;
-import com.ning.metrics.collector.binder.providers.EventFilterProvider;
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.endpoint.filters.FieldExtractors;
-import com.ning.metrics.collector.endpoint.filters.OrFilter;
-import com.ning.metrics.collector.util.Filter;
+import com.ning.metrics.collector.binder.providers.ArrayListProvider;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 

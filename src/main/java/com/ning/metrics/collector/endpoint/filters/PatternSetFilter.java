@@ -17,42 +17,40 @@
 package com.ning.metrics.collector.endpoint.filters;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
-import com.ning.metrics.collector.util.Filter;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import org.weakref.jmx.Managed;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
-public class PatternSetFilter implements Filter<ExtractedAnnotation>
+class PatternSetFilter implements Filter<ExtractedAnnotation>
 {
     private final FieldExtractor fieldExtractor;
     private final ConcurrentMap<String, Pattern> patternMap = new ConcurrentHashMap<String, Pattern>();
 
     @Inject
-    public PatternSetFilter(FieldExtractor fieldExtractor, Set<Pattern> patterns)
+    public PatternSetFilter(final FieldExtractor fieldExtractor, final Iterable<Pattern> patterns)
     {
         this.fieldExtractor = fieldExtractor;
 
-        for (Pattern pattern : patterns) {
+        for (final Pattern pattern : patterns) {
             patternMap.put(pattern.toString(), pattern);
         }
     }
 
     @Override
-    public boolean passesFilter(String name, ExtractedAnnotation annotation)
+    public boolean passesFilter(final String name, final ExtractedAnnotation annotation)
     {
-        String input = fieldExtractor.getField(name, annotation);
+        final String input = fieldExtractor.getField(name, annotation);
 
         if (input == null) {
             return false;
         }
 
-        for (Pattern pattern : patternMap.values()) {
+        for (final Pattern pattern : patternMap.values()) {
             if (pattern.matcher(input).find()) {
                 return true;
             }
@@ -68,13 +66,13 @@ public class PatternSetFilter implements Filter<ExtractedAnnotation>
     }
 
     @Managed(description = "add a regular expression to filter set")
-    public void addPattern(String patternString)
+    public void addPattern(final String patternString)
     {
         patternMap.put(patternString, Pattern.compile(patternString));
     }
 
     @Managed(description = "add a regular expression to filter set")
-    public void removePattern(String patternString)
+    public void removePattern(final String patternString)
     {
         patternMap.remove(patternString);
     }

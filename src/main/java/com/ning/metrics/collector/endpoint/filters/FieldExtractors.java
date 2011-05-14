@@ -16,14 +16,14 @@
 
 package com.ning.metrics.collector.endpoint.filters;
 
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 
-public enum FieldExtractors implements FieldExtractor
+enum FieldExtractors implements FieldExtractor
 {
     HOST
         {
             @Override
-            public String getField(String eventName, ExtractedAnnotation annotation)
+            public String getField(final String eventName, final ExtractedAnnotation annotation)
             {
                 return annotation.getReferrerHost();
             }
@@ -31,7 +31,7 @@ public enum FieldExtractors implements FieldExtractor
     IP
         {
             @Override
-            public String getField(String eventName, ExtractedAnnotation annotation)
+            public String getField(final String eventName, final ExtractedAnnotation annotation)
             {
                 return annotation.getIpAddress();
             }
@@ -39,7 +39,7 @@ public enum FieldExtractors implements FieldExtractor
     USERAGENT
         {
             @Override
-            public String getField(String eventName, ExtractedAnnotation annotation)
+            public String getField(final String eventName, final ExtractedAnnotation annotation)
             {
                 return annotation.getUserAgent();
             }
@@ -47,7 +47,7 @@ public enum FieldExtractors implements FieldExtractor
     PATH
         {
             @Override
-            public String getField(String eventName, ExtractedAnnotation annotation)
+            public String getField(final String eventName, final ExtractedAnnotation annotation)
             {
                 return annotation.getReferrerPath();
             }
@@ -55,7 +55,7 @@ public enum FieldExtractors implements FieldExtractor
     EVENT_TYPE
         {
             @Override
-            public String getField(String eventName, ExtractedAnnotation annotation)
+            public String getField(final String eventName, final ExtractedAnnotation annotation)
             {
                 return eventName;
             }

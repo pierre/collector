@@ -17,7 +17,7 @@
 package com.ning.metrics.collector.events.parsing;
 
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
 
 public interface EventParser

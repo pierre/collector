@@ -17,6 +17,7 @@
 package com.ning.metrics.collector.endpoint.extractors;
 
 import com.ning.metrics.collector.endpoint.MockHttpHeaders;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;

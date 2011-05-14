@@ -19,8 +19,8 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
-import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 

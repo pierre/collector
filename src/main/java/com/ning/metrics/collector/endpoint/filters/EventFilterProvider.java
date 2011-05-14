@@ -14,18 +14,16 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.endpoint.filters;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.ning.metrics.collector.endpoint.filters.FieldExtractor;
-import com.ning.metrics.collector.endpoint.filters.PatternSetFilter;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class EventFilterProvider implements Provider<PatternSetFilter>
+class EventFilterProvider implements Provider<PatternSetFilter>
 {
     private final FieldExtractor fieldExtractor;
     private final Set<Pattern> patternSet = new HashSet<Pattern>();

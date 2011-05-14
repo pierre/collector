@@ -17,6 +17,7 @@
 package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.events.parsing.EventParser;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;

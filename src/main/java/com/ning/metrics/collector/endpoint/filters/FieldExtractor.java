@@ -16,9 +16,9 @@
 
 package com.ning.metrics.collector.endpoint.filters;
 
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 
-public interface FieldExtractor
+interface FieldExtractor
 {
-    public String getField(String eventName, ExtractedAnnotation annotation);
+    String getField(String eventName, ExtractedAnnotation annotation);
 }

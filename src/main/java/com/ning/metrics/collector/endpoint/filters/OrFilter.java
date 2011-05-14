@@ -17,27 +17,25 @@
 package com.ning.metrics.collector.endpoint.filters;
 
 import com.google.inject.Inject;
-
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
-import com.ning.metrics.collector.util.Filter;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public class OrFilter implements Filter<ExtractedAnnotation>
+class OrFilter implements Filter<ExtractedAnnotation>
 {
     private final List<Filter> filterList;
 
     @Inject
-    public OrFilter(List<Filter> filterList)
+    public OrFilter(final List<Filter> filterList)
     {
         this.filterList = filterList;
     }
 
     @Override
-    public boolean passesFilter(String eventName, ExtractedAnnotation annotation)
+    public boolean passesFilter(final String eventName, final ExtractedAnnotation annotation)
     {
-        for (Filter filter : filterList) {
+        for (final Filter filter : filterList) {
             if (filter.passesFilter(eventName, annotation)) {
                 return true;
             }

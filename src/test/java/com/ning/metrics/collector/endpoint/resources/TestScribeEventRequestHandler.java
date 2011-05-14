@@ -14,9 +14,11 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
-import com.ning.metrics.collector.endpoint.resources.ScribeEventRequestHandler;
+import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.MockScribeEventHandler;
+import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.Granularity;
 import com.ning.metrics.serialization.event.SmileBucketEvent;
 import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
@@ -59,10 +61,10 @@ public class TestScribeEventRequestHandler
     @Test(groups = "fast")
     public void testSmileSuccess() throws Exception
     {
-        SmileBucketEvent smileEvent = createSmileBucketEvent();
+        final SmileBucketEvent smileEvent = createSmileBucketEvent();
 
         // See ScribeSender in com.ning:metrics.eventtracker
-        List<LogEntry> logEntries = new ArrayList<LogEntry>();
+        final List<LogEntry> logEntries = new ArrayList<LogEntry>();
         logEntries.add(new LogEntry(EVENT_NAME, new String(smileEvent.getSerializedEvent(), SmileEnvelopeEvent.CHARSET)));
 
         Assert.assertEquals(eventRequestHandler.Log(logEntries), ResultCode.OK);
@@ -76,7 +78,7 @@ public class TestScribeEventRequestHandler
     @Test(groups = "fast")
     public void testSuccess() throws Exception
     {
-        List<LogEntry> logEntries = new ArrayList<LogEntry>();
+        final List<LogEntry> logEntries = new ArrayList<LogEntry>();
         logEntries.add(new LogEntry(EVENT_NAME, THRIFT_MSG));
         Assert.assertEquals(eventRequestHandler.Log(logEntries), ResultCode.OK);
 
@@ -90,7 +92,7 @@ public class TestScribeEventRequestHandler
     @Test(groups = "fast")
     public void testUnsupportedEvent() throws Exception
     {
-        List<LogEntry> logEntries = new ArrayList<LogEntry>();
+        final List<LogEntry> logEntries = new ArrayList<LogEntry>();
         logEntries.add(new LogEntry(EVENT_NAME, "msg"));
         Assert.assertEquals(eventRequestHandler.Log(logEntries), ResultCode.OK);
 
@@ -104,7 +106,7 @@ public class TestScribeEventRequestHandler
     public void testCollectorFailure() throws Exception
     {
         eventHandler.setFakeCollectorFailure(true);
-        List<LogEntry> logEntries = new ArrayList<LogEntry>();
+        final List<LogEntry> logEntries = new ArrayList<LogEntry>();
         logEntries.add(new LogEntry(EVENT_NAME, null));
         Assert.assertEquals(eventRequestHandler.Log(logEntries), ResultCode.OK);
 
@@ -118,7 +120,7 @@ public class TestScribeEventRequestHandler
 
     private SmileBucketEvent createSmileBucketEvent() throws IOException
     {
-        SmileBucket nodes = new SmileBucket();
+        final SmileBucket nodes = new SmileBucket();
         for (int i = 0; i < 5; i++) {
             nodes.add((JsonNode) createSmileEvent().getData());
         }
@@ -126,16 +128,16 @@ public class TestScribeEventRequestHandler
         return new SmileBucketEvent(EVENT_NAME, Granularity.HOURLY, nodes);
     }
 
-    private SmileEnvelopeEvent createSmileEvent() throws IOException
+    private Event createSmileEvent() throws IOException
     {
         // Use same configuration as SmileEnvelopeEvent
-        SmileFactory f = new SmileFactory();
+        final SmileFactory f = new SmileFactory();
         f.configure(SmileGenerator.Feature.CHECK_SHARED_NAMES, true);
         f.configure(SmileGenerator.Feature.CHECK_SHARED_STRING_VALUES, true);
         f.configure(SmileParser.Feature.REQUIRE_HEADER, false);
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        JsonGenerator g = f.createJsonGenerator(stream);
+        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        final JsonGenerator g = f.createJsonGenerator(stream);
 
         g.writeStartObject();
         g.writeStringField(SmileEnvelopeEvent.SMILE_EVENT_GRANULARITY_TOKEN_NAME, Granularity.HOURLY.toString());

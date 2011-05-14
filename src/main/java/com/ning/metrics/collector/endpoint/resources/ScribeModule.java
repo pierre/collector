@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.modules;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;

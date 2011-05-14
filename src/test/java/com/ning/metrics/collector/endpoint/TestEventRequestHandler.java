@@ -17,7 +17,6 @@
 package com.ning.metrics.collector.endpoint;
 
 import com.ning.metrics.collector.endpoint.extractors.MockEventExtractor;
-import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
