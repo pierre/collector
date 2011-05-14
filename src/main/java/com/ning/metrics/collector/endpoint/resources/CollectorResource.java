@@ -25,7 +25,6 @@ import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -44,8 +43,8 @@ public class CollectorResource
 
     @Inject
     public CollectorResource(
-        @ExternalEventRequestHandler EventRequestHandler requestHandler,
-        EventExtractorUtil extractorUtil
+        @ExternalEventRequestHandler final EventRequestHandler requestHandler,
+        final EventExtractorUtil extractorUtil
     )
     {
         this.requestHandler = requestHandler;
@@ -54,15 +53,15 @@ public class CollectorResource
 
     @GET
     public Response get(
-        @QueryParam("v") String event,
-        @QueryParam("date") String eventDateTimeString,
-        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
-        @Context HttpHeaders httpHeaders,
-        @Context ServletRequest request
+        @QueryParam("v") final String event,
+        @QueryParam("date") final String eventDateTimeString,
+        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
+        @Context final HttpHeaders httpHeaders,
+        @Context final ServletRequest request
     )
     {
-        EventStats eventStats = new EventStats();
-        DateTime eventDateTime = new DateTime(eventDateTimeString);
+        final EventStats eventStats = new EventStats();
+        final DateTime eventDateTime = new DateTime(eventDateTimeString);
         return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, request.getRemoteAddr(), extractorUtil), eventStats);
     }
 }

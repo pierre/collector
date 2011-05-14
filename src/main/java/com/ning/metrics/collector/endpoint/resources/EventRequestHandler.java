@@ -41,9 +41,9 @@ public class EventRequestHandler
     private final EventHandler eventHandler;
 
     public EventRequestHandler(
-            EventHandler eventHandler,
-            EventExtractor eventExtractor,
-            EventEndPointStats stats
+            final EventHandler eventHandler,
+            final EventExtractor eventExtractor,
+            final EventEndPointStats stats
     )
     {
         this.eventExtractor = eventExtractor;
@@ -52,9 +52,9 @@ public class EventRequestHandler
     }
 
     // TODO the statistics we collect here are less relevant now that we're processing collections of events at a time
-    public Response handleEventRequest(String eventString, ExtractedAnnotation annotation, EventStats eventStats)
+    public Response handleEventRequest(final String eventString, final ExtractedAnnotation annotation, final EventStats eventStats)
     {
-        Collection<? extends Event> events;
+        final Collection<? extends Event> events;
 
         try {
             // do not update stats here, while extracting events. update when processing.
@@ -86,7 +86,7 @@ public class EventRequestHandler
         // We were able to parse all events
         int failCount = 0;
 
-        for (Event event : events) {
+        for (final Event event : events) {
             try {
                 log.debug(String.format("Processing event %s", event));
                 // We ignore the Response here (see below)

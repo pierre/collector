@@ -46,8 +46,8 @@ public class Base64CollectorResource
 
     @Inject
     public Base64CollectorResource(
-        @Base64ExternalEventRequestHandler EventRequestHandler requestHandler,
-        EventExtractorUtil extractorUtil
+        @Base64ExternalEventRequestHandler final EventRequestHandler requestHandler,
+        final EventExtractorUtil extractorUtil
     )
     {
         this.requestHandler = requestHandler;
@@ -57,15 +57,15 @@ public class Base64CollectorResource
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response get(
-        @QueryParam("v") String event,
-        @QueryParam("date") String eventDateTimeString,
-        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
-        @Context HttpHeaders httpHeaders,
-        @Context ServletRequest request
+        @QueryParam("v") final String event,
+        @QueryParam("date") final String eventDateTimeString,
+        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
+        @Context final HttpHeaders httpHeaders,
+        @Context final ServletRequest request
     )
     {
-        EventStats eventStats = new EventStats();
-        DateTime eventDateTime = new DateTime(eventDateTimeString);
+        final EventStats eventStats = new EventStats();
+        final DateTime eventDateTime = new DateTime(eventDateTimeString);
         return requestHandler.handleEventRequest(event, new ParsedRequest(httpHeaders, eventDateTime, eventGranularity, request.getRemoteAddr(), extractorUtil), eventStats);
     }
 }
