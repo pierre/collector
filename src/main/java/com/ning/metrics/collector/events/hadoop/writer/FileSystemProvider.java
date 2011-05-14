@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.events.hadoop.writer;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -27,7 +27,7 @@ import org.apache.hadoop.fs.FileSystem;
 
 import java.io.IOException;
 
-public class FileSystemProvider implements Provider<FileSystem>
+class FileSystemProvider implements Provider<FileSystem>
 {
     private final FileSystem fileSystem;
 

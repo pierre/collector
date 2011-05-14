@@ -26,12 +26,14 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.ReadableInstant;
 import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,15 +52,15 @@ public class HadoopFileEventWriter implements EventWriter
     private final String tmpDirectory;
     private final FileSystem fs;
     private int maxOutputStreams = 64;
-    private final Queue<FileError> fileErrorList = new ArrayDeque<FileError>();
+    private final Collection<FileError> fileErrorList = new ArrayDeque<FileError>();
     private volatile DateTime lastFlushed = new DateTime();
-    private final List<HadoopOutputChunk> closedChunkList = new ArrayList<HadoopOutputChunk>();
+    private final Collection<HadoopOutputChunk> closedChunkList = new ArrayList<HadoopOutputChunk>();
     private final Map<String, HadoopOutputChunk> outputChunks = new LinkedHashMap<String, HadoopOutputChunk>()
     {
-        protected boolean removeEldestEntry(Map.Entry<String, HadoopOutputChunk> eldest)
+        protected boolean removeEldestEntry(final Map.Entry<String, HadoopOutputChunk> eldest)
         {
             if (size() > maxOutputStreams) {
-                HadoopOutputChunk output = eldest.getValue();
+                final HadoopOutputChunk output = eldest.getValue();
                 try {
                     output.close();
                     closedChunkList.add(output);
@@ -77,20 +79,20 @@ public class HadoopFileEventWriter implements EventWriter
 
     @Inject
     public HadoopFileEventWriter(
-        FileSystem fs,
-        CollectorConfig config
+        final FileSystem fs,
+        final CollectorConfig config
     )
     {
         this(config.getEventOutputDirectory(), config.getTemporaryEventOutputDirectory(), fs, config.getMaxHadoopWriters(), config.getLocalIp(), config.getLocalPort());
     }
 
     public HadoopFileEventWriter(
-        String baseDirectory,
-        String tmpBase,
-        FileSystem fs,
-        int maxOutputStreams,
-        String ip,
-        int port
+        final String baseDirectory,
+        final String tmpBase,
+        final FileSystem fs,
+        final int maxOutputStreams,
+        final String ip,
+        final int port
     )
     {
         this.baseDirectory = baseDirectory;
@@ -112,30 +114,30 @@ public class HadoopFileEventWriter implements EventWriter
      * @see com.ning.metrics.serialization.smile.SmileEnvelopeEventsToSmileBucketEvents to bundle properly Smile events
      */
     @Profiled(tag = "jmx", message = "Write event to HDFS")
-    public synchronized void write(Event event) throws IOException
+    public synchronized void write(final Event event) throws IOException
     {
-        for (FileError fileError : fileErrorList) {
+        for (final FileError fileError : fileErrorList) {
             log.error(String.format("Error flushing & closing file %s", fileError.getFilename()), fileError.getException());
         }
         fileErrorList.clear();
 
-        String outputDir = event.getOutputDir(baseDirectory);
-        String tmpOutputDir = event.getOutputDir(tmpDirectory);
+        final String outputDir = event.getOutputDir(baseDirectory);
+        final String tmpOutputDir = event.getOutputDir(tmpDirectory);
         writeEventToHDFS(event, outputDir, tmpOutputDir);
     }
 
-    private void writeEventToHDFS(Event event, String outputDir, String tmpOutputDir) throws IOException
+    private void writeEventToHDFS(final Event event, final String outputDir, final String tmpOutputDir) throws IOException
     {
-        Object value = event.getData();
-        HadoopOutputChunk chunk = getChunk(event, outputDir, tmpOutputDir, value, value.getClass());
+        final Object value = event.getData();
+        final HadoopOutputChunk chunk = getChunk(event, outputDir, tmpOutputDir, value, value.getClass());
 
         if (chunk != null) {
-            SequenceFile.Writer writer = chunk.getWriter();
+            final SequenceFile.Writer writer = chunk.getWriter();
             writer.append(BOOL_WRITABLE, value);
         }
     }
 
-    private HadoopOutputChunk getChunk(Event event, String outputDir, String tmpOutputDir, Object value, Class<?> clazz) throws IOException
+    private HadoopOutputChunk getChunk(final Event event, final String outputDir, final String tmpOutputDir, final Object value, final Class<?> clazz) throws IOException
     {
         if (value == null) {
             // Trying to write a null value triggers an NPE in SequenceFile$BlockCompressWriter.append.
@@ -146,8 +148,8 @@ public class HadoopFileEventWriter implements EventWriter
 
         HadoopOutputChunk chunk = outputChunks.get(outputDir);
         if (chunk == null) {
-            DateTime now = new DateTime();
-            String filename = String.format("%s-%s", now, sessionId).replace(":", ".");
+            final DateTime now = new DateTime();
+            final String filename = String.format("%s-%s", now, sessionId).replace(":", ".");
             Path outputPath = new Path(outputDir, filename);
             Path tmpOutputPath = new Path(tmpOutputDir, filename);
 
@@ -157,7 +159,7 @@ public class HadoopFileEventWriter implements EventWriter
             }
 
             log.info(String.format("OutputPath (tmp): %s (%s)", outputPath.toUri().getPath(), tmpOutputPath.toUri().getPath()));
-            SequenceFile.Writer writer = SequenceFile.createWriter(fs, fs.getConf(), tmpOutputPath, TBooleanWritable.class, clazz, SequenceFile.CompressionType.BLOCK);
+            final SequenceFile.Writer writer = SequenceFile.createWriter(fs, fs.getConf(), tmpOutputPath, TBooleanWritable.class, clazz, SequenceFile.CompressionType.BLOCK);
             chunk = new HadoopOutputChunk(tmpOutputPath, outputPath, writer);
             outputChunks.put(outputDir, chunk);
         }
@@ -166,7 +168,7 @@ public class HadoopFileEventWriter implements EventWriter
 
     private List<HadoopOutputChunk> getAllChunks()
     {
-        List<HadoopOutputChunk> allChunks = new ArrayList<HadoopOutputChunk>(outputChunks.values());
+        final List<HadoopOutputChunk> allChunks = new ArrayList<HadoopOutputChunk>(outputChunks.values());
         allChunks.addAll(closedChunkList);
 
         return allChunks;
@@ -193,14 +195,14 @@ public class HadoopFileEventWriter implements EventWriter
     @Override
     public synchronized void forceCommit() throws IOException
     {
-        List<HadoopOutputChunk> allChunks = getAllChunks();
+        final List<HadoopOutputChunk> allChunks = getAllChunks();
 
-        for (HadoopOutputChunk chunk : allChunks) {
+        for (final HadoopOutputChunk chunk : allChunks) {
             chunk.close();
         }
 
         try {
-            for (HadoopOutputChunk chunk : allChunks) {
+            for (final HadoopOutputChunk chunk : allChunks) {
                 chunk.commit(fs);
             }
         }
@@ -220,14 +222,14 @@ public class HadoopFileEventWriter implements EventWriter
     @Override
     public synchronized void rollback() throws IOException
     {
-        List<HadoopOutputChunk> allChunks = getAllChunks();
+        final List<HadoopOutputChunk> allChunks = getAllChunks();
 
-        for (HadoopOutputChunk chunk : allChunks) {
+        for (final HadoopOutputChunk chunk : allChunks) {
             chunk.close();
         }
 
         try {
-            for (HadoopOutputChunk chunk : allChunks) {
+            for (final HadoopOutputChunk chunk : allChunks) {
                 chunk.rollback(fs);
             }
         }
@@ -246,7 +248,7 @@ public class HadoopFileEventWriter implements EventWriter
     @Managed(description = "seconds since last commit of events to hdfs")
     public long getSecondsSinceLastUpdate()
     {
-        DateTime now = new DateTime();
+        final ReadableInstant now = new DateTime();
 
         return (now.getMillis() - lastFlushed.getMillis()) / 1000;
     }

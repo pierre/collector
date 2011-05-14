@@ -26,7 +26,7 @@ class FileError
     private final String filename;
     private final IOException exception;
 
-    FileError(String filename, IOException exception)
+    FileError(final String filename, final IOException exception)
     {
         this.filename = filename;
         this.exception = exception;

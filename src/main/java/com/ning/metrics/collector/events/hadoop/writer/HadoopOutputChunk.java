@@ -32,7 +32,7 @@ class HadoopOutputChunk
     private final SequenceFile.Writer writer;
     private boolean isClosed = false;
 
-    HadoopOutputChunk(Path sourcePath, Path destinationPath, SequenceFile.Writer writer)
+    HadoopOutputChunk(final Path sourcePath, final Path destinationPath, final SequenceFile.Writer writer)
     {
         this.sourcePath = sourcePath;
         this.destinationPath = destinationPath;
@@ -58,9 +58,9 @@ class HadoopOutputChunk
      * @param fileSystem Filesystem object to operate on
      * @throws IOException generic IOException
      */
-    public void commit(FileSystem fileSystem) throws IOException
+    public void commit(final FileSystem fileSystem) throws IOException
     {
-        Path destinationDir = destinationPath.getParent();
+        final Path destinationDir = destinationPath.getParent();
 
         // parent directory has to exist for a hdfs rename to succeed
         if (!fileSystem.exists(destinationDir) && !fileSystem.mkdirs(destinationPath.getParent())) {
@@ -77,13 +77,13 @@ class HadoopOutputChunk
      * @param fileSystem FileSystem object to operate on
      * @throws IOException generic IOException
      */
-    public void rollback(FileSystem fileSystem) throws IOException
+    public void rollback(final FileSystem fileSystem) throws IOException
     {
         deleteIfExists(sourcePath, fileSystem);
         deleteIfExists(destinationPath, fileSystem);
     }
 
-    private void deleteIfExists(Path path, FileSystem fileSystem) throws IOException
+    private void deleteIfExists(final Path path, final FileSystem fileSystem) throws IOException
     {
         if (fileSystem.exists(path) && !fileSystem.delete(path, false)) {
             throw new IOException(String.format("unable to delete %s", path));
