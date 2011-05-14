@@ -16,10 +16,7 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
-import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -31,7 +28,7 @@ public class MockEventExtractor implements EventExtractor
     private Event event = null;
 
     @Override
-    public Collection<Event> extractEvent(String eventName, ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<Event> extractEvent(ExtractedAnnotation annotation) throws EventParsingException
     {
         if (throwsEventParseException) {
             throw new EventParsingException("IGNORE - Expected exception for tests");

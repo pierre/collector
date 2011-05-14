@@ -17,10 +17,9 @@
 package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
-
-import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.collector.events.parsing.EventParser;
+import com.ning.metrics.serialization.event.Event;
+import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -41,12 +40,14 @@ public class QueryParameterEventExtractor implements EventExtractor
     }
 
     @Override
-    public Collection<? extends Event> extractEvent(final String event, final ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<? extends Event> extractEvent(final ExtractedAnnotation annotation) throws EventParsingException
     {
-        if (event != null) {
-            log.debug(String.format("Query parameter to process: %s", event));
-            final String type = event.substring(0, event.indexOf(","));
-            final String eventTypeString = event.substring(event.indexOf(",") + 1);
+        final String eventName = annotation.getEventName();
+
+        if (eventName != null) {
+            log.debug(String.format("Query parameter to process: %s", eventName));
+            final String type = eventName.substring(0, eventName.indexOf(","));
+            final String eventTypeString = eventName.substring(eventName.indexOf(",") + 1);
 
             log.debug(String.format("Event type [%s], event string [%s]", type, eventTypeString));
 

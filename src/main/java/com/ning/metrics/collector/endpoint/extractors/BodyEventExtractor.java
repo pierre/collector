@@ -37,8 +37,10 @@ public class BodyEventExtractor implements EventExtractor
     private static final Logger log = Logger.getLogger(BodyEventExtractor.class);
 
     @Override
-    public Collection<? extends Event> extractEvent(final String eventType, final ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<? extends Event> extractEvent(final ExtractedAnnotation annotation) throws EventParsingException
     {
+        final String eventType = annotation.getEventName();
+
         if (eventType != null) {
             if (annotation == null) {
                 log.warn("Null annotation");

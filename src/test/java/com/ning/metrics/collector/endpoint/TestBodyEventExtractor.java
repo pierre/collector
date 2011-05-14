@@ -63,14 +63,14 @@ public class TestBodyEventExtractor
     public void testValidRequest() throws Exception
     {
         ParsedRequest validRequest = new ParsedRequest(
-            null,
+            eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             new ByteArrayInputStream(payload),
             null,
             null,
             null
         );
-        Collection<? extends Event> events = extractor.extractEvent(eventType, validRequest);
+        Collection<? extends Event> events = extractor.extractEvent(validRequest);
 
         for (Event event : events) {
             Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
@@ -87,7 +87,7 @@ public class TestBodyEventExtractor
     public void testValidRequestWithRoute() throws Exception
     {
         ParsedRequest routedRequest = new ParsedRequest(
-            null,
+            eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             new ByteArrayInputStream(payload),
             null,
@@ -95,7 +95,7 @@ public class TestBodyEventExtractor
             null
         );
 
-        Collection<? extends Event> events = extractor.extractEvent(eventType, routedRequest);
+        Collection<? extends Event> events = extractor.extractEvent(routedRequest);
 
         for (Event event : events) {
             Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
@@ -119,14 +119,14 @@ public class TestBodyEventExtractor
             null,
             null
         );
-        Assert.assertEquals(extractor.extractEvent(null, missingNameRequest), null);
+        Assert.assertEquals(extractor.extractEvent(missingNameRequest), null);
     }
 
     @Test(groups = "fast")
     public void testGetInputThrowsIOException() throws Exception
     {
         ParsedRequest throwsIOExceptionRequest = new ParsedRequest(
-            null,
+            eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             null,
             null,
@@ -135,7 +135,7 @@ public class TestBodyEventExtractor
         );
 
         try {
-            extractor.extractEvent(eventType, throwsIOExceptionRequest);
+            extractor.extractEvent(throwsIOExceptionRequest);
             Assert.fail("expected exception");
         }
         catch (Exception e) {
@@ -148,7 +148,7 @@ public class TestBodyEventExtractor
     {
         byte[] invalidBytes = {1, 2, 3};
         ParsedRequest throwsParseExceptionRequest = new ParsedRequest(
-            null,
+            eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13"),
             new ByteArrayInputStream(invalidBytes),
             null,
@@ -157,7 +157,7 @@ public class TestBodyEventExtractor
         );
 
         try {
-            extractor.extractEvent(eventType, throwsParseExceptionRequest);
+            extractor.extractEvent(throwsParseExceptionRequest);
             Assert.fail("expected exception");
         }
         catch (Exception e) {
@@ -169,7 +169,7 @@ public class TestBodyEventExtractor
     public void testInvalidContentType() throws Exception
     {
         ParsedRequest invalidContentTypeRequest = new ParsedRequest(
-            null,
+            eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", null),
             new ByteArrayInputStream(payload),
             null,
@@ -178,7 +178,7 @@ public class TestBodyEventExtractor
         );
 
         try {
-            extractor.extractEvent(eventType, invalidContentTypeRequest);
+            extractor.extractEvent(invalidContentTypeRequest);
             Assert.fail("expected exception");
         }
         catch (Exception e) {
@@ -192,7 +192,7 @@ public class TestBodyEventExtractor
         MockHttpHeaders headers = new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", null, payloadSize);
 
         ParsedRequest request = new ParsedRequest(
-            null,
+            eventType,
             headers,
             new ByteArrayInputStream(payload),
             null,

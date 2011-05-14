@@ -58,7 +58,7 @@ public class EventRequestHandler
 
         try {
             // do not update stats here, while extracting events. update when processing.
-            events = eventExtractor.extractEvent(eventName, annotation);
+            events = eventExtractor.extractEvent(annotation);
             eventStats.recordExtracted();
         }
         catch (EventParsingException e) {
