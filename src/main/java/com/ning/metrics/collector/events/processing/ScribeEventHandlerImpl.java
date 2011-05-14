@@ -31,8 +31,9 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
     private static final Logger logger = Logger.getLogger(ScribeEventHandlerImpl.class);
 
     private final EventCollector collector;
-    private volatile boolean scribeCollectionEnabled;
     private final EventEndPointStats stats;
+
+    private volatile boolean scribeCollectionEnabled;
 
     @Inject
     public ScribeEventHandlerImpl(
@@ -41,17 +42,9 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
         @ScribeStats EventEndPointStats endPointStats
     )
     {
-        this(collector, config.isScribeCollectionEnabled(), endPointStats);
-    }
-
-    public ScribeEventHandlerImpl(
-        EventCollector collector,
-        boolean enabled,
-        EventEndPointStats stats)
-    {
         this.collector = collector;
-        this.scribeCollectionEnabled = enabled;
-        this.stats = stats;
+        this.scribeCollectionEnabled = config.isScribeCollectionEnabled();
+        this.stats = endPointStats;
     }
 
     @Override
