@@ -39,8 +39,8 @@ public class EventRequestHandlerProvider implements Provider<EventRequestHandler
         Class<? extends Annotation> eventEndPointStatsAnnotation
     )
     {
-        this.eventExtractorKey = Key.get(eventExtractorClazz, eventExtractorAnnotation);
-        this.eventEndPointStatsKey = Key.get(EventEndPointStats.class, eventEndPointStatsAnnotation);
+        eventExtractorKey = Key.get(eventExtractorClazz, eventExtractorAnnotation);
+        eventEndPointStatsKey = Key.get(EventEndPointStats.class, eventEndPointStatsAnnotation);
     }
 
 
@@ -49,8 +49,8 @@ public class EventRequestHandlerProvider implements Provider<EventRequestHandler
         Class<? extends Annotation> eventEndPointStatsAnnotation
     )
     {
-        this.eventExtractorKey = Key.get(eventExtractorClazz);
-        this.eventEndPointStatsKey = Key.get(EventEndPointStats.class, eventEndPointStatsAnnotation);
+        eventExtractorKey = Key.get(eventExtractorClazz);
+        eventEndPointStatsKey = Key.get(EventEndPointStats.class, eventEndPointStatsAnnotation);
     }
 
     @Inject

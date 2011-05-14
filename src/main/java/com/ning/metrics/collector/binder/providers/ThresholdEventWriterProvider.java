@@ -35,8 +35,8 @@ public class ThresholdEventWriterProvider implements Provider<ThresholdEventWrit
     )
     {
         this.eventWriter = eventWriter;
-        this.flushEventQueueSize = config.getFlushEventQueueSize();
-        this.refreshDelayInSeconds = config.getRefreshDelayInSeconds();
+        flushEventQueueSize = config.getFlushEventQueueSize();
+        refreshDelayInSeconds = config.getRefreshDelayInSeconds();
     }
 
     @Override

@@ -30,7 +30,7 @@ public class ThriftEnvelopeEventParserProvider implements Provider<ThriftEnvelop
 
     public ThriftEnvelopeEventParserProvider(Class<? extends NumberConverter> numberConverterClazz)
     {
-        this.numberConverterKey = Key.get(numberConverterClazz);
+        numberConverterKey = Key.get(numberConverterClazz);
     }
 
     @Inject

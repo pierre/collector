@@ -32,12 +32,12 @@ public class ExternalEventExtractorProvider implements Provider<QueryParameterEv
 
     public ExternalEventExtractorProvider(Annotation thriftEnvelopeEventParserAnnotation)
     {
-        this.thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
+        thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
     }
 
     public ExternalEventExtractorProvider(Class<? extends Annotation> thriftEnvelopeEventParserAnnotation)
     {
-        this.thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
+        thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
     }
 
     @Inject
