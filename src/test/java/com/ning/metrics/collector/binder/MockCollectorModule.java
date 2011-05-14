@@ -46,7 +46,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class MockCollectorModule extends AbstractModule
+public class MockCollectorModule extends AbstractModule
 {
     private MockEventWriter diskSpoolWriter = new MockEventWriter();
     private ThresholdEventWriter thresholdEventWriter = new ThresholdEventWriter(diskSpoolWriter, 2, 300);
