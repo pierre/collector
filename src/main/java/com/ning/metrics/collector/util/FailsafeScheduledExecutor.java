@@ -33,27 +33,6 @@ public class FailsafeScheduledExecutor extends ScheduledThreadPoolExecutor
 {
     private final Logger log = Logger.getLogger(FailsafeScheduledExecutor.class);
 
-    /**
-     * Creates a new single-threaded executor with a {@link NamedThreadFactory} of the given name.
-     *
-     * @param name thread name base
-     */
-    public FailsafeScheduledExecutor(String name)
-    {
-        this(1, name);
-    }
-
-    /**
-     * Creates a new executor with a {@link NamedThreadFactory} of the given name.
-     *
-     * @param corePoolSize number of threads in the pool
-     * @param name         thread name base
-     */
-    public FailsafeScheduledExecutor(int corePoolSize, String name)
-    {
-        this(corePoolSize, new NamedThreadFactory(name));
-    }
-
     public FailsafeScheduledExecutor(int corePoolSize, ThreadFactory threadFactory)
     {
         super(corePoolSize, threadFactory);
