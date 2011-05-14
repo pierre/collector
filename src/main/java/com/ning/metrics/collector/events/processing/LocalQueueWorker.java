@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 
 import java.util.concurrent.BlockingQueue;
 
-public class LocalQueueWorker implements Runnable
+class LocalQueueWorker implements Runnable
 {
     private static final Logger logger = Logger.getLogger(LocalQueueWorker.class);
     private final BlockingQueue<Object> eventQueue;

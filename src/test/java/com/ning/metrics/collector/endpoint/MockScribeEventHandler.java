@@ -64,7 +64,7 @@ public class MockScribeEventHandler implements ScribeEventHandler
     }
 
     @Override
-    public void handleFailure(LogEntry entry, EventStats eventStats)
+    public void handleFailure(LogEntry entry)
     {
         handleFailureCalled = true;
 

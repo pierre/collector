@@ -87,7 +87,7 @@ public class ActiveMQConnection implements EventQueueConnection
         return new ActiveMQSession(config, this, type);
     }
 
-    TopicSession createTopicSession() throws JMSException
+    TopicSession createTopicSession()
     {
         TopicSession result = null;
 

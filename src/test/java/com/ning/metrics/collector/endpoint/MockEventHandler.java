@@ -53,7 +53,7 @@ public class MockEventHandler implements EventHandler
     }
 
     @Override
-    public Response handleFailure(Response.Status s, EventEndPointStats stats, EventStats eventStats, Exception e)
+    public Response handleFailure(Response.Status s, EventEndPointStats stats, Exception e)
     {
         handleFailureCalled = true;
 

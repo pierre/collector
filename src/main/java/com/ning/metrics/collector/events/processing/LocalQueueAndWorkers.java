@@ -16,16 +16,16 @@
 
 package com.ning.metrics.collector.events.processing;
 
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
+import com.ning.metrics.collector.util.NamedThreadFactory;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
-import com.ning.metrics.collector.util.NamedThreadFactory;
-
-public class LocalQueueAndWorkers
+class LocalQueueAndWorkers
 {
     private final BlockingQueue<Object> queue;
     private final EventQueueSession processor;

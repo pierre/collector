@@ -26,7 +26,7 @@ import com.ning.metrics.collector.events.parsing.converters.NumberConverter;
 public class ThriftEnvelopeEventParserProvider implements Provider<ThriftEnvelopeEventParser>
 {
     private Injector injector = null;
-    private Key<? extends NumberConverter> numberConverterKey;
+    private final Key<? extends NumberConverter> numberConverterKey;
 
     public ThriftEnvelopeEventParserProvider(Class<? extends NumberConverter> numberConverterClazz)
     {

@@ -79,7 +79,7 @@ public class EventHandlerImpl implements EventHandler
             if (event == null) {
                 String msg = "Received empty event";
                 log.info(msg);
-                return handleFailure(Response.Status.BAD_REQUEST, stats, eventStats, new EventParsingException(msg));
+                return handleFailure(Response.Status.BAD_REQUEST, stats, new EventParsingException(msg));
             }
             else {
                 if (requestFilter.passesFilter(event.getName(), annotation)) {
@@ -110,7 +110,7 @@ public class EventHandlerImpl implements EventHandler
     }
 
     @Override
-    public Response handleFailure(Response.Status status, EventEndPointStats stats, EventStats eventStats, Exception e)
+    public Response handleFailure(Response.Status status, EventEndPointStats stats, Exception e)
     {
         stats.updateFailedEvents();
         return Response.status(status)

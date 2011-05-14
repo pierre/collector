@@ -21,13 +21,13 @@ import org.apache.log4j.Logger;
 
 import java.util.concurrent.ThreadFactory;
 
-public class LoggingThreadFactory implements ThreadFactory
+class LoggingThreadFactory implements ThreadFactory
 {
     private final static Logger log = LogManager.getLogger(LoggingThreadFactory.class);
 
     private final ThreadFactory delegate;
 
-    public LoggingThreadFactory(ThreadFactory delegate)
+    private LoggingThreadFactory(ThreadFactory delegate)
     {
         this.delegate = delegate;
     }

@@ -51,9 +51,4 @@ public class UrlDecodingTokenizer implements Tokenizer
             throw new EventParsingException("error URL decoding token", e);
         }
     }
-
-    public int getTokenCount()
-    {
-        return baseTokenizer.getTokenCount();
-    }
 }

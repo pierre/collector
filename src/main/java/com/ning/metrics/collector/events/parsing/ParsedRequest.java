@@ -29,12 +29,12 @@ public class ParsedRequest implements ExtractedAnnotation
 {
     private static final Logger log = Logger.getLogger(ParsedRequest.class);
 
-    private DateTime eventDateTime;
+    private final DateTime eventDateTime;
     private String ipAddress;
     private String referrerHost = null;
     private String referrerPath = null;
     private String userAgent = null;
-    private Granularity granularity;
+    private final Granularity granularity;
     private int contentLength = 0;
     private String contentType = null;
     private InputStream inputStream;

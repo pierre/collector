@@ -28,7 +28,7 @@ import java.util.List;
 public class ArrayListProvider<T> implements Provider<List<T>>
 {
     private Injector injector = null;
-    private List<Key<? extends T>> injectables = new ArrayList<Key<? extends T>>();
+    private final List<Key<? extends T>> injectables = new ArrayList<Key<? extends T>>();
 
     @Inject
     public void configure(Injector injector)

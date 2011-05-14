@@ -24,5 +24,5 @@ public interface ScribeEventHandler
 {
     public boolean processEvent(Event event, EventStats eventStats);
 
-    public void handleFailure(LogEntry entry, EventStats eventStats);
+    public void handleFailure(LogEntry entry);
 }

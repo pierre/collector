@@ -28,7 +28,7 @@ import java.lang.annotation.Annotation;
 public class ExternalEventExtractorProvider implements Provider<QueryParameterEventExtractor>
 {
     private Injector injector = null;
-    private Key<ThriftEnvelopeEventParser> thriftEnvelopeEventParserKey;
+    private final Key<ThriftEnvelopeEventParser> thriftEnvelopeEventParserKey;
 
     public ExternalEventExtractorProvider(Annotation thriftEnvelopeEventParserAnnotation)
     {

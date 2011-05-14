@@ -21,6 +21,4 @@ public interface Tokenizer
     public boolean hasNext();
 
     public Token next() throws EventParsingException;
-
-    public int getTokenCount();
 }

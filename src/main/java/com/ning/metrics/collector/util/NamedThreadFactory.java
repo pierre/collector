@@ -31,7 +31,7 @@ public class NamedThreadFactory implements ThreadFactory
         this(name, new LoggingThreadFactory());
     }
 
-    public NamedThreadFactory(String name, ThreadFactory delegate)
+    private NamedThreadFactory(String name, ThreadFactory delegate)
     {
         this.delegate = delegate;
         this.name = name;

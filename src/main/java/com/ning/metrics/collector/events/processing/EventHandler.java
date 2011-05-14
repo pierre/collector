@@ -27,5 +27,5 @@ public interface EventHandler
 {
     public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats, EventStats eventStats);
 
-    public Response handleFailure(Response.Status s, EventEndPointStats stats, EventStats eventStats, Exception e);
+    public Response handleFailure(Response.Status s, EventEndPointStats stats, Exception e);
 }

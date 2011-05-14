@@ -29,8 +29,8 @@ import java.lang.annotation.Annotation;
 
 public class EventRequestHandlerProvider implements Provider<EventRequestHandler>
 {
-    private Key<? extends EventExtractor> eventExtractorKey;
-    private Key<EventEndPointStats> eventEndPointStatsKey;
+    private final Key<? extends EventExtractor> eventExtractorKey;
+    private final Key<EventEndPointStats> eventEndPointStatsKey;
     private Injector injector = null;
 
     public EventRequestHandlerProvider(

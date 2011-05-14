@@ -51,9 +51,4 @@ public class SplitTokenizer implements Tokenizer
         return token;
 
     }
-
-    public int getTokenCount()
-    {
-        return parts.length;
-    }
 }

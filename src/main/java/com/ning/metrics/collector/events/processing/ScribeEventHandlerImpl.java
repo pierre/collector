@@ -77,7 +77,7 @@ public class ScribeEventHandlerImpl implements ScribeEventHandler
     }
 
     @Override
-    public void handleFailure(LogEntry l, EventStats eventStats)
+    public void handleFailure(LogEntry l)
     {
         logger.warn(String.format("Error parsing request type: %s", l));
         stats.updateTotalEvents();

@@ -34,7 +34,7 @@ public class QueryParameterEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
     private final EventParser thriftEventParser;
-    private static LinkedList<Event> v = new LinkedList<Event>();
+    private static final LinkedList<Event> v = new LinkedList<Event>();
 
     @Inject
     public QueryParameterEventExtractor(EventParser thriftEventParser)

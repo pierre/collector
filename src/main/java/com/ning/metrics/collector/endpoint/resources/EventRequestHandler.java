@@ -64,22 +64,22 @@ public class EventRequestHandler
         catch (EventParsingException e) {
             log.info(String.format("Unable to extract event: %s [%s]", eventString, annotation.toString()), e);
             // If one event fails, the entire collection of events is rejected
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, e);
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
         }
         catch (RuntimeException e) {
             log.info(String.format("Unable to extract event: %s [%s]", eventString, annotation.toString()), e);
             // If one event fails, the entire collection of events is rejected
-            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
+            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
         }
 
         if (events == null) {
             if (eventString == null) {
                 log.warn("No event type specified");
-                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, new IllegalArgumentException("Event name wasn't specified."));
+                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Event name wasn't specified."));
             }
             else {
                 log.warn("No event specified");
-                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, new IllegalArgumentException("No event specified."));
+                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("No event specified."));
             }
         }
 
@@ -96,7 +96,7 @@ public class EventRequestHandler
                 failCount++;
                 log.info(String.format("Exception while processing event: %s [%s]", eventString, annotation.toString()), e);
                 // We don't care about the Response returned here, but we do care about incrementing stats about failed events
-                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
+                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
             }
         }
 

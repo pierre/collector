@@ -19,10 +19,6 @@ package com.ning.metrics.collector.events.parsing;
 @SuppressWarnings("serial")
 public class EventParsingException extends Exception
 {
-    public EventParsingException()
-    {
-        super();
-    }
 
     public EventParsingException(String message)
     {
@@ -32,10 +28,5 @@ public class EventParsingException extends Exception
     public EventParsingException(String message, Throwable cause)
     {
         super(message, cause);
-    }
-
-    public EventParsingException(Throwable cause)
-    {
-        super(cause);
     }
 }
