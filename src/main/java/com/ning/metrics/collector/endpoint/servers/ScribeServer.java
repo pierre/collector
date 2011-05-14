@@ -46,12 +46,12 @@ public class ScribeServer
     private TNonblockingServer server = null;
 
     @Inject
-    public ScribeServer(Iface eventRequestHandler, CollectorConfig config) throws TTransportException
+    public ScribeServer(final Iface eventRequestHandler, final CollectorConfig config) throws TTransportException
     {
         this.eventRequestHandler = eventRequestHandler;
         this.config = config;
 
-        Executor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("ScribeServer"));
+        final Executor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("ScribeServer"));
         executor.execute(new Runnable()
         {
             @Override
@@ -84,8 +84,8 @@ public class ScribeServer
      */
     private void start() throws TTransportException
     {
-        TNonblockingServerTransport socket = new TNonblockingServerSocket(config.getScribePort());
-        TProcessor processor = new Processor(eventRequestHandler);
+        final TNonblockingServerTransport socket = new TNonblockingServerSocket(config.getScribePort());
+        final TProcessor processor = new Processor(eventRequestHandler);
 
         server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
         log.info(String.format("Starting terminal Scribe server on port %d", config.getScribePort()));

@@ -36,22 +36,21 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import java.util.EventListener;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Singleton
 public class JettyServer
 {
-    private final static Logger log = Logger.getLogger(JettyServer.class);
+    private static final Logger log = Logger.getLogger(JettyServer.class);
 
     private final CollectorConfig config;
     private boolean initialized = false;
 
     @Inject
-    public JettyServer(CollectorConfig config)
+    public JettyServer(final CollectorConfig config)
     {
         this.config = config;
-        Executor executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
+        final Executor executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
         executor.execute(new Runnable()
         {
             @Override
@@ -75,13 +74,13 @@ public class JettyServer
 
         final Server server = new Server();
 
-        Connector connector = new SelectChannelConnector();
+        final Connector connector = new SelectChannelConnector();
         connector.setHost(config.getLocalIp());
         connector.setPort(config.getLocalPort());
         server.addConnector(connector);
 
         if (config.isSSLEnabled()) {
-            SslConnector sslConnector = new SslSelectChannelConnector();
+            final SslConnector sslConnector = new SslSelectChannelConnector();
             sslConnector.setPort(config.getLocalSSLPort());
             sslConnector.setKeystore(config.getSSLkeystoreLocation());
             sslConnector.setKeyPassword(config.getSSLkeystorePassword());
@@ -91,18 +90,18 @@ public class JettyServer
 
         server.setStopAtShutdown(true);
 
-        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
+        final ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         context.addEventListener(new JettyListener());
 
         // Jersey insists on using java.util.logging (JUL)
-        EventListener listener = new SetupJULBridge();
+        final EventListener listener = new SetupJULBridge();
         context.addEventListener(listener);
 
         // Make sure Guice filter all requests
-        FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
+        final FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
         context.addFilter(filterHolder, "/*", ServletContextHandler.NO_SESSIONS);
 
-        ServletHolder sh = new ServletHolder(DefaultServlet.class);
+        final ServletHolder sh = new ServletHolder(DefaultServlet.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
         sh.setInitParameter("com.sun.jersey.config.property.packages", "com.ning.metrics.collector.endpoint");
         context.addServlet(sh, "/*");
