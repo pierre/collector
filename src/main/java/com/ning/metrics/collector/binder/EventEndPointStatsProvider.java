@@ -23,22 +23,17 @@ import com.ning.metrics.collector.endpoint.EventEndPointStats;
 
 public class EventEndPointStatsProvider implements Provider<EventEndPointStats>
 {
-    private final int rateWindowSizeMinutes;
+    private final CollectorConfig config;
 
     @Inject
     public EventEndPointStatsProvider(CollectorConfig config)
     {
-        this(config.getRateWindowSizeMinutes());
-    }
-
-    public EventEndPointStatsProvider(int rateWindowSizeMinutes)
-    {
-        this.rateWindowSizeMinutes = rateWindowSizeMinutes;
+        this.config = config;
     }
 
     @Override
     public EventEndPointStats get()
     {
-        return new EventEndPointStats(rateWindowSizeMinutes);
+        return new EventEndPointStats(config.getRateWindowSizeMinutes());
     }
 }
