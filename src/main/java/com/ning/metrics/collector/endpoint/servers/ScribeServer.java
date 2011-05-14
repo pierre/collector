@@ -36,22 +36,18 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class ScribeServer
 {
-    private final Iface eventRequestHandler;
-    private final int port;
-    private TNonblockingServer server = null;
-
     private static final Logger log = Logger.getLogger(ScribeServer.class);
+
+    private final Iface eventRequestHandler;
+    private final CollectorConfig config;
+
+    private TNonblockingServer server = null;
 
     @Inject
     public ScribeServer(Iface eventRequestHandler, CollectorConfig config) throws TTransportException
     {
-        this(eventRequestHandler, config.getScribePort());
-    }
-
-    public ScribeServer(Iface eventRequestHandler, int port) throws TTransportException
-    {
         this.eventRequestHandler = eventRequestHandler;
-        this.port = port;
+        this.config = config;
 
         ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("ScribeServer"));
         executor.execute(new Runnable()
@@ -86,7 +82,7 @@ public class ScribeServer
      */
     private void start() throws TTransportException
     {
-        TNonblockingServerTransport socket = new TNonblockingServerSocket(port);
+        TNonblockingServerTransport socket = new TNonblockingServerSocket(config.getScribePort());
         Processor processor = new Processor(eventRequestHandler);
 
         server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
