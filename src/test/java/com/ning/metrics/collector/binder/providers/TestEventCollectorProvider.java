@@ -21,7 +21,6 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExec
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.modules.MockCollectorModule;
-import com.ning.metrics.collector.binder.providers.EventCollectorProvider;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.events.processing.BufferingEventCollector;
 import com.ning.metrics.collector.events.processing.EventQueueProcessor;
@@ -88,6 +87,7 @@ public class TestEventCollectorProvider
         assertEquals(bufferingEventWriter.getCommittedEventList().size(), 1);
 
         assertTrue(hdfsExecutor.isTerminated()); // Writer executor
+        // TODO
         //assertEquals(((MockEventWriter) hdfsEventWriter).getFlushedEventList().size(), 1);
     }
 }
