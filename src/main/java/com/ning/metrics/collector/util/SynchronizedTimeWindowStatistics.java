@@ -50,36 +50,11 @@ public class SynchronizedTimeWindowStatistics extends DescriptiveStatistics
     private Queue<Long> queuedTimes = new ArrayDeque<Long>();
 
     /**
-     * @param timeWindow
+     * @param timeWindow window size in milliseconds
      */
     public SynchronizedTimeWindowStatistics(long timeWindow)
     {
         this.timeWindow = timeWindow;
-    }
-
-    /**
-     * @return sample count
-     */
-    public synchronized int getSampleCount()
-    {
-        return queuedTimes.size();
-    }
-
-    /**
-     * @return time window
-     */
-    public synchronized long getTimeWindow()
-    {
-        return timeWindow;
-    }
-
-    /**
-     * @param timeWindow
-     */
-    public synchronized void setTimeWindow(long timeWindow)
-    {
-        this.timeWindow = timeWindow;
-        flushOldSamples();
     }
 
     private void flushOldSamples()
