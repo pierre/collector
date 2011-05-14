@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import org.apache.log4j.Logger;
+import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TNonblockingServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
@@ -28,6 +29,7 @@ import org.apache.thrift.transport.TTransportException;
 import scribe.thrift.scribe.Iface;
 import scribe.thrift.scribe.Processor;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -49,7 +51,7 @@ public class ScribeServer
         this.eventRequestHandler = eventRequestHandler;
         this.config = config;
 
-        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("ScribeServer"));
+        Executor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("ScribeServer"));
         executor.execute(new Runnable()
         {
             @Override
@@ -83,7 +85,7 @@ public class ScribeServer
     private void start() throws TTransportException
     {
         TNonblockingServerTransport socket = new TNonblockingServerSocket(config.getScribePort());
-        Processor processor = new Processor(eventRequestHandler);
+        TProcessor processor = new Processor(eventRequestHandler);
 
         server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
         log.info(String.format("Starting terminal Scribe server on port %d", config.getScribePort()));

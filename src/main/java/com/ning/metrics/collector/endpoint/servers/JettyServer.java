@@ -26,12 +26,15 @@ import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import java.util.EventListener;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -48,7 +51,7 @@ public class JettyServer
     public JettyServer(CollectorConfig config)
     {
         this.config = config;
-        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
+        Executor executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
         executor.execute(new Runnable()
         {
             @Override
@@ -78,7 +81,7 @@ public class JettyServer
         server.addConnector(connector);
 
         if (config.isSSLEnabled()) {
-            SslSelectChannelConnector sslConnector = new SslSelectChannelConnector();
+            SslConnector sslConnector = new SslSelectChannelConnector();
             sslConnector.setPort(config.getLocalSSLPort());
             sslConnector.setKeystore(config.getSSLkeystoreLocation());
             sslConnector.setKeyPassword(config.getSSLkeystorePassword());
@@ -92,7 +95,7 @@ public class JettyServer
         context.addEventListener(new JettyListener());
 
         // Jersey insists on using java.util.logging (JUL)
-        SetupJULBridge listener = new SetupJULBridge();
+        EventListener listener = new SetupJULBridge();
         context.addEventListener(listener);
 
         // Make sure Guice filter all requests
