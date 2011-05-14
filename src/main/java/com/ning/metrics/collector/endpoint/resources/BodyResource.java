@@ -19,6 +19,7 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.endpoint.extractors.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.extractors.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
@@ -66,7 +67,8 @@ public class BodyResource
     {
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), NING_THRIFT), eventStats);
+        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), NING_THRIFT);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 
     @POST
@@ -83,7 +85,8 @@ public class BodyResource
     {
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), MediaType.APPLICATION_JSON), eventStats);
+        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), MediaType.APPLICATION_JSON);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 
     @POST
@@ -100,6 +103,7 @@ public class BodyResource
     {
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), APPLICATION_JSON_SMILE), eventStats);
+        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), APPLICATION_JSON_SMILE);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 }

@@ -238,6 +238,7 @@ public class TestThriftEnvelopeEventParser
 
     private static class ConcreteAnnotation implements ExtractedAnnotation
     {
+        private final String eventName = null;
         private final DateTime dateTime;
         private final String ip;
         private final String referrerHost;
@@ -251,6 +252,12 @@ public class TestThriftEnvelopeEventParser
             this.referrerHost = referrerHost;
             this.referrerPath = referrerPath;
             this.userAgent = userAgent;
+        }
+
+        @Override
+        public String getEventName()
+        {
+            return eventName;
         }
 
         @Override

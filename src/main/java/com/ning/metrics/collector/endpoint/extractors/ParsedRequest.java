@@ -30,6 +30,7 @@ public class ParsedRequest implements ExtractedAnnotation
     private static final Logger log = Logger.getLogger(ParsedRequest.class);
     private static final EventExtractorUtil eventExtractorUtil = new EventExtractorUtil();
 
+    private final String eventName;
     private final DateTime eventDateTime;
     private String ipAddress;
     private String referrerHost = null;
@@ -43,24 +44,27 @@ public class ParsedRequest implements ExtractedAnnotation
     /**
      * Constructor used by the external API (GET only)
      *
+     * @param eventName         name of the event parsed
      * @param httpHeaders       HTTP headers of the incoming request
      * @param eventDateTime     query value parameter (optional)
      * @param granularityString query value parameter (optional)
      * @param peerIpAddress     requestor (peer) IP address (optional)
      */
     public ParsedRequest(
+        final String eventName,
         final HttpHeaders httpHeaders,
         final DateTime eventDateTime,
         final String granularityString,
         final String peerIpAddress
     )
     {
-        this(httpHeaders, null, eventDateTime, granularityString, peerIpAddress, null);
+        this(eventName, httpHeaders, null, eventDateTime, granularityString, peerIpAddress, null);
     }
 
     /**
      * Constructor used by the external API (GET only)
      *
+     * @param eventName         name of the event parsed
      * @param httpHeaders       HTTP headers of the incoming request
      * @param inputStream       content of the POST request
      * @param eventDateTime     query value parameter (optional)
@@ -68,6 +72,7 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param peerIpAddress     requestor (peer) IP address (optional)
      */
     public ParsedRequest(
+        final String eventName,
         final HttpHeaders httpHeaders,
         final InputStream inputStream,
         final DateTime eventDateTime,
@@ -75,12 +80,13 @@ public class ParsedRequest implements ExtractedAnnotation
         final String peerIpAddress
     )
     {
-        this(httpHeaders, inputStream, eventDateTime, granularityString, peerIpAddress, null);
+        this(eventName, httpHeaders, inputStream, eventDateTime, granularityString, peerIpAddress, null);
     }
 
     /**
      * Constructor used by the internal API (POST only)
      *
+     * @param eventName         name of the event parsed
      * @param httpHeaders       HTTP headers of the incoming request
      * @param inputStream       content of the POST request
      * @param eventDateTime     query value parameter (optional)
@@ -89,6 +95,7 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param contentType       Content-Type of the POST request (optional)
      */
     public ParsedRequest(
+        final String eventName,
         final HttpHeaders httpHeaders,
         final InputStream inputStream,
         final DateTime eventDateTime,
@@ -97,6 +104,7 @@ public class ParsedRequest implements ExtractedAnnotation
         final String contentType
     )
     {
+        this.eventName = eventName;
         this.eventDateTime = eventExtractorUtil.dateFromDateTime(eventDateTime);
 
         granularity = eventExtractorUtil.granularityFromString(granularityString);
@@ -121,6 +129,12 @@ public class ParsedRequest implements ExtractedAnnotation
         this.inputStream = inputStream;
 
         userAgent = eventExtractorUtil.getUserAgentFromHeaders(httpHeaders);
+    }
+
+    @Override
+    public String getEventName()
+    {
+        return eventName;
     }
 
     @Override

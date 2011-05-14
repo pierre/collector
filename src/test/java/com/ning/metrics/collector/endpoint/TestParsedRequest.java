@@ -90,7 +90,7 @@ public class TestParsedRequest
     public void testParseDateExplicit() throws Exception
     {
         HttpHeaders httpHeaders = createDummyHeaders();
-        ParsedRequest parsedRequest = new ParsedRequest(httpHeaders, new DateTime("2001-02-03"), null, null);
+        ParsedRequest parsedRequest = new ParsedRequest(null, httpHeaders, new DateTime("2001-02-03"), null, null);
         Assert.assertEquals(parsedRequest.getDateTime(), new DateTime("2001-02-03"));
     }
 
@@ -110,6 +110,6 @@ public class TestParsedRequest
     private ParsedRequest createParsedRequestWithNoQueryParameter()
     {
         HttpHeaders httpHeaders = createDummyHeaders();
-        return new ParsedRequest(httpHeaders, null, null, null);
+        return new ParsedRequest(null, httpHeaders, null, null, null);
     }
 }

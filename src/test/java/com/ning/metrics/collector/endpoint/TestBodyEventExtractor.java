@@ -63,6 +63,7 @@ public class TestBodyEventExtractor
     public void testValidRequest() throws Exception
     {
         ParsedRequest validRequest = new ParsedRequest(
+            null,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             new ByteArrayInputStream(payload),
             null,
@@ -86,6 +87,7 @@ public class TestBodyEventExtractor
     public void testValidRequestWithRoute() throws Exception
     {
         ParsedRequest routedRequest = new ParsedRequest(
+            null,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             new ByteArrayInputStream(payload),
             null,
@@ -110,6 +112,7 @@ public class TestBodyEventExtractor
     public void testNoNameParameter() throws Exception
     {
         ParsedRequest missingNameRequest = new ParsedRequest(
+            null,
             new MockHttpHeaders(null, null, null, payloadSize),
             null,
             null,
@@ -123,6 +126,7 @@ public class TestBodyEventExtractor
     public void testGetInputThrowsIOException() throws Exception
     {
         ParsedRequest throwsIOExceptionRequest = new ParsedRequest(
+            null,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             null,
             null,
@@ -144,6 +148,7 @@ public class TestBodyEventExtractor
     {
         byte[] invalidBytes = {1, 2, 3};
         ParsedRequest throwsParseExceptionRequest = new ParsedRequest(
+            null,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13"),
             new ByteArrayInputStream(invalidBytes),
             null,
@@ -164,6 +169,7 @@ public class TestBodyEventExtractor
     public void testInvalidContentType() throws Exception
     {
         ParsedRequest invalidContentTypeRequest = new ParsedRequest(
+            null,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", null),
             new ByteArrayInputStream(payload),
             null,
@@ -186,6 +192,7 @@ public class TestBodyEventExtractor
         MockHttpHeaders headers = new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", null, payloadSize);
 
         ParsedRequest request = new ParsedRequest(
+            null,
             headers,
             new ByteArrayInputStream(payload),
             null,

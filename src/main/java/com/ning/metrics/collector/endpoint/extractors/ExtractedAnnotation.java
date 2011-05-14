@@ -23,6 +23,8 @@ import java.io.InputStream;
 
 public interface ExtractedAnnotation
 {
+    String getEventName();
+
     DateTime getDateTime();
 
     String getReferrerHost();
