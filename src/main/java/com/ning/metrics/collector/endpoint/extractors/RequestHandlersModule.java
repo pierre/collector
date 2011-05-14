@@ -54,13 +54,13 @@ public class RequestHandlersModule implements Module
             .toProvider(new ThriftEnvelopeEventParserProvider(Base64NumberConverter.class)).asEagerSingleton();
 
         binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
-            .toProvider(new ExternalEventExtractorProvider(Names.named("base64"))).asEagerSingleton();
+            .toProvider(new QueryParameterEventExtractorProvider(Names.named("base64"))).asEagerSingleton();
 
         binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base10"))
             .toProvider(new ThriftEnvelopeEventParserProvider(DecimalNumberConverter.class)).asEagerSingleton();
 
         binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
-            .toProvider(new ExternalEventExtractorProvider(Names.named("base10"))).asEagerSingleton();
+            .toProvider(new QueryParameterEventExtractorProvider(Names.named("base10"))).asEagerSingleton();
 
         binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base64"), ExternalEventEndPointStats.class)).asEagerSingleton();

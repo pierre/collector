@@ -24,17 +24,17 @@ import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 
 import java.lang.annotation.Annotation;
 
-public class ExternalEventExtractorProvider implements Provider<QueryParameterEventExtractor>
+public class QueryParameterEventExtractorProvider implements Provider<QueryParameterEventExtractor>
 {
     private Injector injector;
     private final Key<ThriftEnvelopeEventParser> thriftEnvelopeEventParserKey;
 
-    public ExternalEventExtractorProvider(final Annotation thriftEnvelopeEventParserAnnotation)
+    public QueryParameterEventExtractorProvider(final Annotation thriftEnvelopeEventParserAnnotation)
     {
         thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
     }
 
-    public ExternalEventExtractorProvider(final Class<? extends Annotation> thriftEnvelopeEventParserAnnotation)
+    public QueryParameterEventExtractorProvider(final Class<? extends Annotation> thriftEnvelopeEventParserAnnotation)
     {
         thriftEnvelopeEventParserKey = Key.get(ThriftEnvelopeEventParser.class, thriftEnvelopeEventParserAnnotation);
     }
