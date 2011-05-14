@@ -14,20 +14,19 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.collector.events.processing.EventHandler;
 
 import java.lang.annotation.Annotation;
 
-public class EventRequestHandlerProvider implements Provider<EventRequestHandler>
+class EventRequestHandlerProvider implements Provider<EventRequestHandler>
 {
     private final Key<? extends EventExtractor> eventExtractorKey;
     private final Key<EventEndPointStats> eventEndPointStatsKey;

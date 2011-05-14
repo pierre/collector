@@ -25,7 +25,6 @@ import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler
 import com.ning.metrics.collector.binder.annotations.InternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
 import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
-import com.ning.metrics.collector.binder.providers.EventRequestHandlerProvider;
 import com.ning.metrics.collector.binder.providers.ThriftEnvelopeEventParserProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
