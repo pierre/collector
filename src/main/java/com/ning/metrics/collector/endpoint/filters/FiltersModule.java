@@ -23,7 +23,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.binder.providers.ArrayListProvider;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 

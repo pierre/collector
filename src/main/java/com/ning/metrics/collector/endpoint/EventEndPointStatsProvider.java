@@ -14,12 +14,11 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.endpoint;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.endpoint.EventEndPointStats;
 
 public class EventEndPointStatsProvider implements Provider<EventEndPointStats>
 {
