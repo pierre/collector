@@ -86,7 +86,7 @@ public class ScribeServer
         Processor processor = new Processor(eventRequestHandler);
 
         server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
-        log.info(String.format("Starting terminal Scribe server on port %d", port));
+        log.info(String.format("Starting terminal Scribe server on port %d", config.getScribePort()));
         server.serve();
     }
 
