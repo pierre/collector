@@ -41,39 +41,13 @@ public class JettyServer
 {
     private final static Logger log = Logger.getLogger(JettyServer.class);
 
+    private final CollectorConfig config;
     private boolean initialized = false;
 
-    private final String ip;
-    private final int port;
-    private final int sslPort;
-    private final boolean sslEnabled;
-    private final String keystoreLocation;
-    private final String keystorePassword;
-
     @Inject
-    public JettyServer(
-        CollectorConfig config
-    )
+    public JettyServer(CollectorConfig config)
     {
-        this(config.getLocalIp(), config.getLocalPort(), config.isSSLEnabled(), config.getLocalSSLPort(), config.getSSLkeystoreLocation(), config.getSSLkeystorePassword());
-    }
-
-    public JettyServer(
-        String ip,
-        int port,
-        boolean sslEnabled,
-        int sslPort,
-        String keystoreLocation,
-        String keystorePassword
-    )
-    {
-        this.ip = ip;
-        this.port = port;
-        this.sslEnabled = sslEnabled;
-        this.sslPort = sslPort;
-        this.keystoreLocation = keystoreLocation;
-        this.keystorePassword = keystorePassword;
-
+        this.config = config;
         ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
         executor.execute(new Runnable()
         {
@@ -99,16 +73,16 @@ public class JettyServer
         final Server server = new Server();
 
         Connector connector = new SelectChannelConnector();
-        connector.setHost(ip);
-        connector.setPort(port);
+        connector.setHost(config.getLocalIp());
+        connector.setPort(config.getLocalPort());
         server.addConnector(connector);
 
-        if (sslEnabled) {
+        if (config.isSSLEnabled()) {
             SslSelectChannelConnector sslConnector = new SslSelectChannelConnector();
-            sslConnector.setPort(sslPort);
-            sslConnector.setKeystore(keystoreLocation);
-            sslConnector.setKeyPassword(keystorePassword);
-            sslConnector.setPassword(keystorePassword);
+            sslConnector.setPort(config.getLocalSSLPort());
+            sslConnector.setKeystore(config.getSSLkeystoreLocation());
+            sslConnector.setKeyPassword(config.getSSLkeystorePassword());
+            sslConnector.setPassword(config.getSSLkeystorePassword());
             server.addConnector(sslConnector);
         }
 
