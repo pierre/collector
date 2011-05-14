@@ -27,12 +27,12 @@ import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler
 import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
 import com.ning.metrics.collector.binder.providers.ThriftEnvelopeEventParserProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.resources.EventHandlerImpl;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
-import com.ning.metrics.collector.events.processing.EventHandler;
-import com.ning.metrics.collector.events.processing.EventHandlerImpl;
+import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 

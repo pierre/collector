@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
@@ -24,6 +24,7 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.filters.Filter;
+import com.ning.metrics.collector.events.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 import org.weakref.jmx.Managed;
@@ -44,18 +45,18 @@ public class EventHandlerImpl implements EventHandler
 
     @Inject
     public EventHandlerImpl(
-        EventCollector collector,
-        @SuppressWarnings("unchecked") @EventEndpointRequestFilter Filter requestFilter,
-        CollectorConfig config
+        final EventCollector collector,
+        @SuppressWarnings("unchecked") @EventEndpointRequestFilter final Filter requestFilter,
+        final CollectorConfig config
     )
     {
         this(collector, requestFilter, config.isEventEndpointEnabled());
     }
 
     public EventHandlerImpl(
-        EventCollector collector,
-        @SuppressWarnings("unchecked") Filter requestFilter,
-        boolean enabled
+        final EventCollector collector,
+        @SuppressWarnings("unchecked") final Filter requestFilter,
+        final boolean enabled
     )
     {
         this.collector = collector;
@@ -71,13 +72,13 @@ public class EventHandlerImpl implements EventHandler
     @SuppressWarnings("unchecked")
     @Override
     //TODO no  need for stats
-    public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats, EventStats eventStats)
+    public Response processEvent(final Event event, final ExtractedAnnotation annotation, final EventEndPointStats stats, final EventStats eventStats)
     {
         stats.updateTotalEvents();
 
         if (collectionEnabled) {
             if (event == null) {
-                String msg = "Received empty event";
+                final String msg = "Received empty event";
                 log.info(msg);
                 return handleFailure(Response.Status.BAD_REQUEST, stats, new EventParsingException(msg));
             }
@@ -110,7 +111,7 @@ public class EventHandlerImpl implements EventHandler
     }
 
     @Override
-    public Response handleFailure(Response.Status status, EventEndPointStats stats, Exception e)
+    public Response handleFailure(final Response.Status status, final EventEndPointStats stats, final Exception e)
     {
         stats.updateFailedEvents();
         return Response.status(status)
@@ -120,7 +121,7 @@ public class EventHandlerImpl implements EventHandler
     }
 
     @Managed(description = "enable/disable collection of events")
-    public void setCollectionEnabled(boolean value)
+    public void setCollectionEnabled(final boolean value)
     {
         collectionEnabled = value;
     }

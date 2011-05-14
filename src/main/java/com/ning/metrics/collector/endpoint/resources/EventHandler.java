@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 
 public interface EventHandler
 {
-    public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats, EventStats eventStats);
+    Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats, EventStats eventStats);
 
-    public Response handleFailure(Response.Status s, EventEndPointStats stats, Exception e);
+    Response handleFailure(Response.Status s, EventEndPointStats stats, Exception e);
 }

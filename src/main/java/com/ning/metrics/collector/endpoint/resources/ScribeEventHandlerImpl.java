@@ -38,9 +38,9 @@ class ScribeEventHandlerImpl implements ScribeEventHandler
 
     @Inject
     public ScribeEventHandlerImpl(
-        EventCollector collector,
-        CollectorConfig config,
-        @ScribeStats EventEndPointStats endPointStats
+        final EventCollector collector,
+        final CollectorConfig config,
+        @ScribeStats final EventEndPointStats endPointStats
     )
     {
         this.collector = collector;
@@ -49,10 +49,10 @@ class ScribeEventHandlerImpl implements ScribeEventHandler
     }
 
     @Override
-    public boolean processEvent(Event event, EventStats eventStats)
+    public boolean processEvent(final Event event, final EventStats eventStats)
     {
         assert event != null;
-        boolean success;
+        final boolean success;
 
         stats.updateTotalEvents();
 
@@ -78,7 +78,7 @@ class ScribeEventHandlerImpl implements ScribeEventHandler
     }
 
     @Override
-    public void handleFailure(LogEntry l)
+    public void handleFailure(final LogEntry l)
     {
         logger.warn(String.format("Error parsing request type: %s", l));
         stats.updateTotalEvents();
@@ -86,7 +86,7 @@ class ScribeEventHandlerImpl implements ScribeEventHandler
     }
 
     @Managed(description = "enable/disable collection of events")
-    public void setScribeCollectionEnabled(boolean value)
+    public void setScribeCollectionEnabled(final boolean value)
     {
         scribeCollectionEnabled = value;
     }
