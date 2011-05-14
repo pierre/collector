@@ -24,6 +24,7 @@ import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -60,7 +61,7 @@ public class Base64CollectorResource
         @QueryParam("date") String eventDateTimeString,
         @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
         @Context HttpHeaders httpHeaders,
-        @Context HttpServletRequest request
+        @Context ServletRequest request
     )
     {
         EventStats eventStats = new EventStats();

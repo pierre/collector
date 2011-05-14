@@ -24,7 +24,7 @@ import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -67,7 +67,7 @@ public class BodyResource
             @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
             byte[] content,
             @Context HttpHeaders httpHeaders,
-            @Context HttpServletRequest request
+            @Context ServletRequest request
     )
     {
         EventStats eventStats = new EventStats();
@@ -84,7 +84,7 @@ public class BodyResource
             @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
             byte[] content,
             @Context HttpHeaders httpHeaders,
-            @Context HttpServletRequest request
+            @Context ServletRequest request
     )
     {
         EventStats eventStats = new EventStats();
@@ -101,7 +101,7 @@ public class BodyResource
             @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
             byte[] content,
             @Context HttpHeaders httpHeaders,
-            @Context HttpServletRequest request
+            @Context ServletRequest request
     )
     {
         EventStats eventStats = new EventStats();

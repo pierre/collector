@@ -169,7 +169,7 @@ public class ScribeEventRequestHandler implements Iface
         Collection<SmileBucketEvent> smileEvents = extractSmileBucketEvents(category, message);
 
         if (smileEvents == null) {
-            ArrayList<Event> thriftEnvelope = new ArrayList<Event>();
+            Collection<Event> thriftEnvelope = new ArrayList<Event>();
             thriftEnvelope.add(extractThriftEnvelopeEvent(category, message));
             return thriftEnvelope;
         }
