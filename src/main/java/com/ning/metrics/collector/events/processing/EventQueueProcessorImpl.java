@@ -87,7 +87,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         });
     }
 
-    public void start()
+    void start()
     {
         if (enabled.get() && connection != null) {
             connection.reconnect();

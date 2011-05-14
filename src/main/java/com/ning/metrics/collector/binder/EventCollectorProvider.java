@@ -86,7 +86,7 @@ public class EventCollectorProvider implements Provider<EventCollector>
         return collector;
     }
 
-    protected static void mainCollectorShutdownHook(BufferingEventCollector collector, DiskSpoolEventWriter hdfsWriter)
+    static void mainCollectorShutdownHook(BufferingEventCollector collector, DiskSpoolEventWriter hdfsWriter)
     {
         log.info("Starting main shutdown sequence");
 
