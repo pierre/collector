@@ -14,10 +14,12 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
+import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.processing.ScribeEventHandler;
+import com.ning.metrics.collector.endpoint.resources.ScribeEventHandler;
 import scribe.thrift.LogEntry;
 
 import java.util.ArrayList;

@@ -19,7 +19,6 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.processing.ScribeEventHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.SmileBucketEvent;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;

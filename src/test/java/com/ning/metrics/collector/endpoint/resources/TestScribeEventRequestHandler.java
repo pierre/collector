@@ -17,7 +17,6 @@
 package com.ning.metrics.collector.endpoint.resources;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.MockScribeEventHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.Granularity;
 import com.ning.metrics.serialization.event.SmileBucketEvent;

@@ -21,8 +21,6 @@ import com.google.inject.Module;
 import com.ning.metrics.collector.binder.annotations.ScribeStats;
 import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.events.processing.ScribeEventHandler;
-import com.ning.metrics.collector.events.processing.ScribeEventHandlerImpl;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 import scribe.thrift.scribe;

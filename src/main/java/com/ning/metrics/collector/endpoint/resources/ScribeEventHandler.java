@@ -14,15 +14,18 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.events.processing;
+package com.ning.metrics.collector.endpoint.resources;
 
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
 import scribe.thrift.LogEntry;
 
-public interface ScribeEventHandler
+/**
+ * Event handler for the Thrift API (Scribe).
+ */
+interface ScribeEventHandler
 {
-    public boolean processEvent(Event event, EventStats eventStats);
+    boolean processEvent(Event event, EventStats eventStats);
 
-    public void handleFailure(LogEntry entry);
+    void handleFailure(LogEntry entry);
 }

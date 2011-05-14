@@ -14,10 +14,14 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint;
+package com.ning.metrics.collector.endpoint.resources;
 
+import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.endpoint.MockEventHandler;
+import com.ning.metrics.collector.endpoint.MockHttpHeaders;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.MockEventExtractor;
-import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
 import org.testng.Assert;
