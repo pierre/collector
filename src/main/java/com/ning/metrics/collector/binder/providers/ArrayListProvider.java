@@ -57,7 +57,7 @@ public class ArrayListProvider<T> implements Provider<List<T>>
     @Override
     public List<T> get()
     {
-        ArrayList<T> retVal = new ArrayList<T>();
+        List<T> retVal = new ArrayList<T>();
         for (Key<? extends T> injectable : injectables) {
             retVal.add(injector.getInstance(injectable));
         }
