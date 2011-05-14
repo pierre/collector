@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MockHttpHeaders implements HttpHeaders
+class MockHttpHeaders implements HttpHeaders
 {
     private MultivaluedMap<String, String> headers = new InBoundHeaders();
 
@@ -83,7 +83,7 @@ public class MockHttpHeaders implements HttpHeaders
     @Override
     public List<String> getRequestHeader(String name)
     {
-        return (List<String>) headers.get(name);
+        return headers.get(name);
     }
 
     /**

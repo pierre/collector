@@ -189,8 +189,6 @@ public class MockCollectorModule extends AbstractModule
 
         /**
          * We need to override the flush method as we don't want to deal with files
-         *
-         * @throws IOException generic IOException
          */
         @Override
         public void flush()

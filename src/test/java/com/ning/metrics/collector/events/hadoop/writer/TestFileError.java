@@ -26,7 +26,7 @@ public class TestFileError
 {
     private static final String PATH = "/events/foo.thrift";
     private static final IOException EXCEPTION = new IOException();
-    FileError error;
+    private FileError error;
 
     @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception

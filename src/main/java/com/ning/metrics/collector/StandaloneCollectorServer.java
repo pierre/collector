@@ -139,6 +139,7 @@ public class StandaloneCollectorServer
      * Hack to share the injector with the Jersey GuiceFilter
      *
      * @see com.ning.metrics.collector.binder.modules.JettyListener
+     * @return the main injector
      */
     public static Injector getInjector()
     {

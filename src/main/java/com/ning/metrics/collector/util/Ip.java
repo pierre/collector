@@ -34,7 +34,7 @@ public class Ip
                 return (Integer.parseInt(parts[0]) << 24) | (Integer.parseInt(parts[1]) << 16)
                     | (Integer.parseInt(parts[2])) << 8 | (Integer.parseInt(parts[3]));
             }
-            catch (NumberFormatException e) {
+            catch (NumberFormatException ignored) {
             }
         }
         return 0;
