@@ -34,9 +34,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.EventListener;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Singleton
 public class JettyServer
@@ -51,25 +48,9 @@ public class JettyServer
     public JettyServer(final CollectorConfig config)
     {
         this.config = config;
-        final Executor executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
-        executor.execute(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    start();
-                    // Will be shut down automatically, see below
-                }
-                catch (Exception e) {
-                    log.warn("Unable to start the Jetty server", e);
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
     }
 
-    private void start() throws Exception
+    public void start() throws Exception
     {
         final long startTime = System.currentTimeMillis();
 
@@ -113,11 +94,14 @@ public class JettyServer
         log.info(String.format("Jetty server started in %d:%02d", secondsToStart / 60, secondsToStart % 60));
 
         initialized = true;
-        server.join();
     }
 
     public void stop()
     {
+        if (!initialized) {
+            return;
+        }
+
         try {
             server.stop();
         }

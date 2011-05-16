@@ -57,7 +57,7 @@ import static com.google.inject.matcher.Matchers.any;
  */
 public class StandaloneCollectorServer
 {
-    private final static Logger log = Logger.getLogger(StandaloneCollectorServer.class);
+    private static final Logger log = Logger.getLogger(StandaloneCollectorServer.class);
     private static Injector injector = null;
 
     public static void main(String... args) throws Exception
@@ -112,6 +112,7 @@ public class StandaloneCollectorServer
 
         /* Start the Jetty endpoint */
         JettyServer jetty = injector.getInstance(JettyServer.class);
+        jetty.start();
 
         // We need to wait for Jetty to be fully up (it will setup SLF4j). Otherwise, we may encounter a race condition:
         //SLF4J: The following loggers will not work becasue they were created
