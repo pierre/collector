@@ -15,23 +15,73 @@
  */
 package com.ning.metrics.collector.events.hadoop.writer;
 
+import com.google.inject.Inject;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.SequenceFile;
 
 import java.io.IOException;
-import java.net.URI;
 
-public interface FileSystemAccess
+class FileSystemAccess
 {
-    public SequenceFile.Writer getWriter(Path tmpOutputPath, Class writableClass, Class valueClass) throws IOException;
+    private final Configuration hdfsConfig;
+    private FileSystem fs = null;
+    private final Object connectionLock = new Object();
 
-    public URI getUri();
+    private static final long MIN_WAIT_TIME = 1000; // 1 second
+    private static final long MAX_WAIT_TIME = 600000; // 10 minutes
 
-    boolean exists(Path path) throws IOException;
+    @Inject
+    public FileSystemAccess(Configuration hdfsConfig)
+    {
+        this.hdfsConfig = hdfsConfig;
+    }
 
-    boolean rename(Path sourcePath, Path destinationPath) throws IOException;
+    public FileSystem get()
+    {
+        try {
+            return getFileSystemSafe();
+        }
+        catch (IOException e) {
+            long waitTime = MIN_WAIT_TIME;
 
-    boolean mkdirs(Path parent) throws IOException;
+            synchronized (connectionLock) {
+                while (true) {
+                    try {
+                        // try to set up the FileSystem
+                        setFileSystem();
+                        return getFileSystemSafe();
+                    }
+                    catch (IOException e1) {
+                        // exp backoff
+                        try {
+                            Thread.sleep(waitTime);
+                        }
+                        catch (InterruptedException e2) {
+                            e2.printStackTrace();
+                        }
 
-    boolean delete(Path path, boolean b) throws IOException;
+                        if (waitTime <= MAX_WAIT_TIME / 2) {
+                            waitTime *= 2;
+                        }
+                        else {
+                            waitTime = MAX_WAIT_TIME;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // throws an IOException if the current FileSystem isn't working
+    private FileSystem getFileSystemSafe() throws IOException
+    {
+        fs.getFileStatus(new Path("/"));
+        return fs;
+    }
+
+    private void setFileSystem() throws IOException
+    {
+        fs = FileSystem.get(hdfsConfig);
+    }
 }

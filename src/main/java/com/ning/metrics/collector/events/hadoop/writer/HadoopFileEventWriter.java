@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 /**
  * HDFS EventWriter for the serialization-writer library
@@ -50,7 +49,7 @@ public class HadoopFileEventWriter implements EventWriter
     private final String sessionId;
     private final String baseDirectory;
     private final String tmpDirectory;
-    private final FileSystem fs;
+    private final FileSystemAccess fsAccess;
     private int maxOutputStreams = 64;
     private final Collection<FileError> fileErrorList = new ArrayDeque<FileError>();
     private volatile DateTime lastFlushed = new DateTime();
@@ -79,17 +78,17 @@ public class HadoopFileEventWriter implements EventWriter
 
     @Inject
     public HadoopFileEventWriter(
-        final FileSystem fs,
+        final FileSystemAccess fsAccess,
         final CollectorConfig config
     )
     {
-        this(config.getEventOutputDirectory(), config.getTemporaryEventOutputDirectory(), fs, config.getMaxHadoopWriters(), config.getLocalIp(), config.getLocalPort());
+        this(config.getEventOutputDirectory(), config.getTemporaryEventOutputDirectory(), fsAccess, config.getMaxHadoopWriters(), config.getLocalIp(), config.getLocalPort());
     }
 
     public HadoopFileEventWriter(
         final String baseDirectory,
         final String tmpBase,
-        final FileSystem fs,
+        final FileSystemAccess fsAccess,
         final int maxOutputStreams,
         final String ip,
         final int port
@@ -97,7 +96,7 @@ public class HadoopFileEventWriter implements EventWriter
     {
         this.baseDirectory = baseDirectory;
         this.tmpDirectory = String.format("%s%s%s", tmpBase, baseDirectory.startsWith("/") ? "" : "/", baseDirectory);
-        this.fs = fs;
+        this.fsAccess = fsAccess;
         this.maxOutputStreams = maxOutputStreams;
         this.sessionId = String.format("%s-%d", ip, port);
     }
@@ -153,13 +152,13 @@ public class HadoopFileEventWriter implements EventWriter
             Path outputPath = new Path(outputDir, filename);
             Path tmpOutputPath = new Path(tmpOutputDir, filename);
 
-            for (int suffix = 0; fs.exists(tmpOutputPath); suffix++) {
+            for (int suffix = 0; fsAccess.get().exists(tmpOutputPath); suffix++) {
                 outputPath = new Path(outputDir, String.format("%s-%d", filename, suffix));
                 tmpOutputPath = new Path(tmpOutputDir, String.format("%s-%d", filename, suffix));
             }
 
             log.info(String.format("OutputPath (tmp): %s (%s)", outputPath.toUri().getPath(), tmpOutputPath.toUri().getPath()));
-            final SequenceFile.Writer writer = SequenceFile.createWriter(fs, fs.getConf(), tmpOutputPath, TBooleanWritable.class, clazz, SequenceFile.CompressionType.BLOCK);
+            final SequenceFile.Writer writer = SequenceFile.createWriter(fsAccess.get(), fsAccess.get().getConf(), tmpOutputPath, TBooleanWritable.class, clazz, SequenceFile.CompressionType.BLOCK);
             chunk = new HadoopOutputChunk(tmpOutputPath, outputPath, writer);
             outputChunks.put(outputDir, chunk);
         }
@@ -203,7 +202,7 @@ public class HadoopFileEventWriter implements EventWriter
 
         try {
             for (final HadoopOutputChunk chunk : allChunks) {
-                chunk.commit(fs);
+                chunk.commit(fsAccess.get());
             }
         }
         catch (RuntimeException e) {
@@ -230,7 +229,7 @@ public class HadoopFileEventWriter implements EventWriter
 
         try {
             for (final HadoopOutputChunk chunk : allChunks) {
-                chunk.rollback(fs);
+                chunk.rollback(fsAccess.get());
             }
         }
         catch (RuntimeException e) {
@@ -255,6 +254,6 @@ public class HadoopFileEventWriter implements EventWriter
 
     public String toString()
     {
-        return String.format("HDFS File Writer [%s] [%s]", fs.getUri(), baseDirectory);
+        return String.format("HDFS File Writer [%s] [%s]", fsAccess.get().getUri(), baseDirectory);
     }
 }
