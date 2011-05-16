@@ -173,6 +173,6 @@ public class TestEventRequestHandler
      */
     private ParsedRequest createMockRequestAnnotation()
     {
-        return new ParsedRequest(null, new MockHttpHeaders(), null, null, null, null);
+        return new ParsedRequest("DummyEvent", new MockHttpHeaders(), null, null, null, null);
     }
 }
