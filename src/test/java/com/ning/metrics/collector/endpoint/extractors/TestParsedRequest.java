@@ -100,7 +100,7 @@ public class TestParsedRequest
     {
         long currentTime = System.currentTimeMillis();
         ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
-        Assert.assertTrue(Math.abs(parsedRequest.getDateTime().getMillis() - currentTime) < 5);
+        Assert.assertTrue(Math.abs(parsedRequest.getDateTime().getMillis() - currentTime) < 300);
     }
 
     private HttpHeaders createDummyHeaders()

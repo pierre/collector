@@ -19,14 +19,11 @@ package com.ning.metrics.collector.events.hadoop.writer;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.ning.metrics.collector.binder.providers.DiskSpoolEventWriterProvider;
-import com.ning.metrics.collector.events.hadoop.writer.FileSystemProvider;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
-import com.ning.metrics.collector.events.hadoop.writer.HadoopFileEventWriter;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
-import org.apache.hadoop.fs.FileSystem;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
@@ -55,6 +52,6 @@ public class HdfsModule implements Module
         builder.export(HadoopFileEventWriter.class).as("com.ning.metrics.collector:name=HadoopFileEventWriter");
 
         // HDFS raw access
-        binder.bind(FileSystem.class).toProvider(FileSystemProvider.class).asEagerSingleton();
+        binder.bind(FileSystemAccess.class).toProvider(FileSystemAccessProvider.class).asEagerSingleton();
     }
 }

@@ -27,12 +27,12 @@ import org.apache.hadoop.fs.FileSystem;
 
 import java.io.IOException;
 
-class FileSystemProvider implements Provider<FileSystem>
+class FileSystemAccessProvider implements Provider<FileSystemAccess>
 {
-    private final FileSystem fileSystem;
+    private final FileSystemAccess fileSystemAccess;
 
     @Inject
-    public FileSystemProvider(final CollectorConfig collectorConfig) throws IOException
+    public FileSystemAccessProvider(final CollectorConfig collectorConfig) throws IOException
     {
         final String hfsHost = collectorConfig.getHfsHost();
         final Configuration hadoopConfig = new Configuration();
@@ -52,11 +52,11 @@ class FileSystemProvider implements Provider<FileSystem>
             HadoopSmileOutputStreamSerialization.class.getName(),
             "org.apache.hadoop.io.serializer.WritableSerialization");
 
-        fileSystem = FileSystem.get(hadoopConfig);
+        fileSystemAccess = new FileSystemAccess(hadoopConfig);
     }
 
-    public FileSystem get()
+    public FileSystemAccess get()
     {
-        return fileSystem;
+        return fileSystemAccess;
     }
 }

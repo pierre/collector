@@ -193,7 +193,7 @@ public interface CollectorConfig
     int getMaxHadoopWriters();
 
     @Config("collector.hadoop.host")
-    @DefaultNull
+    @Default("file:///var/tmp/collector/hadoop")
     String getHfsHost();
 
     @Config("collector.event-end-point.enabled")
