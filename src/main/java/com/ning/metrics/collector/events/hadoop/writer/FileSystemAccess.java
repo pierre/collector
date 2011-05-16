@@ -21,10 +21,13 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 class FileSystemAccess
 {
     private final Configuration hdfsConfig;
+    private final Class<? extends FileSystem> fsClass;
     private FileSystem fs = null;
     private final Object connectionLock = new Object();
 
@@ -34,7 +37,13 @@ class FileSystemAccess
     @Inject
     public FileSystemAccess(Configuration hdfsConfig)
     {
+        this(hdfsConfig, FileSystem.class);
+    }
+
+    public FileSystemAccess(Configuration hdfsConfig, Class<? extends FileSystem> fsClass)
+    {
         this.hdfsConfig = hdfsConfig;
+        this.fsClass = fsClass;
     }
 
     public FileSystem get()
@@ -76,12 +85,32 @@ class FileSystemAccess
     // throws an IOException if the current FileSystem isn't working
     private FileSystem getFileSystemSafe() throws IOException
     {
-        fs.getFileStatus(new Path("/"));
-        return fs;
+        try {
+            fs.getFileStatus(new Path("/"));
+            return fs;
+        }
+        catch (NullPointerException e) {
+            throw new IOException("file system not initialized");
+        }
     }
 
     private void setFileSystem() throws IOException
     {
-        fs = FileSystem.get(hdfsConfig);
+        try {
+            Method getMethod = fsClass.getMethod("get", Configuration.class);
+            fs = (FileSystem) getMethod.invoke(null, hdfsConfig);
+        }
+        catch (NoSuchMethodException e) {
+            throw new IOException(String.format("Class %s doesn't have a get method", fsClass), e);
+        }
+        catch (InvocationTargetException e) {
+            throw new IOException(String.format("Got exception while accessing get method for class %s ", fsClass), e);
+        }
+        catch (IllegalAccessException e) {
+            throw new IOException(String.format("Got exception while accessing get method for class %s ", fsClass), e);
+        }
+        catch (RuntimeException e) {
+            throw new IOException(String.format("Got exception while accessing get method for class %s ", fsClass), e);
+        }
     }
 }
