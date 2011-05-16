@@ -61,19 +61,15 @@ public class TestHadoopFileEventWriter
             throw new IOException(String.format("unable to mkdir %s", finalDir));
         }
 
-
-        FileSystem hadoopIsStupid = new RawLocalFileSystem();
         Configuration conf = new Configuration();
         conf.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(), HadoopThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
 
-        hadoopIsStupid.initialize(URI.create("testy://mctesterson"), conf);
-
-        FileSystem fileSystem = new LocalFileSystem(hadoopIsStupid);
+        FileSystemAccess fsAccess = new FileSystemAccess(conf, LocalFileSystem.class);
 
         eventWriter = new HadoopFileEventWriter(
             finalDir.getAbsolutePath(),
             tempDir.getAbsolutePath(),
-            fileSystem,
+            fsAccess,
             2,
             "10.0.0.1",
             8080
