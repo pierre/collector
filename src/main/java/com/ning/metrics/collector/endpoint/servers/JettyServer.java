@@ -45,6 +45,7 @@ public class JettyServer
 
     private final CollectorConfig config;
     private boolean initialized = false;
+    private Server server;
 
     @Inject
     public JettyServer(final CollectorConfig config)
@@ -72,7 +73,7 @@ public class JettyServer
     {
         final long startTime = System.currentTimeMillis();
 
-        final Server server = new Server();
+        server = new Server();
 
         final Connector connector = new SelectChannelConnector();
         connector.setHost(config.getLocalIp());
@@ -113,6 +114,16 @@ public class JettyServer
 
         initialized = true;
         server.join();
+    }
+
+    public void stop()
+    {
+        try {
+            server.stop();
+        }
+        catch (Exception e) {
+            log.warn("Got exception trying to stop Jetty", e);
+        }
     }
 
     /**
