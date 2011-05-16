@@ -16,9 +16,8 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
-import com.ning.metrics.collector.events.processing.EventHandler;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class MockEventHandler implements EventHandler
     }
 
     @Override
-    public Response handleFailure(Response.Status s, EventEndPointStats stats, EventStats eventStats, Exception e)
+    public Response handleFailure(Response.Status s, EventEndPointStats stats, Exception e)
     {
         handleFailureCalled = true;
 

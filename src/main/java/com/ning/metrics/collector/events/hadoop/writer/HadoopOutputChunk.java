@@ -22,20 +22,28 @@ import org.apache.hadoop.io.SequenceFile;
 
 import java.io.IOException;
 
+/**
+ * This class takes care of renaming files in HDFS
+ */
 class HadoopOutputChunk
 {
     private final Path sourcePath;
-    private final Path desintationPath;
+    private final Path destinationPath;
     private final SequenceFile.Writer writer;
     private boolean isClosed = false;
 
-    HadoopOutputChunk(Path sourcePath, Path desintationPath, SequenceFile.Writer writer)
+    HadoopOutputChunk(final Path sourcePath, final Path destinationPath, final SequenceFile.Writer writer)
     {
         this.sourcePath = sourcePath;
-        this.desintationPath = desintationPath;
+        this.destinationPath = destinationPath;
         this.writer = writer;
     }
 
+    /**
+     * Close the underlying writer
+     *
+     * @throws IOException generic IOException
+     */
     public void close() throws IOException
     {
         if (!isClosed) {
@@ -44,26 +52,38 @@ class HadoopOutputChunk
         }
     }
 
-    public void commit(FileSystem fileSystem) throws IOException
+    /**
+     * Rename sourcePath to destinationPath. Parents don't have to exist (they will be created if they don't).
+     *
+     * @param fileSystem Filesystem object to operate on
+     * @throws IOException generic IOException
+     */
+    public void commit(final FileSystem fileSystem) throws IOException
     {
-        Path destinationDir = desintationPath.getParent();
+        final Path destinationDir = destinationPath.getParent();
 
         // parent directory has to exist for a hdfs rename to succeed
-        if (!fileSystem.exists(destinationDir) && !fileSystem.mkdirs(desintationPath.getParent())) {
+        if (!fileSystem.exists(destinationDir) && !fileSystem.mkdirs(destinationPath.getParent())) {
             throw new IOException(String.format("Unable to make destination directory %s (does the parent directory exist?)", destinationDir));
         }
-        if (!fileSystem.rename(sourcePath, desintationPath)) {
-            throw new IOException(String.format("Unable to rename %s to %s", sourcePath, desintationPath));
+        if (!fileSystem.rename(sourcePath, destinationPath)) {
+            throw new IOException(String.format("Unable to rename %s to %s", sourcePath, destinationPath));
         }
     }
 
-    public void rollback(FileSystem fileSystem) throws IOException
+    /**
+     * Delete both sourcePath and destinationPath
+     *
+     * @param fileSystem FileSystem object to operate on
+     * @throws IOException generic IOException
+     */
+    public void rollback(final FileSystem fileSystem) throws IOException
     {
         deleteIfExists(sourcePath, fileSystem);
-        deleteIfExists(desintationPath, fileSystem);
+        deleteIfExists(destinationPath, fileSystem);
     }
 
-    private void deleteIfExists(Path path, FileSystem fileSystem) throws IOException
+    private void deleteIfExists(final Path path, final FileSystem fileSystem) throws IOException
     {
         if (fileSystem.exists(path) && !fileSystem.delete(path, false)) {
             throw new IOException(String.format("unable to delete %s", path));
@@ -78,6 +98,6 @@ class HadoopOutputChunk
     @Override
     public String toString()
     {
-        return String.format("%s : %s -> %s", HadoopOutputChunk.class, sourcePath, desintationPath);
+        return String.format("%s : %s -> %s", HadoopOutputChunk.class, sourcePath, destinationPath);
     }
 }

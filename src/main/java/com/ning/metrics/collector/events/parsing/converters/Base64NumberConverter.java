@@ -37,7 +37,7 @@ public class Base64NumberConverter implements NumberConverter
         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     };
 
-    public static final Map<Character, Integer> DECODING_MAP = new HashMap<Character, Integer>();
+    private static final Map<Character, Integer> DECODING_MAP = new HashMap<Character, Integer>();
 
     static {
         for (int i = 0; i < ENCODING_MAP.length; i++) {
@@ -45,9 +45,9 @@ public class Base64NumberConverter implements NumberConverter
         }
     }
 
-    public static long decode(char[] input)
+    private static long decode(char[] input)
     {
-        long value = 0;
+        long value = 0L;
         boolean isNegative = false;
         int i = 0;
 

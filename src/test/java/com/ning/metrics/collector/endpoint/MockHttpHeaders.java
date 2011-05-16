@@ -83,7 +83,7 @@ public class MockHttpHeaders implements HttpHeaders
     @Override
     public List<String> getRequestHeader(String name)
     {
-        return (List<String>) headers.get(name);
+        return headers.get(name);
     }
 
     /**

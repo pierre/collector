@@ -26,105 +26,64 @@ import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.EventListener;
 
 @Singleton
 public class JettyServer
 {
-    private final static Logger log = Logger.getLogger(JettyServer.class);
+    private static final Logger log = Logger.getLogger(JettyServer.class);
 
+    private final CollectorConfig config;
     private boolean initialized = false;
-
-    private final String ip;
-    private final int port;
-    private final int sslPort;
-    private final boolean sslEnabled;
-    private final String keystoreLocation;
-    private final String keystorePassword;
+    private Server server;
 
     @Inject
-    public JettyServer(
-        CollectorConfig config
-    )
+    public JettyServer(final CollectorConfig config)
     {
-        this(config.getLocalIp(), config.getLocalPort(), config.isSSLEnabled(), config.getLocalSSLPort(), config.getSSLkeystoreLocation(), config.getSSLkeystorePassword());
+        this.config = config;
     }
 
-    public JettyServer(
-        String ip,
-        int port,
-        boolean sslEnabled,
-        int sslPort,
-        String keystoreLocation,
-        String keystorePassword
-    )
-    {
-        this.ip = ip;
-        this.port = port;
-        this.sslEnabled = sslEnabled;
-        this.sslPort = sslPort;
-        this.keystoreLocation = keystoreLocation;
-        this.keystorePassword = keystorePassword;
-
-        ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
-        executor.execute(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    start();
-                }
-                catch (Exception e) {
-                    log.warn("Unable to start the Jetty server", e);
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
-    }
-
-    private void start() throws Exception
+    public void start() throws Exception
     {
         final long startTime = System.currentTimeMillis();
 
-        final Server server = new Server();
+        server = new Server();
 
-        Connector connector = new SelectChannelConnector();
-        connector.setHost(ip);
-        connector.setPort(port);
+        final Connector connector = new SelectChannelConnector();
+        connector.setHost(config.getLocalIp());
+        connector.setPort(config.getLocalPort());
         server.addConnector(connector);
 
-        if (sslEnabled) {
-            SslSelectChannelConnector sslConnector = new SslSelectChannelConnector();
-            sslConnector.setPort(sslPort);
-            sslConnector.setKeystore(keystoreLocation);
-            sslConnector.setKeyPassword(keystorePassword);
-            sslConnector.setPassword(keystorePassword);
+        if (config.isSSLEnabled()) {
+            final SslConnector sslConnector = new SslSelectChannelConnector();
+            sslConnector.setPort(config.getLocalSSLPort());
+            sslConnector.setKeystore(config.getSSLkeystoreLocation());
+            sslConnector.setKeyPassword(config.getSSLkeystorePassword());
+            sslConnector.setPassword(config.getSSLkeystorePassword());
             server.addConnector(sslConnector);
         }
 
         server.setStopAtShutdown(true);
 
-        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
+        final ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         context.addEventListener(new JettyListener());
 
         // Jersey insists on using java.util.logging (JUL)
-        SetupJULBridge listener = new SetupJULBridge();
+        final EventListener listener = new SetupJULBridge();
         context.addEventListener(listener);
 
         // Make sure Guice filter all requests
-        FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
+        final FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
         context.addFilter(filterHolder, "/*", ServletContextHandler.NO_SESSIONS);
 
-        ServletHolder sh = new ServletHolder(DefaultServlet.class);
+        final ServletHolder sh = new ServletHolder(DefaultServlet.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
         sh.setInitParameter("com.sun.jersey.config.property.packages", "com.ning.metrics.collector.endpoint");
         context.addServlet(sh, "/*");
@@ -135,7 +94,20 @@ public class JettyServer
         log.info(String.format("Jetty server started in %d:%02d", secondsToStart / 60, secondsToStart % 60));
 
         initialized = true;
-        server.join();
+    }
+
+    public void stop()
+    {
+        if (!initialized) {
+            return;
+        }
+
+        try {
+            server.stop();
+        }
+        catch (Exception e) {
+            log.warn("Got exception trying to stop Jetty", e);
+        }
     }
 
     /**

@@ -21,10 +21,12 @@ import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEven
 import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
+import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
 import java.io.IOException;
@@ -44,9 +46,9 @@ public class BufferingEventCollector implements EventCollector
     private final ScheduledExecutorService executor;
     private final TaskQueueService taskQueueService;
     private final EventQueueProcessor activeMQController;
+    private final AtomicLong lostEvents = new AtomicLong(0);
 
     private final Stats acceptanceStats = Stats.timeWindow(30, TimeUnit.MINUTES);
-    private final Stats writerStats = Stats.timeWindow(30, TimeUnit.MINUTES);
     private final Stats extractionStats = Stats.timeWindow(30, TimeUnit.MINUTES);
 
     @Inject
@@ -78,22 +80,41 @@ public class BufferingEventCollector implements EventCollector
         this.activeMQController = activeMQController;
     }
 
+    /**
+     * Shutdown the EventCollector. In practice, the collector will continue accepting requests (HTTP or Thrift),
+     * but events won't be accepted anymore.
+     * This stops:
+     * the AMQ hook
+     * the workers queue of disk write operations
+     * the flusher which promotes files from the temporary area to the final area
+     * <p/>
+     *
+     * @throws InterruptedException if we are interrupted while waiting for the queue of workers to be shutdown
+     */
     public void shutdown() throws InterruptedException
     {
+        // Disable AMQ hook
+        activeMQController.stop();
+
+        // Stop accepting incoming events
         taskQueueService.shutdown();
         taskQueueService.awaitTermination(15, TimeUnit.SECONDS);
-        performOperation(new DiskOperation()
-        {
-            @Override
-            public void execute() throws IOException
-            {
-                eventWriter.forceCommit();
-            }
-        });
+
+        // Stop the periodic flusher
+        executor.shutdown();
+        executor.awaitTermination(15, TimeUnit.SECONDS);
+
+        // Promote files to the final area
+        try {
+            eventWriter.forceCommit();
+        }
+        catch (IOException e) {
+            log.warn("Got IOException when trying to promote files to the final spool area", e);
+        }
     }
 
     @Inject
-    public void startFlusher()
+    public void startCommiter()
     {
         executor.schedule(new Runnable()
         {
@@ -101,14 +122,15 @@ public class BufferingEventCollector implements EventCollector
             public void run()
             {
                 try {
-                    performOperation(new DiskOperation()
-                    {
-                        @Override
-                        public void execute() throws IOException
-                        {
-                            eventWriter.commit();
-                        }
-                    });
+                    eventWriter.commit();
+                }
+                catch (IOException e) {
+                    try {
+                        eventWriter.rollback();
+                    }
+                    catch (IOException e1) {
+                        log.warn("Got IOException while trying to quarantine a file", e1);
+                    }
                 }
                 finally {
                     executor.schedule(this, refreshDelayInSeconds.get(), TimeUnit.SECONDS);
@@ -118,11 +140,11 @@ public class BufferingEventCollector implements EventCollector
     }
 
     @Override
+    @Profiled(tag = "jmx", message = "Time to collect an event")
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {
         if ((activeMQController != null) && (event != null)) {
-            String humanReadableMessage = event.getData().toString();
-            activeMQController.send(event.getName(), humanReadableMessage);
+            activeMQController.send(event);
         }
 
         if (taskQueueService.getQueueSize() < maxQueueSize.get()) {
@@ -136,18 +158,18 @@ public class BufferingEventCollector implements EventCollector
                     @Override
                     public void run()
                     {
-                        performOperation(new DiskOperation()
-                        {
-                            @Override
-                            public void execute() throws IOException
-                            {
-                                eventWriter.write(event);
-                            }
-                        });
+                        try {
+                            eventWriter.write(event);
+                        }
+                        catch (IOException e) {
+                            log.debug(String.format("Unable to serialize event. Event is LOST: %s", event.toString()));
+                            lostEvents.getAndIncrement();
+                        }
                     }
                 });
             }
             catch (RejectedExecutionException e) {
+                // shutdown called
                 return false;
             }
 
@@ -164,48 +186,6 @@ public class BufferingEventCollector implements EventCollector
     {
         extractionStats.record(eventStats.getExtractedDelayMillis());
         acceptanceStats.record(eventStats.getAcceptedDelayMillis());
-    }
-
-    /**
-     * Perform a disk operation. On failure, rollback (put the file in the quarantine area).
-     * This needs to be synchronized, since the eventWriter keeps track of the current file being worked on.
-     *
-     * @param operation DiskOperation to perform
-     */
-    synchronized private void performOperation(final DiskOperation operation)
-    {
-        writerStats.profile(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                boolean rollback = true;
-
-                try {
-                    operation.execute();
-                    rollback = false;
-                }
-                catch (IOException e) {
-                    log.warn("Error processing event queue list", e);
-                }
-
-                catch (RuntimeException e) {
-                    log.warn("Runtime exception while processing event queue list", e);
-                }
-                finally {
-                    if (rollback) {
-                        try {
-                            log.warn("Exception performing I/O operation, attempting rollback");
-                            eventWriter.rollback();
-                        }
-                        catch (IOException e1) {
-                            //noinspection ThrowFromFinallyBlock
-                            log.warn("Unable to rollback on commit error", e1);
-                        }
-                    }
-                }
-            }
-        });
     }
 
     @Managed(description = "Set the max number of elements in the in-memory queue; queue size > this => reject events")
@@ -244,18 +224,6 @@ public class BufferingEventCollector implements EventCollector
         return acceptanceStats.getCount();
     }
 
-    @Managed(description = "TP99 of the write operations")
-    public double getWriteMillisTP99()
-    {
-        return writerStats.getMillisTP99();
-    }
-
-    @Managed(description = "Number of write operations used to calculate the writes TP99")
-    public double getWriteCount()
-    {
-        return writerStats.getCount();
-    }
-
     @Managed(description = "TP99 of the time used to extract events from their original payload")
     public double getExtractionMillisTP99()
     {
@@ -266,5 +234,11 @@ public class BufferingEventCollector implements EventCollector
     public double getExtractionCount()
     {
         return extractionStats.getCount();
+    }
+
+    @Managed(description = "Number of events lost")
+    public long getLostEvents()
+    {
+        return lostEvents.get();
     }
 }

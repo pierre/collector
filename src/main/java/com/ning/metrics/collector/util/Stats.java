@@ -17,10 +17,8 @@
 package com.ning.metrics.collector.util;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.weakref.jmx.Managed;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,16 +33,7 @@ public class Stats
     private volatile DescriptiveStatistics millisStats;
     private volatile DescriptiveStatistics sizeStats;
 
-    @SuppressWarnings("unused")
-    private final WindowType windowType;
     private final String windowString;
-
-    @SuppressWarnings("unused")
-    private int capacity;
-    @SuppressWarnings("unused")
-    private long period;
-    @SuppressWarnings("unused")
-    private TimeUnit timeUnit;
 
     private enum WindowType
     {
@@ -53,32 +42,10 @@ public class Stats
     }
 
     /**
-     * Computes the number of milliseconds since the give reference time (in ns)
-     *
-     * @param startNanos the reference time in nanoseconds (use System.nanoTime()) to fetch
-     * @return the number of milliseconds
-     */
-    public static double millisElapsedSince(long startNanos)
-    {
-        return (System.nanoTime() - startNanos) / 1e6;
-    }
-
-    /**
-     * Create a fixed sample size window stats object.
-     *
-     * @param capacity
-     * @return stats
-     */
-    public static Stats sampleWindow(int capacity)
-    {
-        return new Stats(new SynchronizedDescriptiveStatistics(capacity), new SynchronizedDescriptiveStatistics(capacity), WindowType.SAMPLE, capacity, 0, null);
-    }
-
-    /**
      * Create a time window stats object.
      *
-     * @param period
-     * @param unit
+     * @param period length of the time window
+     * @param unit   unit of period
      * @return stats
      */
     public static Stats timeWindow(long period, TimeUnit unit)
@@ -89,13 +56,8 @@ public class Stats
 
     private Stats(DescriptiveStatistics millisStats, DescriptiveStatistics sizeStats, WindowType windowType, int capacity, long period, TimeUnit unit)
     {
-        this.capacity = capacity;
-        this.period = period;
-        this.timeUnit = unit;
-
         this.millisStats = millisStats;
         this.sizeStats = sizeStats;
-        this.windowType = windowType;
         if (windowType == WindowType.SAMPLE) {
             windowString = String.format("%d samples", capacity);
         }
@@ -107,102 +69,13 @@ public class Stats
     /**
      * Record one operation.
      *
-     * @param millis
+     * @param millis number of milliseconds the operation took
      */
     public void record(double millis)
     {
         count.incrementAndGet();
         millisStats.addValue(millis);
     }
-
-    /**
-     * Record one operation.
-     *
-     * @param millis
-     * @param size   magnitude of operation, i.e., bytes or items processed
-     */
-    public void record(double millis, long size)
-    {
-        count.incrementAndGet();
-        this.size.addAndGet(size);
-        millisStats.addValue(millis);
-        sizeStats.addValue(size);
-    }
-
-    /**
-     * Profile a {@link Runnable}.
-     *
-     * @param task
-     * @throws Exception
-     */
-    public void profile(Runnable task)
-    {
-        long start = System.nanoTime();
-        try {
-            task.run();
-        }
-        finally {
-            record(millisElapsedSince(start));
-        }
-    }
-
-    /**
-     * Profile a {@link Callable}.
-     *
-     * @param <T>
-     * @param task
-     * @return result
-     * @throws Exception
-     */
-    public <T> T profile(Callable<T> task) throws Exception
-    {
-        long start = System.nanoTime();
-        try {
-            return task.call();
-        }
-        finally {
-            record(millisElapsedSince(start));
-        }
-    }
-
-    /**
-     * Profile a {@link Callable}..
-     *
-     * @param <T>
-     * @param task
-     * @param size
-     * @return result
-     * @throws Exception
-     */
-    public <T> T profile(Callable<T> task, long size) throws Exception
-    {
-        long start = System.nanoTime();
-        try {
-            return task.call();
-        }
-        finally {
-            record(millisElapsedSince(start), size);
-        }
-    }
-
-    /**
-     * Reset all statistics
-     */
-    /*
-     * For some reason, this had funky behavior
-    @Managed
-    public void reset()
-    {
-    	count.set(0);
-    	size.set(0);
-    	if (windowType == WindowType.SAMPLE) {
-    		millisStats = new SynchronizedDescriptiveStatistics(capacity);
-    		sizeStats = new SynchronizedDescriptiveStatistics(capacity);
-    	} else {
-    		millisStats = new SynchronizedTimeWindowStatistics(TimeUnit.SECONDS.convert(period, timeUnit));
-    		sizeStats = new SynchronizedTimeWindowStatistics(TimeUnit.SECONDS.convert(period, timeUnit));
-    	}
-    } */
 
     /**
      * Count.
@@ -219,6 +92,7 @@ public class Stats
      * @return bytes read
      */
     @Managed
+    @SuppressWarnings("unused")
     public long getSize()
     {
         return size.get();
@@ -228,6 +102,7 @@ public class Stats
      * @return min
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisMin()
     {
         double min = millisStats.getMin();
@@ -238,6 +113,7 @@ public class Stats
      * @return max
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisMax()
     {
         double max = millisStats.getMax();
@@ -250,6 +126,7 @@ public class Stats
      * @return average
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisAvg()
     {
         double avg = millisStats.getMean();
@@ -262,6 +139,7 @@ public class Stats
      * @return 50th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisTP50()
     {
         double percentile = millisStats.getPercentile(50);
@@ -274,6 +152,7 @@ public class Stats
      * @return 90th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisTP90()
     {
         double percentile = millisStats.getPercentile(90);
@@ -298,6 +177,7 @@ public class Stats
      * @return 99.9th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisTP999()
     {
         double percentile = millisStats.getPercentile(99.9);
@@ -310,6 +190,7 @@ public class Stats
      * @return 99.99th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisTP9999()
     {
         double percentile = millisStats.getPercentile(99.99);
@@ -322,6 +203,7 @@ public class Stats
      * @return 99.999th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getMillisTP99999()
     {
         double percentile = millisStats.getPercentile(99.999);
@@ -332,6 +214,7 @@ public class Stats
      * @return min
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeMin()
     {
         double min = sizeStats.getMin();
@@ -342,6 +225,7 @@ public class Stats
      * @return max
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeMax()
     {
         double max = sizeStats.getMax();
@@ -354,6 +238,7 @@ public class Stats
      * @return average
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeAvg()
     {
         double avg = sizeStats.getMean();
@@ -366,6 +251,7 @@ public class Stats
      * @return 50th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeTP50()
     {
         double percentile = sizeStats.getPercentile(50);
@@ -378,6 +264,7 @@ public class Stats
      * @return 90th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeTP90()
     {
         double percentile = sizeStats.getPercentile(90);
@@ -390,6 +277,7 @@ public class Stats
      * @return 99th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeTP99()
     {
         double percentile = sizeStats.getPercentile(99);
@@ -402,6 +290,7 @@ public class Stats
      * @return 99.9th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeTP999()
     {
         double percentile = sizeStats.getPercentile(99.9);
@@ -414,6 +303,7 @@ public class Stats
      * @return 99th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeTP9999()
     {
         double percentile = sizeStats.getPercentile(99.99);
@@ -426,6 +316,7 @@ public class Stats
      * @return 99.999th percentile
      */
     @Managed
+    @SuppressWarnings("unused")
     public double getSizeTP99999()
     {
         double percentile = sizeStats.getPercentile(99.999);
@@ -436,6 +327,7 @@ public class Stats
      * @return the windowType
      */
     @Managed
+    @SuppressWarnings("unused")
     public String getWindowType()
     {
         return windowString;

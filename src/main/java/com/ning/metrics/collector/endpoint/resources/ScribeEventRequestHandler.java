@@ -19,7 +19,6 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.processing.ScribeEventHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.SmileBucketEvent;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
@@ -46,7 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ScribeEventRequestHandler implements Iface
+class ScribeEventRequestHandler implements Iface
 {
     private static final Charset CHARSET = Charset.forName("ISO-8859-1");
 
@@ -63,7 +62,7 @@ public class ScribeEventRequestHandler implements Iface
 
     @Inject
     public ScribeEventRequestHandler(
-        ScribeEventHandler eventHandler
+        final ScribeEventHandler eventHandler
     )
     {
         this.eventHandler = eventHandler;
@@ -76,23 +75,23 @@ public class ScribeEventRequestHandler implements Iface
      * @return resultCode  OK if everything went well, TRY_LATER otherwise
      */
     @Override
-    public ResultCode Log(List<LogEntry> logEntries)
+    public ResultCode Log(final List<LogEntry> logEntries)
     {
         boolean success = false;
 
-        for (LogEntry entry : logEntries) {
-            EventStats eventStats = new EventStats();
+        for (final LogEntry entry : logEntries) {
+            final EventStats eventStats = new EventStats();
 
             if (entry.getCategory() == null) {
                 log.info("Ignoring scribe entry with null category");
-                eventHandler.handleFailure(entry, eventStats);
+                eventHandler.handleFailure(entry);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
                 continue;
             }
             else if (entry.getMessage() == null) {
                 log.info("Ignoring scribe entry with null message");
-                eventHandler.handleFailure(entry, eventStats);
+                eventHandler.handleFailure(entry);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
                 continue;
@@ -103,11 +102,11 @@ public class ScribeEventRequestHandler implements Iface
 
                 // Return a collection here: in case of Smile, we may can a bucket of events that overlaps on multiple
                 // output directories
-                Collection<? extends Event> events = extractEvent(entry.getCategory(), entry.getMessage());
+                final Collection<? extends Event> events = extractEvent(entry.getCategory(), entry.getMessage());
 
                 // We only record failure when collectors are falling over (rejecting)
                 success = true;
-                for (Event event : events) {
+                for (final Event event : events) {
                     if (event != null) {
                         eventStats.recordExtracted();
                         if (!eventHandler.processEvent(event, eventStats)) {
@@ -115,25 +114,25 @@ public class ScribeEventRequestHandler implements Iface
                         }
                     }
                     else {
-                        eventHandler.handleFailure(entry, eventStats);
+                        eventHandler.handleFailure(entry);
                     }
                 }
             }
             catch (RuntimeException e) {
                 log.info(String.format("Ignoring malformed entry [%s]: %s", entry, e.getLocalizedMessage()));
-                eventHandler.handleFailure(entry, eventStats);
+                eventHandler.handleFailure(entry);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
             catch (TException e) {
                 log.info(String.format("Ignoring malformed Thrift [%s]: %s", entry, e.getLocalizedMessage()));
-                eventHandler.handleFailure(entry, eventStats);
+                eventHandler.handleFailure(entry);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
             catch (IOException e) {
                 log.info(String.format("Ignoring malformed Smile [%s]: %s", entry, e.getLocalizedMessage()));
-                eventHandler.handleFailure(entry, eventStats);
+                eventHandler.handleFailure(entry);
                 // We don't want Scribe to try later if it sends messages we don't understand.
                 success = true;
             }
@@ -164,12 +163,12 @@ public class ScribeEventRequestHandler implements Iface
      * @throws TException          when the ThriftEnvelope cannot be generated
      * @throws java.io.IOException when the SmileEnvelopeEvent cannot be generated
      */
-    private Collection<? extends Event> extractEvent(String category, String message) throws TException, IOException
+    private Collection<? extends Event> extractEvent(final String category, final String message) throws TException, IOException
     {
-        Collection<SmileBucketEvent> smileEvents = extractSmileBucketEvents(category, message);
+        final Collection<SmileBucketEvent> smileEvents = extractSmileBucketEvents(category, message);
 
         if (smileEvents == null) {
-            ArrayList<Event> thriftEnvelope = new ArrayList<Event>();
+            final Collection<Event> thriftEnvelope = new ArrayList<Event>();
             thriftEnvelope.add(extractThriftEnvelopeEvent(category, message));
             return thriftEnvelope;
         }
@@ -178,7 +177,7 @@ public class ScribeEventRequestHandler implements Iface
         }
     }
 
-    private Collection<SmileBucketEvent> extractSmileBucketEvents(String category, String message) throws IOException
+    private Collection<SmileBucketEvent> extractSmileBucketEvents(final String category, final String message) throws IOException
     {
         // See http://wiki.fasterxml.com/JacksonBinaryFormatSpec
         // We assume for now that we are sending Smile on the wire. This may change though (lzo compression?)
@@ -190,11 +189,10 @@ public class ScribeEventRequestHandler implements Iface
         }
     }
 
-    private Event extractThriftEnvelopeEvent(String category, String message)
-        throws TException
+    private Event extractThriftEnvelopeEvent(final String category, final String message) throws TException
     {
         Event event;
-        String[] payload = StringUtils.split(message, ":");
+        final String[] payload = StringUtils.split(message, ":");
 
         if (payload == null || payload.length != 2) {
             // Invalid API
@@ -210,13 +208,14 @@ public class ScribeEventRequestHandler implements Iface
         }
 
         // The payload is Base64 encoded
-        byte[] thrift = new Base64().decode(payload[1].getBytes());
+        final byte[] thrift = new Base64().decode(payload[1].getBytes());
 
         // Assume a ThriftEnvelopeEvent from the eventtracker (uses Java serialization).
         // This is bigger on the wire, but the interface is portable. Serialize using TBinaryProtocol
         // if you care about size (see below).
+        ObjectInputStream objectInputStream = null;
         try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(thrift)));
+            objectInputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(thrift)));
             event = new ThriftEnvelopeEvent();
             event.readExternal(objectInputStream);
 
@@ -226,6 +225,16 @@ public class ScribeEventRequestHandler implements Iface
         }
         catch (Exception e) {
             log.debug(String.format("Payload is not a ThriftEvent: %s", e.getLocalizedMessage()));
+        }
+        finally {
+            try {
+                if (objectInputStream != null) {
+                    objectInputStream.close();
+                }
+            }
+            catch (IOException e) {
+                log.warn("Unable to close stream when deserializing thrift events", e);
+            }
         }
 
         // Not a ThriftEvent, probably native Thrift serialization (TBinaryProtocol)
@@ -237,7 +246,7 @@ public class ScribeEventRequestHandler implements Iface
                 event = ThriftToThriftEnvelopeEvent.extractEvent(category, new DateTime(eventDateTime), thrift);
             }
         }
-        catch (Exception e) {
+        catch (TException e) {
             log.debug("Event doesn't look like a Thrift, assuming plain text");
             if (eventDateTime == null) {
                 event = StringToThriftEnvelopeEvent.extractEvent(category, payload[1]);
@@ -280,19 +289,19 @@ public class ScribeEventRequestHandler implements Iface
     }
 
     @Override
-    public long getCounter(String s)
+    public long getCounter(final String s)
     {
         return counters.get(s);
     }
 
     @Override
-    public void setOption(String s, String s1)
+    public void setOption(final String s, final String s1)
     {
         options.put(s, s1);
     }
 
     @Override
-    public String getOption(String s)
+    public String getOption(final String s)
     {
         return options.get(s);
     }
@@ -304,7 +313,7 @@ public class ScribeEventRequestHandler implements Iface
     }
 
     @Override
-    public String getCpuProfile(int i)
+    public String getCpuProfile(final int i)
     {
         return null;
     }

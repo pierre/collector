@@ -18,19 +18,17 @@ package com.ning.metrics.collector.endpoint.resources;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
-import com.ning.metrics.collector.events.processing.EventHandler;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
 /**
- * Event handler for the HTTP GET API.
- * also called within internal event pipeline
+ * Event handler for the HTTP API (GET and POST).
  */
 public class EventRequestHandler
 {
@@ -41,9 +39,9 @@ public class EventRequestHandler
     private final EventHandler eventHandler;
 
     public EventRequestHandler(
-            EventHandler eventHandler,
-            EventExtractor eventExtractor,
-            EventEndPointStats stats
+        final EventHandler eventHandler,
+        final EventExtractor eventExtractor,
+        final EventEndPointStats stats
     )
     {
         this.eventExtractor = eventExtractor;
@@ -52,41 +50,42 @@ public class EventRequestHandler
     }
 
     // TODO the statistics we collect here are less relevant now that we're processing collections of events at a time
-    public Response handleEventRequest(String eventString, ExtractedAnnotation annotation, EventStats eventStats)
+    public Response handleEventRequest(final ExtractedAnnotation annotation, final EventStats eventStats)
     {
-        Collection<? extends Event> events;
+        final String eventName = annotation.getEventName();
+        final Collection<? extends Event> events;
 
         try {
             // do not update stats here, while extracting events. update when processing.
-            events = eventExtractor.extractEvent(eventString, annotation);
+            events = eventExtractor.extractEvent(annotation);
             eventStats.recordExtracted();
         }
         catch (EventParsingException e) {
-            log.info(String.format("Unable to extract event: %s [%s]", eventString, annotation.toString()), e);
+            log.info(String.format("Unable to extract event: %s [%s]", eventName, annotation.toString()), e);
             // If one event fails, the entire collection of events is rejected
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, e);
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
         }
         catch (RuntimeException e) {
-            log.info(String.format("Unable to extract event: %s [%s]", eventString, annotation.toString()), e);
+            log.info(String.format("Unable to extract event: %s [%s]", eventName, annotation.toString()), e);
             // If one event fails, the entire collection of events is rejected
-            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
+            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
         }
 
         if (events == null) {
-            if (eventString == null) {
+            if (eventName == null) {
                 log.warn("No event type specified");
-                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, new IllegalArgumentException("Event name wasn't specified."));
+                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Event name wasn't specified."));
             }
             else {
                 log.warn("No event specified");
-                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, eventStats, new IllegalArgumentException("No event specified."));
+                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("No event specified."));
             }
         }
 
         // We were able to parse all events
         int failCount = 0;
 
-        for (Event event : events) {
+        for (final Event event : events) {
             try {
                 log.debug(String.format("Processing event %s", event));
                 // We ignore the Response here (see below)
@@ -94,14 +93,14 @@ public class EventRequestHandler
             }
             catch (RuntimeException e) {
                 failCount++;
-                log.info(String.format("Exception while processing event: %s [%s]", eventString, annotation.toString()), e);
+                log.info(String.format("Exception while processing event: %s [%s]", eventName, annotation.toString()), e);
                 // We don't care about the Response returned here, but we do care about incrementing stats about failed events
-                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, eventStats, e);
+                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
             }
         }
 
         if (failCount > 0) {
-            log.warn(String.format("%d total exceptions while processing event: %s [%s]", failCount, eventString, annotation.toString()));
+            log.warn(String.format("%d total exceptions while processing event: %s [%s]", failCount, eventName, annotation.toString()));
         }
 
         // Even though some events weren't processed correctly, we still return a 202.

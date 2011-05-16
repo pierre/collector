@@ -18,12 +18,12 @@ package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
+import com.ning.metrics.collector.endpoint.filters.Filter;
+import com.ning.metrics.collector.endpoint.resources.EventHandlerImpl;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtilImpl;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
 import com.ning.metrics.serialization.event.StubEvent;
-import com.ning.metrics.collector.util.Filter;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -54,7 +54,7 @@ public class TestEventHandlerImpl
             }
         };
         stats = new EventEndPointStats(5);
-        annotation = new ParsedRequest(null, null, null, null, null, new EventExtractorUtilImpl());
+        annotation = new ParsedRequest("DummyEvent", null, null, null, null);
         eventHandler = new EventHandlerImpl(collector, requestFilter, true);
         eventStats = new EventStats();
     }
@@ -84,7 +84,7 @@ public class TestEventHandlerImpl
     {
         Response response = eventHandler.processEvent(null, annotation, stats, eventStats);
         assertFailedEvent(response);
-        Assert.assertEquals((String) response.getMetadata().getFirst("Warning"), "199 com.ning.metrics.collector.events.parsing.EventParsingException: Received empty event");
+        Assert.assertEquals((String) response.getMetadata().getFirst("Warning"), "199 com.ning.metrics.collector.endpoint.extractors.EventParsingException: Received empty event");
     }
 
     @Test(groups = "fast")

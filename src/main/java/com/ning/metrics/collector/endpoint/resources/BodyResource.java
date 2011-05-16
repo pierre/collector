@@ -19,8 +19,8 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.parsing.EventExtractorUtil;
-import com.ning.metrics.collector.events.parsing.ParsedRequest;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
@@ -46,66 +46,64 @@ public class BodyResource
     private static final String NING_THRIFT = "ning/thrift";
 
     private final EventRequestHandler requestHandler;
-    private final EventExtractorUtil extractorUtil;
 
     @Inject
-    public BodyResource(
-            @InternalEventRequestHandler EventRequestHandler requestHandler,
-            EventExtractorUtil extractorUtil
-    )
+    public BodyResource(@InternalEventRequestHandler final EventRequestHandler requestHandler)
     {
         this.requestHandler = requestHandler;
-        this.extractorUtil = extractorUtil;
     }
 
     @POST
     @Consumes(NING_THRIFT)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postThrift(
-            @QueryParam("name") String eventName,
-            @QueryParam("date") String eventDateTimeString,
-            @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
-            byte[] content,
-            @Context HttpHeaders httpHeaders,
-            @Context HttpServletRequest request
+        @QueryParam("name") final String eventName,
+        @QueryParam("date") final String eventDateTimeString,
+        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
+        final byte[] content,
+        @Context final HttpHeaders httpHeaders,
+        @Context final HttpServletRequest request
     )
     {
-        EventStats eventStats = new EventStats();
-        DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), NING_THRIFT, extractorUtil), eventStats);
+        final EventStats eventStats = new EventStats();
+        final DateTime eventDateTime = new DateTime(eventDateTimeString);
+        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), NING_THRIFT);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postJson(
-            @QueryParam("name") String eventName,
-            @QueryParam("date") String eventDateTimeString,
-            @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
-            byte[] content,
-            @Context HttpHeaders httpHeaders,
-            @Context HttpServletRequest request
+        @QueryParam("name") final String eventName,
+        @QueryParam("date") final String eventDateTimeString,
+        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
+        final byte[] content,
+        @Context final HttpHeaders httpHeaders,
+        @Context final HttpServletRequest request
     )
     {
-        EventStats eventStats = new EventStats();
-        DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), MediaType.APPLICATION_JSON, extractorUtil), eventStats);
+        final EventStats eventStats = new EventStats();
+        final DateTime eventDateTime = new DateTime(eventDateTimeString);
+        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), MediaType.APPLICATION_JSON);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 
     @POST
     @Consumes(APPLICATION_JSON_SMILE)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postSmile(
-            @QueryParam("name") String eventName,
-            @QueryParam("date") String eventDateTimeString,
-            @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) String eventGranularity,
-            byte[] content,
-            @Context HttpHeaders httpHeaders,
-            @Context HttpServletRequest request
+        @QueryParam("name") final String eventName,
+        @QueryParam("date") final String eventDateTimeString,
+        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
+        final byte[] content,
+        @Context final HttpHeaders httpHeaders,
+        @Context final HttpServletRequest request
     )
     {
-        EventStats eventStats = new EventStats();
-        DateTime eventDateTime = new DateTime(eventDateTimeString);
-        return requestHandler.handleEventRequest(eventName, new ParsedRequest(httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), APPLICATION_JSON_SMILE, extractorUtil), eventStats);
+        final EventStats eventStats = new EventStats();
+        final DateTime eventDateTime = new DateTime(eventDateTimeString);
+        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), APPLICATION_JSON_SMILE);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 }

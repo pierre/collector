@@ -17,6 +17,8 @@
 package com.ning.metrics.collector.events.parsing;
 
 import com.google.inject.Inject;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.collector.events.parsing.converters.BooleanConverter;
 import com.ning.metrics.collector.events.parsing.converters.ByteConverter;
 import com.ning.metrics.collector.events.parsing.converters.DoubleConverter;
@@ -31,6 +33,7 @@ import com.ning.metrics.serialization.thrift.ThriftField;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ThriftEnvelopeEventParser implements EventParser
 {
@@ -57,7 +60,7 @@ public class ThriftEnvelopeEventParser implements EventParser
         try {
             Tokenizer tokenizer = new UrlDecodingTokenizer(new SplitTokenizer(input, TOKEN_SEPARATOR));
             List<ThriftField> payload = new ArrayList<ThriftField>();
-            short id = 1;
+            short id = (short) 1;
 
             while (tokenizer.hasNext()) {
                 Token token = tokenizer.next();
@@ -111,23 +114,28 @@ public class ThriftEnvelopeEventParser implements EventParser
 
     private ThriftField getAnnotatedValue(short id, Token token, ExtractedAnnotation annotation)
     {
-        String function = token.getValue().toLowerCase();
+        String function = token.getValue().toLowerCase(Locale.US);
         if ("date".equals(function)) {
             return ThriftField.createThriftField(annotation.getDateTime().getMillis(), id);
         }
         else if ("host".equals(function)) {
-            return ThriftField.createThriftField(annotation.getReferrerHost(), id);
+            return ThriftField.createThriftField(nullCheck(annotation.getReferrerHost()), id);
         }
         else if ("path".equals(function)) {
-            return ThriftField.createThriftField(annotation.getReferrerPath(), id);
+            return ThriftField.createThriftField(nullCheck(annotation.getReferrerPath()), id);
         }
         else if ("ua".equals(function)) {
-            return ThriftField.createThriftField(annotation.getUserAgent(), id);
+            return ThriftField.createThriftField(nullCheck(annotation.getUserAgent()), id);
         }
         else if ("ip".equals(function)) {
             return ThriftField.createThriftField(Ip.ipToInt(annotation.getIpAddress()), id);
         }
 
         throw new IllegalArgumentException(String.format("invalid annotation function: %s", function));
+    }
+
+    private String nullCheck(final String annotation)
+    {
+        return annotation == null ? "" : annotation;
     }
 }

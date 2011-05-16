@@ -40,7 +40,7 @@ public class SetupJULBridge implements ServletContextListener
         final Handler[] handlers = rootLogger.getHandlers();
 
         if (!ArrayUtils.isEmpty(handlers)) {
-            for (Handler handler : handlers) {
+            for (final Handler handler : handlers) {
                 rootLogger.removeHandler(handler);
             }
         }

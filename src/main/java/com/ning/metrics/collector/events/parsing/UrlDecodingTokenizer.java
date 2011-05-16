@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.events.parsing;
 
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
@@ -50,10 +52,5 @@ public class UrlDecodingTokenizer implements Tokenizer
         catch (UnsupportedEncodingException e) {
             throw new EventParsingException("error URL decoding token", e);
         }
-    }
-
-    public int getTokenCount()
-    {
-        return baseTokenizer.getTokenCount();
     }
 }

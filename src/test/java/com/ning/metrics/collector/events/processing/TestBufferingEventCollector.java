@@ -18,6 +18,11 @@ package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.realtime.EventQueueConnection;
+import com.ning.metrics.collector.realtime.EventQueueConnectionFactory;
+import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
+import com.ning.metrics.collector.realtime.EventQueueSession;
+import com.ning.metrics.collector.realtime.EventQueueStats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.MockEventWriter;
@@ -27,6 +32,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -40,8 +46,9 @@ import static org.testng.Assert.assertEquals;
 
 public class TestBufferingEventCollector
 {
-    private List<ScheduledCommand> flusherCommands;
-    private List<Runnable> drainerCommands;
+    private static final int REFRESH_DELAY_IN_SECONDS = 3;
+    private List<ScheduledCommand> commiterCommands;
+    private List<Runnable> writesCommands;
     private List<Object> sentEvents;
     private MockEventWriter eventWriter;
     private Event event;
@@ -55,8 +62,8 @@ public class TestBufferingEventCollector
     @BeforeMethod(alwaysRun = true)
     void setup()
     {
-        flusherCommands = new ArrayList<ScheduledCommand>();
-        drainerCommands = new ArrayList<Runnable>();
+        commiterCommands = new ArrayList<ScheduledCommand>();
+        writesCommands = new ArrayList<Runnable>();
         sentEvents = new CopyOnWriteArrayList<Object>();
         eventWriter = new MockEventWriter();
 
@@ -115,9 +122,22 @@ public class TestBufferingEventCollector
             public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit)
             {
                 //only flush commands come in via schedule
-                flusherCommands.add(new ScheduledCommand(command, delay, unit));
+                commiterCommands.add(new ScheduledCommand(command, delay, unit));
 
                 return null;
+            }
+
+            @Override
+            public void shutdown()
+            {
+                commiterCommands.clear();
+            }
+
+            @Override
+            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
+            {
+                // no-op
+                return true;
             }
         };
         event = new StubEvent();
@@ -126,56 +146,71 @@ public class TestBufferingEventCollector
             @Override
             public void execute(Runnable command)
             {
-                drainerCommands.add(command);
+                writesCommands.add(command);
             }
 
             @Override
             public void shutdown()
             {
-                runDrainerCommands();
+                performWrites();
             }
 
             @Override
             public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
             {
-                return drainerCommands.isEmpty();
+                return writesCommands.isEmpty();
             }
 
             @Override
             public int getQueueSize()
             {
-                return drainerCommands.size();
+                return writesCommands.size();
             }
-        },
-            msgSender, 5, 30);
+        }, msgSender, 5, REFRESH_DELAY_IN_SECONDS);
         eventStats = new EventStats();
     }
 
     private void startCollectorThreads()
     {
-        collector.startFlusher();
+        collector.startCommiter();
     }
 
-    private void runFlusherCommand()
+    private void stopCollectorThreads() throws InterruptedException
     {
-        flusherCommands.remove(0).getCommand().run();
+        collector.shutdown();
     }
 
-    private void runDrainerCommands()
+    private void performCommits()
     {
-        while (!drainerCommands.isEmpty()) {
-            drainerCommands.remove(0).run();
+        commiterCommands.remove(0).getCommand().run();
+    }
+
+    private void performWrites()
+    {
+        while (!writesCommands.isEmpty()) {
+            writesCommands.remove(0).run();
+        }
+    }
+
+    private void performFlushes()
+    {
+        try {
+            eventWriter.flush();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Test(groups = "fast")
     public void testStartFlusher() throws Exception
     {
-        collector.startFlusher();
-        Assert.assertEquals(flusherCommands.size(), 1);
+        collector.startCommiter();
+        Assert.assertEquals(commiterCommands.size(), 1);
     }
 
 
+    // AMQ test
     @Test(groups = "slow")
     public void testQueue() throws Exception
     {
@@ -229,6 +264,7 @@ public class TestBufferingEventCollector
         assertEquals(stats.getErroredEvents(), 0);
     }
 
+    // AMQ test
     @Test(groups = "slow")
     public void testQueueOverflow() throws Exception
     {
@@ -267,69 +303,74 @@ public class TestBufferingEventCollector
         assertEquals(stats.getErroredEvents(), 0);
     }
 
-    @Test(groups = "fast")
+    @Test(groups = "slow")
     public void testCollectFlow() throws Exception
     {
         startCollectorThreads();
         collector.collectEvent(event, eventStats);
-        assertEventCounts(0, 0);
-        runDrainerCommands();
-        assertEventCounts(1, 0);
-        runFlusherCommand();
-        assertEventCounts(0, 1);
+        assertEventCounts(0, 0, 0, 0);
+        performWrites();
+        assertEventCounts(1, 0, 0, 0);
+        performCommits();
+        assertEventCounts(0, 1, 0, 0);
     }
 
     @Test(groups = "fast")
     public void testWriteFails() throws Exception
     {
-        //make sure events that are drained, but not committed are wiped when a write fails and calls rollback()
+        // Make sure events that have been written, but not committed yet, are not wiped when a write fails
         startCollectorThreads();
         submitEvents(4);
-        runDrainerCommands();
-        assertEventCounts(4, 0);
-        eventWriter.setWriteThrowsException(true);
+        assertEventCounts(0, 0, 0, 0);
+        performWrites();
+        assertEventCounts(4, 0, 0, 0);
+        eventWriter.setWriteThrowsException(true); // It's lost, we can't do much about it
         submitEvents(1);
-        runDrainerCommands();
-        assertEventCounts(0, 0);
+        performWrites();
+        assertEventCounts(4, 0, 0, 0);
     }
 
     @Test(groups = "fast")
     public void testCommitFails() throws Exception
     {
-        //if a commit fails, those writes are rolled back
+        // If a commit fails, those writes are rolled back
         startCollectorThreads();
         eventWriter.setCommitThrowsException(true);
         submitEvents(4);
-        runDrainerCommands();
-        assertEventCounts(4, 0);
-        collector.shutdown();
-        assertEventCounts(0, 0);
+        assertEventCounts(0, 0, 0, 0);
+        performWrites();
+        assertEventCounts(4, 0, 0, 0);
+        performCommits();
+        assertEventCounts(0, 0, 4, 0);
     }
 
     @Test(groups = "fast")
     public void testRollbackFails() throws Exception
     {
-        //if rollback fails, event counts are unaltered
+        // If rollback fails, event counts are unaltered
         startCollectorThreads();
         submitEvents(4);
-        runDrainerCommands();
-        assertEventCounts(4, 0);
-        eventWriter.setWriteThrowsException(true);
+        performWrites();
+        assertEventCounts(4, 0, 0, 0);
+        performCommits();
+        assertEventCounts(0, 4, 0, 0);
+        eventWriter.setCommitThrowsException(true);
         eventWriter.setRollbackThrowsException(true);
         submitEvents(1);
-        runDrainerCommands();
-        assertEventCounts(4, 0);
+        performWrites();
+        assertEventCounts(1, 4, 0, 0);
+        stopCollectorThreads();
+        assertEventCounts(1, 4, 0, 0);
     }
 
-    @Test(groups = "fast")
+    @Test(groups = "slow")
     public void testBlockingDrain() throws Exception
     {
         startCollectorThreads();
         submitEvents(5);
-        assertEventCounts(0, 0);
-        runDrainerCommands();
-
-        assertEventCounts(5, 0);
+        assertEventCounts(0, 0, 0, 0); // This just adds events to write (stub executor)
+        performWrites();
+        assertEventCounts(5, 0, 0, 0);
     }
 
     @Test(groups = "fast")
@@ -337,21 +378,23 @@ public class TestBufferingEventCollector
     {
         startCollectorThreads();
         submitEvents(5);
-        assertEventCounts(0, 0);
-        collector.shutdown();
-        assertEventCounts(0, 5);
+        assertEventCounts(0, 0, 0, 0);
+        performWrites();
+        performCommits();
+        performFlushes();
+        assertEventCounts(0, 0, 0, 5);
     }
 
     @Test(groups = "fast")
-    public void testFlush() throws Exception
+    public void testCommit() throws Exception
     {
         startCollectorThreads();
         submitEvents(5);
-        assertEventCounts(0, 0);
-        runDrainerCommands();
-        assertEventCounts(5, 0);
-        flusherCommands.remove(0).getCommand().run();
-        assertEventCounts(0, 5);
+        assertEventCounts(0, 0, 0, 0);
+        performWrites();
+        assertEventCounts(5, 0, 0, 0);
+        commiterCommands.remove(0).getCommand().run();
+        assertEventCounts(0, 5, 0, 0);
     }
 
     @Test(groups = "fast")
@@ -363,10 +406,12 @@ public class TestBufferingEventCollector
         Assert.assertEquals(collector.collectEvent(event, eventStats), false);
     }
 
-    private void assertEventCounts(int written, int commit)
+    private void assertEventCounts(int written, int committed, int quarantined, int flushed)
     {
         Assert.assertEquals(eventWriter.getWrittenEventList().size(), written);
-        Assert.assertEquals(eventWriter.getCommittedEventList().size(), commit);
+        Assert.assertEquals(eventWriter.getCommittedEventList().size(), committed);
+        Assert.assertEquals(eventWriter.getQuarantinedEventList().size(), quarantined);
+        Assert.assertEquals(eventWriter.getFlushedEventList().size(), flushed);
     }
 
     private void submitEvents(int num)
@@ -379,29 +424,15 @@ public class TestBufferingEventCollector
     static class ScheduledCommand
     {
         private final Runnable command;
-        private final long delay;
-        private final TimeUnit unit;
 
         private ScheduledCommand(Runnable command, long delay, TimeUnit unit)
         {
             this.command = command;
-            this.delay = delay;
-            this.unit = unit;
         }
 
         public Runnable getCommand()
         {
             return command;
-        }
-
-        public long getDelay()
-        {
-            return delay;
-        }
-
-        public TimeUnit getUnit()
-        {
-            return unit;
         }
     }
 }

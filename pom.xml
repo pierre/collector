@@ -36,6 +36,10 @@
             <url>https://repository.cloudera.com/content/repositories/releases/</url>
         </repository>
         <repository>
+            <id>Codehaus</id>
+            <url>http://repository.codehaus.org/</url>
+        </repository>
+        <repository>
             <id>maven2-repository.java.net</id>
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
@@ -53,6 +57,11 @@
         </repository>
     </repositories>
     <dependencies>
+        <dependency>
+            <groupId>aopalliance</groupId>
+            <artifactId>aopalliance</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -86,9 +95,20 @@
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
+            <artifactId>async-http-client</artifactId>
+            <version>1.6.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ning</groupId>
             <artifactId>metrics.eventtracker</artifactId>
             <version>3.1.1-SNAPSHOT</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ning</groupId>
+            <artifactId>metrics.goodwill-access</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
@@ -272,6 +292,11 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
             <version>7.4.0.v20110414</version>
+        </dependency>
+        <dependency>
+            <groupId>org.perf4j</groupId>
+            <artifactId>perf4j</artifactId>
+            <version>0.9.14</version>
         </dependency>
         <dependency>
             <groupId>org.skife.config</groupId>
@@ -519,6 +544,7 @@
                         <exclude>run.sh</exclude>
                         <exclude>run-local.sh</exclude>
                         <exclude>src/site/**</exclude>
+                        <exclude>*.log</exclude>
                         <!-- We have some extra dependencies in there, see license on a per file basis -->
                         <exclude>src/utils/**</exclude>
                         <!-- This is a straight import from the upstream libraries -->
@@ -538,6 +564,7 @@
                 <configuration>
                     <threshold>Low</threshold>
                     <effort>Max</effort>
+                    <excludeFilterFile>src/main/resources/findbugsExcludeFilter.xml</excludeFilterFile>
                 </configuration>
             </plugin>
             <plugin>

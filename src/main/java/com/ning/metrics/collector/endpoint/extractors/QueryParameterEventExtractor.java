@@ -17,38 +17,41 @@
 package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
-
-import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.events.parsing.EventParser;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
+import com.ning.metrics.serialization.event.Event;
+import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- * API versions 1 and 2: query parameters-based API (via GET)
+ * API versions 1 and 2: query parameters-based API (via GET).
+ * The lower level extraction business happens in EventParser.
+ *
+ * @see EventParser
  */
-public class QueryParameterEventExtractor implements EventExtractor
+class QueryParameterEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
     private final EventParser thriftEventParser;
-    private static LinkedList<Event> v = new LinkedList<Event>();
+    private static final Collection<Event> v = new LinkedList<Event>();
 
     @Inject
-    public QueryParameterEventExtractor(EventParser thriftEventParser)
+    public QueryParameterEventExtractor(final EventParser thriftEventParser)
     {
         this.thriftEventParser = thriftEventParser;
     }
 
     @Override
-    public Collection<? extends Event> extractEvent(String event, ExtractedAnnotation annotation) throws EventParsingException
+    public Collection<? extends Event> extractEvent(final ExtractedAnnotation annotation) throws EventParsingException
     {
-        if (event != null) {
-            log.debug(String.format("Query parameter to process: %s", event));
-            String type = event.substring(0, event.indexOf(","));
-            String eventTypeString = event.substring(event.indexOf(",") + 1);
+        final String eventName = annotation.getEventName();
+
+        if (eventName != null) {
+            log.debug(String.format("Query parameter to process: %s", eventName));
+            final String type = eventName.substring(0, eventName.indexOf(","));
+            final String eventTypeString = eventName.substring(eventName.indexOf(",") + 1);
 
             log.debug(String.format("Event type [%s], event string [%s]", type, eventTypeString));
 

@@ -18,7 +18,7 @@ package com.ning.metrics.collector.events.processing;
 
 import java.util.concurrent.ExecutorService;
 
-public interface TaskQueueService extends ExecutorService
+interface TaskQueueService extends ExecutorService
 {
-	public int getQueueSize();
+    int getQueueSize();
 }

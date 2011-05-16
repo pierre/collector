@@ -85,7 +85,7 @@ public class EventEndPointStats
         updateSuccessfulEventsByType(eventTypeString);
     }
 
-    public void updateSuccessfulEventsByType(String eventType)
+    void updateSuccessfulEventsByType(String eventType)
     {
         AtomicLong zeroCounter = new AtomicLong(0);
         AtomicLong counter = successfulEventsByType.putIfAbsent(eventType, zeroCounter);

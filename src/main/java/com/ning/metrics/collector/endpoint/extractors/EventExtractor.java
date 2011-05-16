@@ -16,9 +16,8 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.events.parsing.EventParsingException;
-import com.ning.metrics.collector.events.parsing.ExtractedAnnotation;
 
 import java.util.Collection;
 
@@ -29,10 +28,9 @@ public interface EventExtractor
      * The annotation is a special extractor for the http request. To save space in the request, one can delegate to the
      * annotation to populate certain fields.
      *
-     * @param event Event type (ThriftEnvelope name) for the external event API, Event name (Thrift type) for the internal API
      * @param annotation annotation for the http request
      * @return a constructed Event
      * @throws EventParsingException if the event can't be parsed properly
      */
-    public Collection<? extends Event> extractEvent(String event, ExtractedAnnotation annotation) throws EventParsingException;
+    public Collection<? extends Event> extractEvent(ExtractedAnnotation annotation) throws EventParsingException;
 }

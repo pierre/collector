@@ -19,22 +19,35 @@ package com.ning.metrics.collector;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
-import com.ning.metrics.collector.binder.modules.EventCollectorModule;
-import com.ning.metrics.collector.binder.modules.OpenSourceCollectorModule;
-import com.ning.metrics.collector.binder.modules.ScribeModule;
+import com.ning.metrics.collector.binder.ProfiledInterceptor;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.events.hadoop.writer.HdfsModule;
+import com.ning.metrics.collector.events.processing.EventCollectorModule;
+import com.ning.metrics.collector.endpoint.filters.FiltersModule;
+import com.ning.metrics.collector.realtime.RealTimeQueueModule;
+import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
+import com.ning.metrics.collector.endpoint.resources.ScribeModule;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.endpoint.servers.ScribeServer;
 import com.ning.metrics.collector.util.F5PoolMemberControl;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.log4j.Logger;
+import org.perf4j.aop.Profiled;
+import org.skife.config.ConfigurationObjectFactory;
+import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
 import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.inject.matcher.Matchers.annotatedWith;
+import static com.google.inject.matcher.Matchers.any;
 
 /**
  * If you are writing your own Main class, make sure to match the name since
@@ -44,7 +57,7 @@ import java.util.Map;
  */
 public class StandaloneCollectorServer
 {
-    private final static Logger log = Logger.getLogger(StandaloneCollectorServer.class);
+    private static final Logger log = Logger.getLogger(StandaloneCollectorServer.class);
     private static Injector injector = null;
 
     public static void main(String... args) throws Exception
@@ -55,18 +68,36 @@ public class StandaloneCollectorServer
         final Map<String, String> params = new HashMap<String, String>();
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
-        injector = Guice.createInjector(
+        final CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
+
+        // Stage.PRODUCTION is mandatory for jmxutils
+        injector = Guice.createInjector(Stage.PRODUCTION,
             new MBeanModule(),               /* Used to trigger registration of mbeans exported via ExportBuilder */
-            new AbstractModule()             /* For jmxutils */
+            new AbstractModule()
             {
                 @Override
                 protected void configure()
                 {
+                    bind(CollectorConfig.class).toInstance(config);
                     bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
+
+                    // JMX exporter
+                    ExportBuilder builder = MBeanModule.newExporter(binder());
+
+                    // Perf4j Stuff
+                    MethodInterceptor interceptor = new ProfiledInterceptor();
+                    bindInterceptor(any(), annotatedWith(Profiled.class), interceptor);
+
+                    // F5 slb stuff
+                    bind(F5PoolMemberControl.class).asEagerSingleton();
+                    builder.export(F5PoolMemberControl.class).as("com.ning.metrics.collector:name=F5poolMemberControl");
                 }
             },
+            new RequestHandlersModule(),
+            new HdfsModule(),                /* Wiring for Hadoop */
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
-            new OpenSourceCollectorModule(), /* Open-Source version of certain interfaces */
+            new RealTimeQueueModule(),       /* AMQ integration */
+            new FiltersModule(config),       /* Provide filters for the HTTP API */
             new ServletModule()              /* Optional, provide the Jetty endpoint */
             {
                 @Override
@@ -81,6 +112,7 @@ public class StandaloneCollectorServer
 
         /* Start the Jetty endpoint */
         JettyServer jetty = injector.getInstance(JettyServer.class);
+        jetty.start();
 
         // We need to wait for Jetty to be fully up (it will setup SLF4j). Otherwise, we may encounter a race condition:
         //SLF4J: The following loggers will not work becasue they were created
@@ -106,6 +138,7 @@ public class StandaloneCollectorServer
      * Hack to share the injector with the Jersey GuiceFilter
      *
      * @see com.ning.metrics.collector.binder.modules.JettyListener
+     * @return the main injector
      */
     public static Injector getInjector()
     {

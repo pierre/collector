@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.parsing.converters;
 
-import com.ning.metrics.collector.events.parsing.EventParsingException;
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 
 public class BooleanConverter implements Converter<Boolean>
 {

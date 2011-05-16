@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.events.parsing;
 
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
+
 public class SplitTokenizer implements Tokenizer
 {
     private final String[] parts;
@@ -50,10 +52,5 @@ public class SplitTokenizer implements Tokenizer
 
         return token;
 
-    }
-
-    public int getTokenCount()
-    {
-        return parts.length;
     }
 }

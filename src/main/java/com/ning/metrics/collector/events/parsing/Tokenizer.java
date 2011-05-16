@@ -16,11 +16,11 @@
 
 package com.ning.metrics.collector.events.parsing;
 
+import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
+
 public interface Tokenizer
 {
     public boolean hasNext();
 
     public Token next() throws EventParsingException;
-
-    public int getTokenCount();
 }
