@@ -102,8 +102,14 @@
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.eventtracker</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.thrift</groupId>
+                    <artifactId>thrift</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
