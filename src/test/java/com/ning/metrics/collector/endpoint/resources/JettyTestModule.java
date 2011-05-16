@@ -34,6 +34,8 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.skife.config.ConfigurationObjectFactory;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,6 +45,8 @@ public class JettyTestModule extends AbstractModule
 {
     abstract static class FastCollectorConfig implements CollectorConfig
     {
+        private int cachedPort = -1;
+
         /**
          * Maximum number of events per file in the temporary spooling area. Past this threshold,
          * buffered events are promoted to the final spool queue.
@@ -75,6 +79,41 @@ public class JettyTestModule extends AbstractModule
         public int getRefreshDelayInSeconds()
         {
             return 1;
+        }
+
+        @Override
+        public int getLocalPort()
+        {
+            if (cachedPort == -1) {
+                cachedPort = findFreePort();
+            }
+
+            return cachedPort;
+        }
+
+        private int findFreePort() {
+            // Find a free port -- this is needed for TestNG to run test classes in parallel
+            ServerSocket socket = null;
+
+            try {
+                try {
+                    socket = new ServerSocket(0);
+                }
+                catch (IOException e) {
+                    return 8080;
+                }
+
+                return socket.getLocalPort();
+            }
+            finally {
+                if (socket != null) {
+                    try {
+                        socket.close();
+                    }
+                    catch (IOException ignored) {
+                    }
+                }
+            }
         }
     }
 
