@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TestDiskSpoolEventWriterProvider
 {
     private static final Logger log = Logger.getLogger(TestDiskSpoolEventWriterProvider.class);
+    private static final String tmpFile = System.getProperty("java.io.tmpdir") + "TestDiskSpoolEventWriterProvider";
 
     private Event originalEvent;
     private DiskSpoolEventWriter writer;
@@ -55,9 +56,8 @@ public class TestDiskSpoolEventWriterProvider
     private static final DateTime EVENT_DATE_TIME = new DateTime(2010, 1, 1, 12, 0, 0, 42);
     private static final String EVENT_NAME = "mySmile";
     private final AtomicBoolean testsRun = new AtomicBoolean(false);
-    private final String tmpFile = System.getProperty("java.io.tmpdir") + "TestDiskSpoolEventWriterProvider";
 
-    abstract class TestConfig implements CollectorConfig
+    abstract static class TestConfig implements CollectorConfig
     {
         @Override
         public long getFlushIntervalInSeconds()
@@ -77,7 +77,7 @@ public class TestDiskSpoolEventWriterProvider
     {
         createSmilePayload();
 
-        final CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
+        final CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(TestConfig.class);
 
         writer = new DiskSpoolEventWriterProvider(
             new MockEventWriter()
@@ -85,19 +85,22 @@ public class TestDiskSpoolEventWriterProvider
                 @Override
                 public void write(final Event event) throws IOException
                 {
-                    Assert.assertEquals(event.getClass(), SmileBucketEvent.class);
-                    Assert.assertEquals(((SmileBucketEvent) event).getNumberOfEvent(), 5);
+                    try {
+                        Assert.assertEquals(event.getClass(), SmileBucketEvent.class);
+                        Assert.assertEquals(((SmileBucketEvent) event).getNumberOfEvent(), 5);
 
-                    Assert.assertEquals(event.getName(), originalEvent.getName());
-                    Assert.assertEquals(event.getGranularity(), originalEvent.getGranularity());
-                    Assert.assertEquals(event.getOutputDir("bleh"), originalEvent.getOutputDir("bleh"));
+                        Assert.assertEquals(event.getName(), originalEvent.getName());
+                        Assert.assertEquals(event.getGranularity(), originalEvent.getGranularity());
+                        Assert.assertEquals(event.getOutputDir("bleh"), originalEvent.getOutputDir("bleh"));
 
-                    final DateTime eventDateTime = SmileEnvelopeEvent.getEventDateTimeFromJson(((SmileBucketEvent) event).getBucket().get(0));
-                    Assert.assertEquals(eventDateTime, EVENT_DATE_TIME);
+                        final DateTime eventDateTime = SmileEnvelopeEvent.getEventDateTimeFromJson(((SmileBucketEvent) event).getBucket().get(0));
+                        Assert.assertEquals(eventDateTime, EVENT_DATE_TIME);
 
-                    Assert.assertEquals(event.getSerializedEvent(), originalEvent.getSerializedEvent());
-
-                    testsRun.set(true);
+                        Assert.assertEquals(event.getSerializedEvent(), originalEvent.getSerializedEvent());
+                    }
+                    finally {
+                        testsRun.set(true);
+                    }
                 }
             },
             new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("spool to HDFS promoter")),
@@ -114,8 +117,15 @@ public class TestDiskSpoolEventWriterProvider
     @Test(groups = "slow")
     public void testGet() throws Exception
     {
+        Assert.assertEquals(writer.getDiskSpoolSize(), 0);
+
         writer.write(originalEvent); // Goes to disk
+        writer.commit();
+        //Assert.assertTrue(writer.getDiskSpoolSize() > 0); -- too tiny, less than 1K
+
         writer.flush(); // Picked up from disk, handed off to handler above
+        Assert.assertEquals(writer.getDiskSpoolSize(), 0);
+
         while (!testsRun.get()) {
             log.info("Tests still running, sleeping...");
             Thread.sleep(100);
