@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@Test(groups = "slow", singleThreaded = true, enabled = false)
+@Test(groups = "slow", singleThreaded = true)
 public class TestCollectorResource extends TestPublicAPI
 {
     // TODO: logging in classes

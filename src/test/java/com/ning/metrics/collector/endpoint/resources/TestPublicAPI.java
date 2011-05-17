@@ -17,6 +17,7 @@
 package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.Inject;
+import com.google.inject.servlet.GuiceFilter;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
@@ -83,6 +84,8 @@ public abstract class TestPublicAPI
         log.info("Test collector stopped");
         client.close();
         log.info("Test http client stopped");
+
+        new GuiceFilter().destroy();
     }
 
     @AfterMethod(alwaysRun = true)
