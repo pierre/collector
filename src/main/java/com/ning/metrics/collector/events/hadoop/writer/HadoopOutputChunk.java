@@ -19,6 +19,7 @@ package com.ning.metrics.collector.events.hadoop.writer;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
@@ -27,6 +28,8 @@ import java.io.IOException;
  */
 class HadoopOutputChunk
 {
+    private static final Logger log = Logger.getLogger(HadoopOutputChunk.class);
+
     private final Path sourcePath;
     private final Path destinationPath;
     private final SequenceFile.Writer writer;
@@ -61,6 +64,8 @@ class HadoopOutputChunk
     public void commit(final FileSystem fileSystem) throws IOException
     {
         final Path destinationDir = destinationPath.getParent();
+
+        log.info(String.format("Renaming [%s] to [%s]", sourcePath, destinationPath));
 
         // parent directory has to exist for a hdfs rename to succeed
         if (!fileSystem.exists(destinationDir) && !fileSystem.mkdirs(destinationPath.getParent())) {

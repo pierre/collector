@@ -21,7 +21,6 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.hadoop.TBooleanWritable;
 import com.ning.metrics.serialization.writer.EventWriter;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Logger;
@@ -157,7 +156,7 @@ public class HadoopFileEventWriter implements EventWriter
                 tmpOutputPath = new Path(tmpOutputDir, String.format("%s-%d", filename, suffix));
             }
 
-            log.info(String.format("OutputPath (tmp): %s (%s)", outputPath.toUri().getPath(), tmpOutputPath.toUri().getPath()));
+            log.info(String.format("Creating new HDFS chunk [%s] -> [%s]", outputPath.toUri().getPath(), tmpOutputPath.toUri().getPath()));
             final SequenceFile.Writer writer = SequenceFile.createWriter(fsAccess.get(), fsAccess.get().getConf(), tmpOutputPath, TBooleanWritable.class, clazz, SequenceFile.CompressionType.BLOCK);
             chunk = new HadoopOutputChunk(tmpOutputPath, outputPath, writer);
             outputChunks.put(outputDir, chunk);
