@@ -27,6 +27,7 @@ import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventHandler;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.SyncType;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -34,6 +35,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWriter>
 {
+    private static final Logger log = Logger.getLogger(DiskSpoolEventWriterProvider.class);
+
     private final EventWriter hadoopEventWriter;
     private final ScheduledExecutorService executor;
     private final CollectorConfig config;
@@ -59,6 +62,8 @@ public class DiskSpoolEventWriterProvider implements Provider<DiskSpoolEventWrit
             @Override
             public void handle(final ObjectInputStream objectInputStream, final CallbackHandler handler) throws ClassNotFoundException, IOException
             {
+                log.info("Flushing locally buffered events to HDFS");
+
                 while (objectInputStream.read() != -1) {
                     final Event event = (Event) objectInputStream.readObject();
                     hadoopEventWriter.write(event);
