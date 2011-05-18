@@ -30,8 +30,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
+import java.util.Collections;
 
 /**
  * Stream-based API (POST).
@@ -69,13 +68,11 @@ class BodyEventExtractor implements EventExtractor
                     throw new EventParsingException(String.format("Parse exception while trying to parse event from post body"), e);
                 }
 
-                final List<ThriftEnvelopeEvent> v = new Vector<ThriftEnvelopeEvent>(1);
-                v.add(0, new ThriftEnvelopeEvent(
+                return Collections.singletonList(new ThriftEnvelopeEvent(
                     annotation.getDateTime(),
                     new ThriftEnvelope(eventType, thriftFieldList),
                     annotation.getBucketGranularity()
                 ));
-                return v;
             }
             else if (annotation.getContentType().equals(MediaType.APPLICATION_JSON) || annotation.getContentType().equals("application/json+smile")) {
                 final Collection<SmileBucketEvent> smileEvents;
