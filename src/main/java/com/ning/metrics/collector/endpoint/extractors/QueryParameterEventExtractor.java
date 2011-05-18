@@ -23,7 +23,7 @@ import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Collections;
 
 /**
  * API versions 1 and 2: query parameters-based API (via GET).
@@ -35,7 +35,6 @@ class QueryParameterEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
     private final EventParser thriftEventParser;
-    private static final Collection<Event> v = new LinkedList<Event>();
 
     @Inject
     public QueryParameterEventExtractor(final EventParser thriftEventParser)
@@ -56,9 +55,7 @@ class QueryParameterEventExtractor implements EventExtractor
             log.debug(String.format("Event type [%s], event string [%s]", type, eventTypeString));
 
             // This API only supports sending one event at a time
-            v.clear();
-            v.add(thriftEventParser.parseThriftEvent(type, eventTypeString, annotation));
-            return v;
+            return Collections.singletonList(thriftEventParser.parseThriftEvent(type, eventTypeString, annotation));
         }
         else {
             return null;
