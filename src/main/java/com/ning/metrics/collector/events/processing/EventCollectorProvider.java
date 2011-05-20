@@ -39,6 +39,7 @@ class EventCollectorProvider implements Provider<EventCollector>
     private final EventQueueProcessor activeMQController;
     private final CollectorConfig config;
     private final DiskSpoolEventWriter hdfsWriter;
+    private final EventSpoolDispatcher dispatcher;
 
     @Inject
     public EventCollectorProvider(
@@ -47,7 +48,8 @@ class EventCollectorProvider implements Provider<EventCollector>
         final TaskQueueService taskQueueService,
         final EventQueueProcessor activeMQController,
         final CollectorConfig config,
-        final DiskSpoolEventWriter hdfsWriter
+        final DiskSpoolEventWriter hdfsWriter,
+        final EventSpoolDispatcher dispatcher
     )
     {
         this.eventWriter = eventWriter;
@@ -56,6 +58,7 @@ class EventCollectorProvider implements Provider<EventCollector>
         this.activeMQController = activeMQController;
         this.config = config;
         this.hdfsWriter = hdfsWriter;
+        this.dispatcher = dispatcher;
     }
 
     /**
@@ -70,7 +73,7 @@ class EventCollectorProvider implements Provider<EventCollector>
     @Override
     public EventCollector get()
     {
-        final BufferingEventCollector collector = new BufferingEventCollector(eventWriter, executor, taskQueueService, activeMQController, config);
+        final BufferingEventCollector collector = new BufferingEventCollector(activeMQController, dispatcher);
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
             @Override
