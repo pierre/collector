@@ -156,7 +156,7 @@ public class HadoopFileEventWriter implements EventWriter
                 tmpOutputPath = new Path(tmpOutputDir, String.format("%s-%d", filename, suffix));
             }
 
-            log.info(String.format("Creating new HDFS chunk [%s] -> [%s]", outputPath.toUri().getPath(), tmpOutputPath.toUri().getPath()));
+            log.debug(String.format("Creating new HDFS chunk [%s] -> [%s]", outputPath.toUri().getPath(), tmpOutputPath.toUri().getPath()));
             final SequenceFile.Writer writer = SequenceFile.createWriter(fsAccess.get(), fsAccess.get().getConf(), tmpOutputPath, TBooleanWritable.class, clazz, SequenceFile.CompressionType.BLOCK);
             chunk = new HadoopOutputChunk(tmpOutputPath, outputPath, writer);
             outputChunks.put(outputDir, chunk);

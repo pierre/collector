@@ -65,7 +65,7 @@ class HadoopOutputChunk
     {
         final Path destinationDir = destinationPath.getParent();
 
-        log.info(String.format("Renaming [%s] to [%s]", sourcePath, destinationPath));
+        log.debug(String.format("Renaming [%s] to [%s]", sourcePath, destinationPath));
 
         // parent directory has to exist for a hdfs rename to succeed
         if (!fileSystem.exists(destinationDir) && !fileSystem.mkdirs(destinationPath.getParent())) {
