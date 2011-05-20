@@ -17,67 +17,34 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
-import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
 import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
-import java.io.IOException;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class BufferingEventCollector implements EventCollector
 {
     private static final Logger log = Logger.getLogger(BufferingEventCollector.class);
 
-    private final EventWriter eventWriter;
-    private final AtomicLong maxQueueSize;
-    private final AtomicInteger refreshDelayInSeconds;
-    private final ScheduledExecutorService executor;
-    private final TaskQueueService taskQueueService;
     private final EventQueueProcessor activeMQController;
+    private final EventSpoolDispatcher dispatcher;
+
     private final AtomicLong lostEvents = new AtomicLong(0);
 
     private final Stats acceptanceStats = Stats.timeWindow(30, TimeUnit.MINUTES);
     private final Stats extractionStats = Stats.timeWindow(30, TimeUnit.MINUTES);
 
     @Inject
-    public BufferingEventCollector(
-        @BufferingEventCollectorEventWriter EventWriter eventWriter,
-        @BufferingEventCollectorExecutor ScheduledExecutorService executor,
-        TaskQueueService taskQueueService,
-        EventQueueProcessor activeMQController,
-        CollectorConfig config
-    )
+    public BufferingEventCollector(final EventQueueProcessor activeMQController, final EventSpoolDispatcher dispatcher)
     {
-        this(eventWriter, executor, taskQueueService, activeMQController, config.getMaxQueueSize(), config.getRefreshDelayInSeconds());
-    }
-
-    public BufferingEventCollector(
-        EventWriter eventWriter,
-        ScheduledExecutorService executor,
-        TaskQueueService taskQueueService,
-        EventQueueProcessor activeMQController,
-        long maxQueueSize,
-        int refreshDelayInSeconds
-    )
-    {
-        this.eventWriter = eventWriter;
-        this.taskQueueService = taskQueueService;
-        this.maxQueueSize = new AtomicLong(maxQueueSize);
-        this.refreshDelayInSeconds = new AtomicInteger(refreshDelayInSeconds);
-        this.executor = executor;
         this.activeMQController = activeMQController;
+        this.dispatcher = dispatcher;
     }
 
     /**
@@ -96,47 +63,7 @@ public class BufferingEventCollector implements EventCollector
         // Disable AMQ hook
         activeMQController.stop();
 
-        // Stop accepting incoming events
-        taskQueueService.shutdown();
-        taskQueueService.awaitTermination(15, TimeUnit.SECONDS);
-
-        // Stop the periodic flusher
-        executor.shutdown();
-        executor.awaitTermination(15, TimeUnit.SECONDS);
-
-        // Promote files to the final area
-        try {
-            eventWriter.forceCommit();
-        }
-        catch (IOException e) {
-            log.warn("Got IOException when trying to promote files to the final spool area", e);
-        }
-    }
-
-    @Inject
-    public void startCommiter()
-    {
-        executor.schedule(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    eventWriter.commit();
-                }
-                catch (IOException e) {
-                    try {
-                        eventWriter.rollback();
-                    }
-                    catch (IOException e1) {
-                        log.warn("Got IOException while trying to quarantine a file", e1);
-                    }
-                }
-                finally {
-                    executor.schedule(this, refreshDelayInSeconds.get(), TimeUnit.SECONDS);
-                }
-            }
-        }, refreshDelayInSeconds.get(), TimeUnit.SECONDS);
+        dispatcher.shutdown();
     }
 
     @Override
@@ -147,63 +74,19 @@ public class BufferingEventCollector implements EventCollector
             activeMQController.send(event);
         }
 
-        if (taskQueueService.getQueueSize() < maxQueueSize.get()) {
-            // Note the TimeStamp when we accepted the record
-            eventStats.recordAccepted();
+        eventStats.recordAccepted();
+        dispatcher.offer(event);
 
-            // Schedule the write to disk
-            try {
-                taskQueueService.execute(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try {
-                            eventWriter.write(event);
-                        }
-                        catch (IOException e) {
-                            log.debug(String.format("Unable to serialize event. Event is LOST: %s", event.toString()));
-                            lostEvents.getAndIncrement();
-                        }
-                    }
-                });
-            }
-            catch (RejectedExecutionException e) {
-                // shutdown called
-                return false;
-            }
+        // Update the statistics
+        updateEndPointsStats(eventStats);
 
-            // Update the statistics
-            updateEndPointsStats(eventStats);
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     private void updateEndPointsStats(EventStats eventStats)
     {
         extractionStats.record(eventStats.getExtractedDelayMillis());
         acceptanceStats.record(eventStats.getAcceptedDelayMillis());
-    }
-
-    @Managed(description = "Set the max number of elements in the in-memory queue; queue size > this => reject events")
-    public void setMaxQueueSize(long maxQueueSize)
-    {
-        this.maxQueueSize.set(maxQueueSize);
-    }
-
-    @Managed(description = "The max number of elements in the in-memory queue; queue size > this => reject events")
-    public long getMaxQueueSize()
-    {
-        return maxQueueSize.get();
-    }
-
-    @Managed(description = "Number of events in the in-memory queue")
-    public long getQueueSize()
-    {
-        return taskQueueService.getQueueSize();
     }
 
     @Managed(description = "TP99 of the current capacity (events/second)")

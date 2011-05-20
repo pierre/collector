@@ -80,7 +80,7 @@ public interface CollectorConfig
 
     @Config("collector.max-event-queue-size")
     @Default("200000")
-    long getMaxQueueSize();
+    int getMaxQueueSize();
 
     @Config("collector.event-routes.persistent")
     @Default("true")
