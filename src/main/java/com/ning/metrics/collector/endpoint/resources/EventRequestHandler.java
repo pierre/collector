@@ -22,9 +22,12 @@ import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.smile.SmileEnvelopeEventExtractor;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -111,5 +114,79 @@ public class EventRequestHandler
         // to drop the whole collection even if only a single event is bad.
         // The only reason we won't return ACCEPTED is when the event is not parsable (see above).
         return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    public Response handleJsonRequest(boolean plainJson, EventStats eventStats, ExtractedAnnotation annotation)
+    {
+        // TODO right now all the events in a file are sharing the same eventStats
+
+        SmileEnvelopeEventExtractor extractor;
+        try {
+            extractor = new SmileEnvelopeEventExtractor(annotation.getInputStream(), plainJson);
+        }
+        catch (RuntimeException e) {
+            log.info(String.format("Unable to extract event. [%s]", annotation.toString()), e);
+            // If one event fails, the entire collection of events is rejected
+            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
+        }
+        catch (IOException e) {
+            // TODO
+            log.info(String.format("Unable to extract event. [%s]", annotation.toString()), e);
+            // If one event fails, the entire collection of events is rejected
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
+        }
+
+        int failCount = 0;
+        int successCount = 0;
+
+        while (true) {
+            try {
+                Event event = extractor.extractNextEvent();
+                eventStats.recordExtracted(); // TODO see above TODO (all events share this eventStats object)
+
+                // if has reached EOF
+                if (event == null) {
+                    break;
+                }
+
+                log.debug(String.format("Processing event %s", event));
+                // We ignore the Response here (see below)
+                eventHandler.processEvent(event, annotation, endPointStats, eventStats);
+                successCount++;
+            }
+            // IOExceptions are thrown by extractEvent
+            catch (IOException e) {
+                failCount++;
+                log.info(String.format("Exception while extracting or processing an event. [%s]", annotation.toString()), e);
+
+                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Invalid body formatting."));
+            }
+            catch (RuntimeException e) {
+                failCount++;
+                log.info(String.format("Exception while extracting or processing an event. [%s]", annotation.toString()), e);
+
+                // We don't care about the Response returned here, but we do care about incrementing stats about failed events
+                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
+            }
+        }
+
+        // if no events specified
+        if (failCount == 0 && successCount == 0) {
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("No events specified."));
+        }
+        // if all fail
+        else if (successCount == 0) {
+            // TODO give a more appropriate response & exception
+            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("No valid events specified."));
+        }
+        // if some fail but some succeed
+        else if (failCount > 0) {
+            log.warn(String.format("%d total exceptions while processing events. [%s]", failCount, annotation.toString()));
+        }
+
+        // if we accept at least one event, return a 202.
+        // i.e. we drop the failed events
+        return Response.status(Response.Status.ACCEPTED).build();
+
     }
 }

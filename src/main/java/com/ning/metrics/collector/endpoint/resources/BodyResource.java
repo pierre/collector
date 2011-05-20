@@ -35,6 +35,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * Internal event API
@@ -75,35 +76,27 @@ public class BodyResource
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postJson(
-        @QueryParam("name") final String eventName,
-        @QueryParam("date") final String eventDateTimeString,
-        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
-        final byte[] content,
+        final InputStream body,
         @Context final HttpHeaders httpHeaders,
         @Context final HttpServletRequest request
     )
     {
         final EventStats eventStats = new EventStats();
-        final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), MediaType.APPLICATION_JSON);
-        return requestHandler.handleEventRequest(annotation, eventStats);
+        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), MediaType.APPLICATION_JSON);
+        return requestHandler.handleJsonRequest(true, eventStats, annotation);
     }
 
     @POST
     @Consumes(APPLICATION_JSON_SMILE)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postSmile(
-        @QueryParam("name") final String eventName,
-        @QueryParam("date") final String eventDateTimeString,
-        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
-        final byte[] content,
+        final InputStream body,
         @Context final HttpHeaders httpHeaders,
         @Context final HttpServletRequest request
     )
     {
         final EventStats eventStats = new EventStats();
-        final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), APPLICATION_JSON_SMILE);
-        return requestHandler.handleEventRequest(annotation, eventStats);
+        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), MediaType.APPLICATION_JSON);
+        return requestHandler.handleJsonRequest(false, eventStats, annotation);
     }
 }
