@@ -17,10 +17,10 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueStats;
+import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
@@ -35,6 +35,8 @@ import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Manager of all queues
@@ -49,26 +51,43 @@ public class EventSpoolDispatcher
     private final Object queueMapMonitor = new Object();
     private final EventWriter hadoopEventWriter;
     private final ScheduledExecutorService hadoopExecutor;
+    private final AtomicBoolean isRunning = new AtomicBoolean(true);
 
     @Inject
-    public EventSpoolDispatcher(@HdfsEventWriter final EventWriter hadoopEventWriter, @HdfsDiskSpoolFlushExecutor final ScheduledExecutorService executor,
-                                final EventQueueStats stats, final CollectorConfig config)
+    public EventSpoolDispatcher(@HdfsEventWriter final EventWriter hadoopEventWriter, final EventQueueStats stats, final CollectorConfig config)
     {
         this.hadoopEventWriter = hadoopEventWriter;
-        this.hadoopExecutor = executor;
+        this.hadoopExecutor = new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter"));
         this.stats = stats;
         this.config = config;
     }
 
+    /**
+     * Close all underlying queues
+     *
+     * @throws InterruptedException if interrupted trying to close a queue
+     */
     public void shutdown() throws InterruptedException
     {
         for (final LocalQueueAndWriter queue : queuesPerPath.values()) {
             queue.close();
         }
         queuesPerPath.clear();
+        isRunning.set(false);
     }
 
-    public void offer(final Event event)
+    public boolean isRunning()
+    {
+        return isRunning.get();
+    }
+
+    /**
+     * Dispatch the specified event to its final eventwriter
+     *
+     * @param event Event to dispatch
+     * @see #getEventWriter()
+     */
+    public boolean offer(final Event event)
     {
         if (event != null) {
             final String hdfsPath = event.getOutputDir(config.getEventOutputDirectory());
@@ -84,13 +103,19 @@ public class EventSpoolDispatcher
                 }
             }
 
-            queue.offer(event);
+            return queue.offer(event);
         }
         else {
             stats.registerEventIgnored();
+            return false;
         }
     }
 
+    /**
+     * Number of events not yet committed (combined size of all queues)
+     *
+     * @return number of uncommitted events
+     */
     public Map<String, Integer> getQueuesSizes()
     {
         final Map<String, Integer> map = new HashMap<String, Integer>();
@@ -101,6 +126,14 @@ public class EventSpoolDispatcher
         return map;
     }
 
+    /**
+     * Create an EventWriter specific to events sharing the same serialization format
+     * and ending in the same directory in HDFS.
+     * In practice, this means that all events of a certain type and serialization type share the same writer, i.e.
+     * all ClickEvent Thrift events during an hour will use the same writer.
+     *
+     * @return eventWriter specific to an event type and serialization type
+     */
     private EventWriter getEventWriter()
     {
         final EventWriter eventWriter = new DiskSpoolEventWriter(new EventHandler()

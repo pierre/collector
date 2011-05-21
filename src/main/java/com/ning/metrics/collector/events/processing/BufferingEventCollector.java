@@ -63,6 +63,7 @@ public class BufferingEventCollector implements EventCollector
         // Disable AMQ hook
         activeMQController.stop();
 
+        // Disable writer to disk
         dispatcher.shutdown();
     }
 
@@ -75,12 +76,17 @@ public class BufferingEventCollector implements EventCollector
         }
 
         eventStats.recordAccepted();
-        dispatcher.offer(event);
 
-        // Update the statistics
+        // Update the endpoint statistics
         updateEndPointsStats(eventStats);
 
-        return true;
+        if (dispatcher.isRunning() && dispatcher.offer(event)) {
+            return true;
+        }
+        else {
+            lostEvents.incrementAndGet();
+            return false;
+        }
     }
 
     private void updateEndPointsStats(EventStats eventStats)
@@ -125,6 +131,7 @@ public class BufferingEventCollector implements EventCollector
         return lostEvents.get();
     }
 
+    @Managed(description = "Number of events in memory")
     public int getQueueSizes()
     {
         int length = 0;

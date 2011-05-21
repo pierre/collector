@@ -112,17 +112,24 @@ class LocalQueueAndWriter
     }
 
     /**
-     * Insert an event to the underlying queue
+     * Inserts the specified element into this queue if it is possible to do
+     * so immediately without violating capacity restrictions, returning
+     * <tt>true</tt> upon success and <tt>false</tt> if no space is currently
+     * available.
      *
      * @param event event to insert
+     * @return <tt>true</tt> if the element was added to this queue, else
+     *         <tt>false</tt>
      */
-    public void offer(final Event event)
+    public boolean offer(final Event event)
     {
         if (queue.offer(event)) {
             stats.registerEventEnqueued();
+            return true;
         }
         else {
             stats.registerEventDropped();
+            return false;
         }
     }
 
