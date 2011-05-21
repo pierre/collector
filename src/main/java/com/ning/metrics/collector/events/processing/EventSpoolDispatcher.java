@@ -91,6 +91,16 @@ public class EventSpoolDispatcher
         }
     }
 
+    public Map<String, Integer> getQueuesSizes()
+    {
+        final Map<String, Integer> map = new HashMap<String, Integer>();
+        for (final String path : queuesPerPath.keySet()) {
+            map.put(path, queuesPerPath.get(path).size());
+        }
+
+        return map;
+    }
+
     private EventWriter getEventWriter()
     {
         final EventWriter eventWriter = new DiskSpoolEventWriter(new EventHandler()

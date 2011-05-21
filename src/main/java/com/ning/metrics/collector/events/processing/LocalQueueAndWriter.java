@@ -125,4 +125,9 @@ class LocalQueueAndWriter
             stats.registerEventDropped();
         }
     }
+
+    public int size()
+    {
+        return queue.size();
+    }
 }

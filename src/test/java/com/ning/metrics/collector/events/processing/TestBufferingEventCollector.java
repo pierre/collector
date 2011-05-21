@@ -141,38 +141,13 @@ public class TestBufferingEventCollector
             }
         };
         event = new StubEvent();
-        collector = new BufferingEventCollector(eventWriter, executor, new StubTaskQueueService()
-        {
-            @Override
-            public void execute(Runnable command)
-            {
-                writesCommands.add(command);
-            }
-
-            @Override
-            public void shutdown()
-            {
-                performWrites();
-            }
-
-            @Override
-            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
-            {
-                return writesCommands.isEmpty();
-            }
-
-            @Override
-            public int getQueueSize()
-            {
-                return writesCommands.size();
-            }
-        }, msgSender, 5, REFRESH_DELAY_IN_SECONDS);
+        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(eventWriter, executor, new EventQueueStats(), config);
+        collector = new BufferingEventCollector(msgSender, dispatcher);
         eventStats = new EventStats();
     }
 
     private void startCollectorThreads()
     {
-        collector.startCommiter();
     }
 
     private void stopCollectorThreads() throws InterruptedException
@@ -201,14 +176,6 @@ public class TestBufferingEventCollector
             throw new RuntimeException(e);
         }
     }
-
-    @Test(groups = "fast")
-    public void testStartFlusher() throws Exception
-    {
-        collector.startCommiter();
-        Assert.assertEquals(commiterCommands.size(), 1);
-    }
-
 
     // AMQ test
     @Test(groups = "slow")
@@ -402,7 +369,7 @@ public class TestBufferingEventCollector
     {
         startCollectorThreads();
         submitEvents(5);
-        Assert.assertEquals(collector.getQueueSize(), 5);
+        Assert.assertEquals(collector.getQueueSizes(), 5);
         Assert.assertEquals(collector.collectEvent(event, eventStats), false);
     }
 

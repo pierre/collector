@@ -70,7 +70,7 @@ public class BufferingEventCollector implements EventCollector
     @Profiled(tag = "jmx", message = "Time to collect an event")
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {
-        if ((activeMQController != null) && (event != null)) {
+        if (activeMQController != null && event != null) {
             activeMQController.send(event);
         }
 
@@ -123,5 +123,15 @@ public class BufferingEventCollector implements EventCollector
     public long getLostEvents()
     {
         return lostEvents.get();
+    }
+
+    public int getQueueSizes()
+    {
+        int length = 0;
+        for (final Integer len : dispatcher.getQueuesSizes().values()) {
+            length += len;
+        }
+
+        return length;
     }
 }

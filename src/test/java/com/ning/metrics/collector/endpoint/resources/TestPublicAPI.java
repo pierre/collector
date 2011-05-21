@@ -96,7 +96,7 @@ public abstract class TestPublicAPI
 
     void assertCleanQueues()
     {
-        Assert.assertEquals(incomingQueue.getQueueSize(), 0);
+        Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
         Assert.assertEquals(spooler.getDiskSpoolSize(), 0);
         Assert.assertEquals(spooler.getQuarantineSize(), 0);
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getWrittenEventList().size());
@@ -110,7 +110,7 @@ public abstract class TestPublicAPI
         Thread.sleep(2000);
 
         // Check the spooler is empty
-        Assert.assertEquals(incomingQueue.getQueueSize(), 0);
+        Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
         Assert.assertEquals(spooler.getDiskSpoolSize(), 0);
         Assert.assertEquals(spooler.getQuarantineSize(), 0);
 
