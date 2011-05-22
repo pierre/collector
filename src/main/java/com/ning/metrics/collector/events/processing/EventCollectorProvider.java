@@ -18,46 +18,21 @@ package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
-import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
-import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
-import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
-
-import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
 
 class EventCollectorProvider implements Provider<EventCollector>
 {
     private static final Logger log = Logger.getLogger(EventCollectorProvider.class);
 
-    private final EventWriter eventWriter;
-    private final ScheduledExecutorService executor;
-    private final TaskQueueService taskQueueService;
     private final EventQueueProcessor activeMQController;
-    private final CollectorConfig config;
-    private final DiskSpoolEventWriter hdfsWriter;
     private final EventSpoolDispatcher dispatcher;
 
     @Inject
-    public EventCollectorProvider(
-        @BufferingEventCollectorEventWriter final EventWriter eventWriter,
-        @BufferingEventCollectorExecutor final ScheduledExecutorService executor,
-        final TaskQueueService taskQueueService,
-        final EventQueueProcessor activeMQController,
-        final CollectorConfig config,
-        final DiskSpoolEventWriter hdfsWriter,
-        final EventSpoolDispatcher dispatcher
-    )
+    public EventCollectorProvider(final EventQueueProcessor activeMQController, final EventSpoolDispatcher dispatcher, final CollectorConfig config)
     {
-        this.eventWriter = eventWriter;
-        this.executor = executor;
-        this.taskQueueService = taskQueueService;
         this.activeMQController = activeMQController;
-        this.config = config;
-        this.hdfsWriter = hdfsWriter;
         this.dispatcher = dispatcher;
     }
 
@@ -68,7 +43,6 @@ class EventCollectorProvider implements Provider<EventCollector>
      * we need to carefully control the lifecycle of the shutdown hook.
      *
      * @return EventCollector instance
-     * @see com.ning.metrics.collector.binder.providers.DiskSpoolEventWriterProvider
      */
     @Override
     public EventCollector get()
@@ -79,14 +53,14 @@ class EventCollectorProvider implements Provider<EventCollector>
             @Override
             public void run()
             {
-                mainCollectorShutdownHook(collector, hdfsWriter);
+                mainCollectorShutdownHook(collector, dispatcher);
             }
         });
 
         return collector;
     }
 
-    static void mainCollectorShutdownHook(final BufferingEventCollector collector, final DiskSpoolEventWriter hdfsWriter)
+    static void mainCollectorShutdownHook(final BufferingEventCollector collector, final EventSpoolDispatcher dispatcher)
     {
         log.info("Starting main shutdown sequence");
 
@@ -99,31 +73,12 @@ class EventCollectorProvider implements Provider<EventCollector>
             log.warn("Interrupted while trying to shutdown the main collector thread", e);
         }
 
-        log.info("Shut down the writers service");
-        // Stop the periodic flusher from local disk to HDFS
         try {
-            hdfsWriter.shutdown();
+            dispatcher.shutdown();
         }
         catch (InterruptedException e) {
-            log.warn("Interrupted while trying to shutdown the HDFS flusher", e);
+            log.warn("Interrupted while trying to shutdown the event dispatcher", e);
         }
-
-        log.info("Flush current open file to disk");
-        // Commit the current file
-        try {
-            hdfsWriter.forceCommit();
-        }
-        catch (IOException e) {
-            log.warn("IOExeption while committing current file", e);
-        }
-
-        log.info("Promote quarantined files to final spool area");
-        // Give quarantined events a last chance
-        hdfsWriter.processQuarantinedFiles();
-
-        log.info("Flush all local files to HDFS");
-        // Flush events to HDFS
-        hdfsWriter.flush();
 
         log.info("Main shutdown sequence has terminated");
     }

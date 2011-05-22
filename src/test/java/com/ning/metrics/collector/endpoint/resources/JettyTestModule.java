@@ -21,13 +21,11 @@ import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.binder.providers.DiskSpoolEventWriterProvider;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
 import com.ning.metrics.collector.endpoint.filters.FiltersModule;
 import com.ning.metrics.collector.events.processing.EventCollectorModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueModule;
 import com.ning.metrics.collector.util.NamedThreadFactory;
-import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -153,7 +151,6 @@ public class JettyTestModule extends AbstractModule
             @Override
             protected void configure()
             {
-                bind(DiskSpoolEventWriter.class).toProvider(DiskSpoolEventWriterProvider.class).asEagerSingleton();
                 bind(ScheduledExecutorService.class).annotatedWith(HdfsDiskSpoolFlushExecutor.class)
                     .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")));
                 bind(EventWriter.class).annotatedWith(HdfsEventWriter.class).toInstance(new MockEventWriter());

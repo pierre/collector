@@ -18,17 +18,10 @@ package com.ning.metrics.collector.events.hadoop.writer;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.collector.binder.providers.DiskSpoolEventWriterProvider;
-import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
-import com.ning.metrics.collector.util.NamedThreadFactory;
-import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * This module provides the wiring for the back-end writers to Hadoop
@@ -37,17 +30,10 @@ public class HdfsModule implements Module
 {
     @Override
     public void configure(final Binder binder)
-    {   // JMX exporter
+    {
+        // JMX exporter
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
-        // The ThresholdEventWriter, controlled by the front-end EventCollector, delegates to this DiskSpoolEventWriter
-        // @see DiskSpoolEventWriterProvider
-        binder.bind(DiskSpoolEventWriter.class).toProvider(DiskSpoolEventWriterProvider.class).asEagerSingleton();
-        builder.export(DiskSpoolEventWriter.class).as("com.ning.metrics.collector:name=DiskSpoolEventWriter");
-
-        // The DiskSpoolEventWriter is responsible for periodic flushes to HDFS
-        binder.bind(ScheduledExecutorService.class).annotatedWith(HdfsDiskSpoolFlushExecutor.class)
-            .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")));
         binder.bind(EventWriter.class).annotatedWith(HdfsEventWriter.class).to(HadoopFileEventWriter.class).asEagerSingleton();
         builder.export(HadoopFileEventWriter.class).as("com.ning.metrics.collector:name=HadoopFileEventWriter");
 

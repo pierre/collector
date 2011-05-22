@@ -24,7 +24,6 @@ import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.events.processing.BufferingEventCollector;
-import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.log4j.Logger;
@@ -46,9 +45,6 @@ public abstract class TestPublicAPI
 
     @Inject
     BufferingEventCollector incomingQueue;
-
-    @Inject
-    DiskSpoolEventWriter spooler;
 
     @Inject
     @HdfsEventWriter
@@ -97,8 +93,6 @@ public abstract class TestPublicAPI
     void assertCleanQueues()
     {
         Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
-        Assert.assertEquals(spooler.getDiskSpoolSize(), 0);
-        Assert.assertEquals(spooler.getQuarantineSize(), 0);
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getWrittenEventList().size());
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getCommittedEventList().size());
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getQuarantinedEventList().size());
@@ -111,8 +105,6 @@ public abstract class TestPublicAPI
 
         // Check the spooler is empty
         Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
-        Assert.assertEquals(spooler.getDiskSpoolSize(), 0);
-        Assert.assertEquals(spooler.getQuarantineSize(), 0);
 
         // Check the event was 'committed' to HDFS
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getWrittenEventList().size());

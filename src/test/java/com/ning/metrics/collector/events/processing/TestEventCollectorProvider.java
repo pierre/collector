@@ -17,12 +17,11 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
+import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
-import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
@@ -43,17 +42,13 @@ public class TestEventCollectorProvider
     private BufferingEventCollector collector;
 
     @Inject
-    @BufferingEventCollectorExecutor
-    private ScheduledExecutorService executor;
-
-    @Inject
-    private TaskQueueService taskQueueService;
-
-    @Inject
     private EventQueueProcessor queueProcessor;
 
     @Inject
     private MockEventWriter bufferingEventWriter;
+
+    @Inject
+    private EventSpoolDispatcher dispatcher;
 
     @Inject
     @HdfsDiskSpoolFlushExecutor
@@ -69,21 +64,27 @@ public class TestEventCollectorProvider
     @Test
     public void testGet() throws Exception
     {
-        assertTrue(collector.collectEvent(new StubEvent(), new EventStats()));
+        assertTrue(collector.collectEvent(new MockEvent(), new EventStats()));
         assertEquals(bufferingEventWriter.getCommittedEventList().size(), 0);
         assertEquals(((MockEventWriter) hdfsEventWriter).getCommittedEventList().size(), 0);
 
-        EventCollectorProvider.mainCollectorShutdownHook(collector, hdfsWriter);
+        EventCollectorProvider.mainCollectorShutdownHook(collector, dispatcher);
 
-        assertFalse(collector.collectEvent(new StubEvent(), new EventStats()));
+        assertFalse(collector.collectEvent(new MockEvent(), new EventStats()));
 
-        assertFalse(queueProcessor.isRunning()); // AMQ
-        assertTrue(taskQueueService.isTerminated()); // Acceptance queue
+        // AMQ should be down
+        assertFalse(queueProcessor.isRunning());
 
-        assertTrue(executor.isTerminated()); // Writer executor
+        // Writer to disk should be down
+        assertFalse(dispatcher.isRunning());
+
+
         assertEquals(bufferingEventWriter.getCommittedEventList().size(), 1);
 
+        // TODO Test queues and workers are down
+
         assertTrue(hdfsExecutor.isTerminated()); // Writer executor
+
         // TODO
         //assertEquals(((MockEventWriter) hdfsEventWriter).getFlushedEventList().size(), 1);
     }

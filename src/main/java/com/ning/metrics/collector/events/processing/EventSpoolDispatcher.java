@@ -19,7 +19,6 @@ package com.ning.metrics.collector.events.processing;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.realtime.EventQueueStats;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.CallbackHandler;
@@ -46,7 +45,7 @@ public class EventSpoolDispatcher
     private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
 
     private final Map<String, LocalQueueAndWriter> queuesPerPath = new HashMap<String, LocalQueueAndWriter>();
-    private final EventQueueStats stats;
+    private final WriterStats stats;
     private final CollectorConfig config;
     private final Object queueMapMonitor = new Object();
     private final EventWriter hadoopEventWriter;
@@ -54,7 +53,7 @@ public class EventSpoolDispatcher
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
 
     @Inject
-    public EventSpoolDispatcher(@HdfsEventWriter final EventWriter hadoopEventWriter, final EventQueueStats stats, final CollectorConfig config)
+    public EventSpoolDispatcher(@HdfsEventWriter final EventWriter hadoopEventWriter, final WriterStats stats, final CollectorConfig config)
     {
         this.hadoopEventWriter = hadoopEventWriter;
         this.hadoopExecutor = new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter"));
@@ -85,6 +84,7 @@ public class EventSpoolDispatcher
      * Dispatch the specified event to its final eventwriter
      *
      * @param event Event to dispatch
+     * @return true on success, false otherwise
      * @see #getEventWriter()
      */
     public boolean offer(final Event event)
@@ -134,7 +134,7 @@ public class EventSpoolDispatcher
      *
      * @return eventWriter specific to an event type and serialization type
      */
-    private EventWriter getEventWriter()
+    protected EventWriter getEventWriter()
     {
         final EventWriter eventWriter = new DiskSpoolEventWriter(new EventHandler()
         {
@@ -151,6 +151,8 @@ public class EventSpoolDispatcher
 
                 objectInputStream.close();
                 hadoopEventWriter.forceCommit();
+
+                stats.registerHdfsFlush();
             }
 
             @Override

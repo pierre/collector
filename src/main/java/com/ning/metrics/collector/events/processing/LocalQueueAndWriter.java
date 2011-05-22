@@ -17,7 +17,6 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.realtime.EventQueueStats;
 import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
@@ -42,15 +41,15 @@ class LocalQueueAndWriter
     private final EventWriter eventWriter;
     private final ScheduledExecutorService scheduledExecutor;
     private final ExecutorService executor;
-    private final EventQueueStats stats;
+    private final WriterStats stats;
 
-    public LocalQueueAndWriter(final CollectorConfig config, final String path, final EventWriter eventWriter, final EventQueueStats stats)
+    public LocalQueueAndWriter(final CollectorConfig config, final String path, final EventWriter eventWriter, final WriterStats stats)
     {
         this.queue = new LinkedBlockingQueue<Event>(config.getMaxQueueSize());
         this.eventWriter = eventWriter;
         this.stats = stats;
 
-        // Background commiter (close the current open file and promote it to the final spool area for flush)
+        // Background committer (close the current open file and promote it to the final spool area for flush)
         this.scheduledExecutor = new FailsafeScheduledExecutor(1, new NamedThreadFactory(path + "-commiter"));
         scheduledExecutor.schedule(new Runnable()
             {
@@ -58,12 +57,13 @@ class LocalQueueAndWriter
                 public void run()
                 {
                     try {
-
                         eventWriter.commit();
+                        stats.registerCommit();
                     }
                     catch (IOException e) {
                         try {
                             eventWriter.rollback();
+                            stats.registerCommitFailure();
                         }
                         catch (IOException e1) {
                             log.warn("Got IOException while trying to quarantine a file", e1);
@@ -100,9 +100,11 @@ class LocalQueueAndWriter
         }
         scheduledExecutor.shutdownNow();
 
-        // Promote files to the final area
         try {
+            // Promote files to the final area
             eventWriter.forceCommit();
+            // Flush to HDFS
+            eventWriter.flush();
         }
         catch (IOException e) {
             log.warn("Got IOException when trying to promote files to the final spool area", e);

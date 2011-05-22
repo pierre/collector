@@ -141,7 +141,7 @@ public class TestBufferingEventCollector
             }
         };
         event = new StubEvent();
-        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(eventWriter, executor, new EventQueueStats(), config);
+        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(eventWriter, new WriterStats(), config);
         collector = new BufferingEventCollector(msgSender, dispatcher);
         eventStats = new EventStats();
     }

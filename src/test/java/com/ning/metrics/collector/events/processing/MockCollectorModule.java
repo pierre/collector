@@ -17,8 +17,6 @@
 package com.ning.metrics.collector.events.processing;
 
 import com.google.inject.AbstractModule;
-import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorEventWriter;
-import com.ning.metrics.collector.binder.annotations.BufferingEventCollectorExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
@@ -52,38 +50,6 @@ public class MockCollectorModule extends AbstractModule
     {
         // For testing only
         bind(MockEventWriter.class).toInstance(diskSpoolWriter);
-
-        bind(EventWriter.class).annotatedWith(BufferingEventCollectorEventWriter.class).toInstance(thresholdEventWriter);
-        bind(ScheduledExecutorService.class).annotatedWith(BufferingEventCollectorExecutor.class).toInstance(new StubScheduledExecutorService()
-        {
-            public AtomicBoolean isShutdown = new AtomicBoolean(false);
-
-            @Override
-            public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException
-            {
-                return true;
-            }
-
-            @Override
-            public void shutdown()
-            {
-                isShutdown.set(true);
-            }
-
-            @Override
-            public boolean isShutdown()
-            {
-                return isShutdown.get();
-            }
-
-            @Override
-            public boolean isTerminated()
-            {
-                return isShutdown.get();
-            }
-        });
-
-        bind(TaskQueueService.class).to(TaskQueueServiceImpl.class).asEagerSingleton();
 
         bind(EventQueueProcessor.class).toInstance(new StubEventQueueProcessor()
         {

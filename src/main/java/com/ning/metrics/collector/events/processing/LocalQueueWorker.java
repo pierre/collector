@@ -16,7 +16,6 @@
 
 package com.ning.metrics.collector.events.processing;
 
-import com.ning.metrics.collector.realtime.EventQueueStats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
@@ -32,9 +31,9 @@ class LocalQueueWorker implements Runnable
 
     private final BlockingQueue<Event> eventQueue;
     private final EventWriter processor;
-    private final EventQueueStats stats;
+    private final WriterStats stats;
 
-    public LocalQueueWorker(final BlockingQueue<Event> msgQueue, final EventWriter eventWriter, final EventQueueStats stats)
+    public LocalQueueWorker(final BlockingQueue<Event> msgQueue, final EventWriter eventWriter, final WriterStats stats)
     {
         this.eventQueue = msgQueue;
         this.processor = eventWriter;
@@ -50,7 +49,7 @@ class LocalQueueWorker implements Runnable
             try {
                 final Event event = eventQueue.take();
                 processor.write(event);
-                stats.registerEventSent();
+                stats.registerEventWritten();
             }
             catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
@@ -58,7 +57,7 @@ class LocalQueueWorker implements Runnable
             }
             catch (Exception ex) {
                 logger.error("Got error while trying to send an event to disk", ex);
-                stats.registerEventSendingErrored();
+                stats.registerEventWritingErrored();
             }
         }
     }

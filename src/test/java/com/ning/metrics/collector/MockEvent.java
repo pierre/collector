@@ -14,18 +14,22 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.annotations;
+package com.ning.metrics.collector;
 
-import com.google.inject.BindingAnnotation;
+import com.ning.metrics.serialization.event.StubEvent;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
-@BindingAnnotation
-public @interface BufferingEventCollectorEventWriter
+public class MockEvent extends StubEvent
 {
+    private String outputPath = "/foo";
+
+    @Override
+    public String getOutputDir(final String prefix)
+    {
+        return outputPath;
+    }
+
+    public void setOutputPath(final String s)
+    {
+        outputPath = s;
+    }
 }
