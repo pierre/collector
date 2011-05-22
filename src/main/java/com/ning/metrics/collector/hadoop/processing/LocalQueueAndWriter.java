@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,7 +38,6 @@ class LocalQueueAndWriter
 
     private final BlockingQueue<Event> queue;
     private final EventWriter eventWriter;
-    private final ScheduledExecutorService scheduledExecutor;
     private final ExecutorService executor;
     private final WriterStats stats;
 
@@ -49,32 +47,6 @@ class LocalQueueAndWriter
         this.eventWriter = eventWriter;
         this.stats = stats;
 
-        // Background committer (close the current open file and promote it to the final spool area for flush)
-        this.scheduledExecutor = new FailsafeScheduledExecutor(1, new NamedThreadFactory(path + "-commiter"));
-        scheduledExecutor.schedule(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try {
-                        eventWriter.commit();
-                        stats.registerCommit();
-                    }
-                    catch (IOException e) {
-                        try {
-                            eventWriter.rollback();
-                            stats.registerCommitFailure();
-                        }
-                        catch (IOException e1) {
-                            log.warn("Got IOException while trying to quarantine a file", e1);
-                        }
-                    }
-                    finally {
-                        scheduledExecutor.schedule(this, config.getRefreshDelayInSeconds(), TimeUnit.SECONDS);
-                    }
-                }
-            }, config.getRefreshDelayInSeconds(), TimeUnit.SECONDS);
-
         // Underlying dequeuer (writer)
         this.executor = new FailsafeScheduledExecutor(1, new NamedThreadFactory(path + "-writer"));
         executor.submit(new LocalQueueWorker(queue, eventWriter, stats));
@@ -82,6 +54,7 @@ class LocalQueueAndWriter
 
     public void close()
     {
+        // Stop the writer
         executor.shutdown();
         try {
             executor.awaitTermination(5, TimeUnit.SECONDS);
@@ -90,15 +63,6 @@ class LocalQueueAndWriter
             Thread.currentThread().interrupt();
         }
         executor.shutdownNow();
-
-        scheduledExecutor.shutdown();
-        try {
-            scheduledExecutor.awaitTermination(5, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        scheduledExecutor.shutdownNow();
 
         try {
             // Promote files to the final area
@@ -138,5 +102,15 @@ class LocalQueueAndWriter
     public int size()
     {
         return queue.size();
+    }
+
+    /**
+     * Unit test hook
+     *
+     * @return underlying eventwriter
+     */
+    protected EventWriter getEventWriter()
+    {
+        return eventWriter;
     }
 }

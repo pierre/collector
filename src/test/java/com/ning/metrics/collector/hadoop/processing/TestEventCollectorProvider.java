@@ -19,7 +19,6 @@ package com.ning.metrics.collector.hadoop.processing;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
-import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
@@ -55,7 +54,6 @@ public class TestEventCollectorProvider
     private ScheduledExecutorService hdfsExecutor;
 
     @Inject
-    @HdfsEventWriter
     private EventWriter hdfsEventWriter;
 
     @Inject

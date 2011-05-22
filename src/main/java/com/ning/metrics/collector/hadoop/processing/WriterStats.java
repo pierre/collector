@@ -77,16 +77,6 @@ public class WriterStats
         erroredEvents.incrementAndGet();
     }
 
-    public void registerCommit()
-    {
-        commits.incrementAndGet();
-    }
-
-    public void registerCommitFailure()
-    {
-        commitFailures.incrementAndGet();
-    }
-
     public void registerHdfsFlush()
     {
         hdfsFlushes.incrementAndGet();
@@ -120,18 +110,6 @@ public class WriterStats
     public long getErroredEvents()
     {
         return erroredEvents.get();
-    }
-
-    @Managed(description = "Number of commits - promotions of local files to the hdfs flusher")
-    public long getCommits()
-    {
-        return commits.get();
-    }
-
-    @Managed(description = "Number of commits that could not be done due to an error")
-    public long getCommitFailures()
-    {
-        return commitFailures.get();
     }
 
     @Managed(description = "Number of files written to Hadoop")

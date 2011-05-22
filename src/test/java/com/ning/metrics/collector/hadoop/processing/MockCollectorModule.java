@@ -18,7 +18,6 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.AbstractModule;
 import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
-import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.serialization.event.Event;
@@ -110,7 +109,7 @@ public class MockCollectorModule extends AbstractModule
 
         };
         bind(ScheduledExecutorService.class).annotatedWith(HdfsDiskSpoolFlushExecutor.class).toInstance(hdfsService);
-        bind(EventWriter.class).annotatedWith(HdfsEventWriter.class).toInstance(hdfsEventWriter);
+        bind(EventWriter.class).toInstance(hdfsEventWriter);
 
         bind(DiskSpoolEventWriter.class).toInstance(
             new MockDiskSpoolEventWriter(new EventHandler()

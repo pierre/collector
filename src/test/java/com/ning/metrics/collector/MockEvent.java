@@ -20,7 +20,7 @@ import com.ning.metrics.serialization.event.StubEvent;
 
 public class MockEvent extends StubEvent
 {
-    private String outputPath = "/foo";
+    private String outputPath = "/var/tmp/mock-event";
 
     @Override
     public String getOutputDir(final String prefix)

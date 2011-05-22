@@ -20,7 +20,6 @@ import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
@@ -47,7 +46,6 @@ public abstract class TestPublicAPI
     BufferingEventCollector incomingQueue;
 
     @Inject
-    @HdfsEventWriter
     EventWriter hdfsWriter;
 
     static final String MEGATRON_2000_USER_AGENT = "NING_MEGATR0N/2000";

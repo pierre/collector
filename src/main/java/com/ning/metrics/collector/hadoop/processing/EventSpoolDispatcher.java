@@ -17,46 +17,32 @@
 package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.writer.CallbackHandler;
-import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
-import com.ning.metrics.serialization.writer.EventHandler;
-import com.ning.metrics.serialization.writer.EventWriter;
-import com.ning.metrics.serialization.writer.SyncType;
-import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Manager of all queues
+ * Manager of writer queues
  */
 public class EventSpoolDispatcher
 {
     private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
 
-    private final Map<String, LocalQueueAndWriter> queuesPerPath = new HashMap<String, LocalQueueAndWriter>();
+    private final PersistentWriterFactory factory;
     private final WriterStats stats;
     private final CollectorConfig config;
+    private final Map<String, LocalQueueAndWriter> queuesPerPath = new HashMap<String, LocalQueueAndWriter>();
     private final Object queueMapMonitor = new Object();
-    private final EventWriter hadoopEventWriter;
-    private final ScheduledExecutorService hadoopExecutor;
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
 
     @Inject
-    public EventSpoolDispatcher(@HdfsEventWriter final EventWriter hadoopEventWriter, final WriterStats stats, final CollectorConfig config)
+    public EventSpoolDispatcher(final PersistentWriterFactory factory, final WriterStats stats, final CollectorConfig config)
     {
-        this.hadoopEventWriter = hadoopEventWriter;
-        this.hadoopExecutor = new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter"));
+        this.factory = factory;
         this.stats = stats;
         this.config = config;
     }
@@ -68,6 +54,7 @@ public class EventSpoolDispatcher
      */
     public void shutdown() throws InterruptedException
     {
+        log.info("Closing all local writer queues");
         for (final LocalQueueAndWriter queue : queuesPerPath.values()) {
             queue.close();
         }
@@ -85,7 +72,6 @@ public class EventSpoolDispatcher
      *
      * @param event Event to dispatch
      * @return true on success, false otherwise
-     * @see #getEventWriter()
      */
     public boolean offer(final Event event)
     {
@@ -97,7 +83,7 @@ public class EventSpoolDispatcher
                 synchronized (queueMapMonitor) {
                     queue = queuesPerPath.get(hdfsPath);
                     if (queue == null) {
-                        queue = new LocalQueueAndWriter(config, hdfsPath, getEventWriter(), stats);
+                        queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats), stats);
                         queuesPerPath.put(hdfsPath, queue);
                     }
                 }
@@ -127,47 +113,22 @@ public class EventSpoolDispatcher
     }
 
     /**
-     * Create an EventWriter specific to events sharing the same serialization format
-     * and ending in the same directory in HDFS.
-     * In practice, this means that all events of a certain type and serialization type share the same writer, i.e.
-     * all ClickEvent Thrift events during an hour will use the same writer.
+     * Unit test hook
      *
-     * @return eventWriter specific to an event type and serialization type
+     * @return underlying map
      */
-    protected EventWriter getEventWriter()
+    protected Map<String, LocalQueueAndWriter> getQueuesPerPath()
     {
-        final EventWriter eventWriter = new DiskSpoolEventWriter(new EventHandler()
-        {
-            // TODO handler?
-            @Override
-            public void handle(final ObjectInputStream objectInputStream, final CallbackHandler handler) throws ClassNotFoundException, IOException
-            {
-                log.info("Flushing locally buffered events to HDFS");
+        return queuesPerPath;
+    }
 
-                while (objectInputStream.read() != -1) {
-                    final Event event = (Event) objectInputStream.readObject();
-                    hadoopEventWriter.write(event);
-                }
-
-                objectInputStream.close();
-                hadoopEventWriter.forceCommit();
-
-                stats.registerHdfsFlush();
-            }
-
-            @Override
-            public void rollback() throws IOException
-            {
-                hadoopEventWriter.rollback();
-            }
-
-            @Override
-            public String toString()
-            {
-                return hadoopEventWriter.toString();
-            }
-        }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), hadoopExecutor,
-            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes());
-        return new ThresholdEventWriter(eventWriter, config.getFlushEventQueueSize(), config.getRefreshDelayInSeconds());
+    /**
+     * Unit test hook
+     *
+     * @return stats object, accounting for all queues
+     */
+    public WriterStats getStats()
+    {
+        return stats;
     }
 }

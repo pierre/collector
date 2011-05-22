@@ -18,7 +18,6 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import org.apache.log4j.Logger;
 
@@ -30,7 +29,7 @@ class EventCollectorProvider implements Provider<EventCollector>
     private final EventSpoolDispatcher dispatcher;
 
     @Inject
-    public EventCollectorProvider(final EventQueueProcessor activeMQController, final EventSpoolDispatcher dispatcher, final CollectorConfig config)
+    public EventCollectorProvider(final EventQueueProcessor activeMQController, final EventSpoolDispatcher dispatcher)
     {
         this.activeMQController = activeMQController;
         this.dispatcher = dispatcher;

@@ -32,6 +32,8 @@ public class EventCollectorModule implements Module
         binder.bind(BufferingEventCollector.class).asEagerSingleton();
         builder.export(BufferingEventCollector.class).as("com.ning.metrics.collector:name=BufferingEventCollector");
 
+        binder.bind(PersistentWriterFactory.class).to(HadoopWriterFactory.class);
+
         binder.bind(EventCollector.class).toProvider(EventCollectorProvider.class).asEagerSingleton();
     }
 }

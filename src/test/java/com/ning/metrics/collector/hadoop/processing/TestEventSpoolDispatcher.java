@@ -16,57 +16,58 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
-import com.ning.metrics.collector.MockEvent;
+import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.serialization.writer.MockEventWriter;
-import org.skife.config.ConfigurationObjectFactory;
+import com.ning.metrics.collector.hadoop.writer.HadoopFileEventWriter;
+import com.ning.metrics.collector.hadoop.writer.HdfsModule;
+import com.ning.metrics.collector.realtime.RealTimeQueueModule;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.thrift.ThriftEnvelope;
+import com.ning.metrics.serialization.thrift.ThriftField;
+import com.ning.metrics.serialization.writer.EventWriter;
+import org.joda.time.DateTime;
 import org.testng.Assert;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Guice(modules = {TestConfigModule.class, EventCollectorModule.class, HdfsModule.class, RealTimeQueueModule.class})
 public class TestEventSpoolDispatcher
 {
+    @Inject
+    CollectorConfig collectorConfig;
+
+    @Inject
+    EventWriter hdfsWriter;
+
+    @Inject
+    EventSpoolDispatcher dispatcher;
+
     @Test(groups = "slow")
-    public void testShutdown() throws Exception
+    public void testFlushSizeThreshold() throws Exception
     {
-        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new MockEventWriter(), new WriterStats(), null);
-        Assert.assertTrue(dispatcher.isRunning());
-        dispatcher.shutdown();
-        Assert.assertFalse(dispatcher.isRunning());
-    }
+        final List<ThriftField> fields = new ArrayList<ThriftField>();
+        fields.add(ThriftField.createThriftField("hello", (short) 1));
+        final ThriftEnvelope envelope = new ThriftEnvelope("MockEvent", fields);
+        final Event eventA = new ThriftEnvelopeEvent(new DateTime(), envelope);
 
-    @Test(groups = "fast")
-    public void testOffer() throws Exception
-    {
-        final CollectorConfig collectorConfig = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
-        final WriterStats stats = new WriterStats();
-        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new MockEventWriter(), stats, collectorConfig);
-
-        final MockEvent eventA = new MockEvent();
-        eventA.setOutputPath("/a");
-
-        final MockEvent eventB = new MockEvent();
-        eventB.setOutputPath("/b");
-
-        Assert.assertNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("/b"));
-
+        // Send an event and wait for the dequeuer to work
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("/b"));
-        Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 1);
-        Assert.assertEquals(stats.getEnqueuedEvents(), 1);
+        Thread.sleep(200);
+        Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 1);
+        Assert.assertEquals(((HadoopFileEventWriter) hdfsWriter).getEventsWritten(), 0);
 
-        dispatcher.offer(eventB);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b"));
-        Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
-        Assert.assertEquals(stats.getEnqueuedEvents(), 2);
-
+        // Send another event and wait for the dequeuer to work. The threshold being two in FastCollectorConfig,
+        // we should have triggered a commit
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b"));
-        Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
-        Assert.assertEquals(stats.getEnqueuedEvents(), 3);
+        Thread.sleep(200);
+        Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 2);
 
+        // Wait for the flush (1 second) and give Hadoop a little time to write
+        Thread.sleep(1100);
+        Assert.assertEquals(((HadoopFileEventWriter) hdfsWriter).getEventsWritten(), 2);
     }
 }

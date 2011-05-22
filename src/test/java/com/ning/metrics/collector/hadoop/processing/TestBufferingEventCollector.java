@@ -141,7 +141,8 @@ public class TestBufferingEventCollector
             }
         };
         event = new StubEvent();
-        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(eventWriter, new WriterStats(), config);
+        final WriterStats stats = new WriterStats();
+        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new HadoopWriterFactory(eventWriter, config), stats, config);
         collector = new BufferingEventCollector(msgSender, dispatcher);
         eventStats = new EventStats();
     }

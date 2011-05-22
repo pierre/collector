@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * HDFS EventWriter for the serialization-writer library
@@ -74,6 +75,7 @@ public class HadoopFileEventWriter implements EventWriter
         }
     };
     private static final TBooleanWritable BOOL_WRITABLE = new TBooleanWritable(true);
+    private AtomicLong eventsWritten = new AtomicLong(0);
 
     @Inject
     public HadoopFileEventWriter(
@@ -122,6 +124,8 @@ public class HadoopFileEventWriter implements EventWriter
         final String outputDir = event.getOutputDir(baseDirectory);
         final String tmpOutputDir = event.getOutputDir(tmpDirectory);
         writeEventToHDFS(event, outputDir, tmpOutputDir);
+
+        eventsWritten.incrementAndGet();
     }
 
     private void writeEventToHDFS(final Event event, final String outputDir, final String tmpOutputDir) throws IOException
@@ -249,6 +253,12 @@ public class HadoopFileEventWriter implements EventWriter
         final ReadableInstant now = new DateTime();
 
         return (now.getMillis() - lastFlushed.getMillis()) / 1000;
+    }
+
+    @Managed(description = "total number of events written to hdfs")
+    public long getEventsWritten()
+    {
+        return eventsWritten.get();
     }
 
     public String toString()
