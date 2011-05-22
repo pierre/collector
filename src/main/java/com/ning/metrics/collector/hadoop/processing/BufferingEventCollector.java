@@ -53,7 +53,6 @@ public class BufferingEventCollector implements EventCollector
      * This stops:
      * the AMQ hook
      * the workers queue of disk write operations
-     * the flusher which promotes files from the temporary area to the final area
      * <p/>
      *
      * @throws InterruptedException if we are interrupted while waiting for the queue of workers to be shutdown
@@ -80,7 +79,7 @@ public class BufferingEventCollector implements EventCollector
         // Update the endpoint statistics
         updateEndPointsStats(eventStats);
 
-        if (dispatcher.isRunning() && dispatcher.offer(event)) {
+        if (dispatcher.offer(event)) {
             return true;
         }
         else {

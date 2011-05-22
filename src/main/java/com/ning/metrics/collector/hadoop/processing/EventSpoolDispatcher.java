@@ -89,7 +89,7 @@ public class EventSpoolDispatcher
      */
     public boolean offer(final Event event)
     {
-        if (event != null) {
+        if (event != null && isRunning.get()) {
             final String hdfsPath = event.getOutputDir(config.getEventOutputDirectory());
             LocalQueueAndWriter queue = queuesPerPath.get(hdfsPath);
 
