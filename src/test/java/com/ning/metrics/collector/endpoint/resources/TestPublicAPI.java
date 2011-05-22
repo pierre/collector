@@ -23,7 +23,7 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
-import com.ning.metrics.collector.events.processing.BufferingEventCollector;
+import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.log4j.Logger;

@@ -23,7 +23,7 @@ import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
 import com.ning.metrics.collector.endpoint.filters.FiltersModule;
-import com.ning.metrics.collector.events.processing.EventCollectorModule;
+import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueModule;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.EventWriter;
