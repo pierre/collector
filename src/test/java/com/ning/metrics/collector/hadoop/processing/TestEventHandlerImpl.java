@@ -48,7 +48,7 @@ public class TestEventHandlerImpl
         final Filter<ExtractedAnnotation> requestFilter = new Filter<ExtractedAnnotation>()
         {
             @Override
-            public boolean passesFilter(String eventName, ExtractedAnnotation input)
+            public boolean passesFilter(final String eventName, final ExtractedAnnotation input)
             {
                 return filterValue;
             }
@@ -62,27 +62,27 @@ public class TestEventHandlerImpl
     @Test(groups = "fast")
     public void testNormalEvent() throws Exception
     {
-        Event event = createEvent("fuu");
+        final Event event = createEvent("fuu");
 
-        Response res = eventHandler.processEvent(event, annotation, stats, eventStats);
+        final Response res = eventHandler.processEvent(event, annotation, stats, eventStats);
         assertSuccessfulEvent(res);
     }
 
     @Test(groups = "fast")
     public void testCollectorReturnsFalse() throws Exception
     {
-        Event event = createEvent("fuu");
+        final Event event = createEvent("fuu");
 
         collector.setAcceptsEvents(false);
 
-        Response res = eventHandler.processEvent(event, annotation, stats, eventStats);
+        final Response res = eventHandler.processEvent(event, annotation, stats, eventStats);
         assertRejectedEvent(res);
     }
 
     @Test(groups = "fast")
     public void testNullEvent() throws Exception
     {
-        Response response = eventHandler.processEvent(null, annotation, stats, eventStats);
+        final Response response = eventHandler.processEvent(null, annotation, stats, eventStats);
         assertFailedEvent(response);
         Assert.assertEquals((String) response.getMetadata().getFirst("Warning"), "199 com.ning.metrics.collector.endpoint.extractors.EventParsingException: Received empty event");
     }
@@ -91,7 +91,7 @@ public class TestEventHandlerImpl
     public void testFilteredRequest() throws Exception
     {
         filterValue = true;
-        Response res = eventHandler.processEvent(createEvent("fuu"), annotation, stats, eventStats);
+        final Response res = eventHandler.processEvent(createEvent("fuu"), annotation, stats, eventStats);
         assertFilteredEvent(res);
     }
 
@@ -113,11 +113,11 @@ public class TestEventHandlerImpl
     {
         eventHandler.setCollectionEnabled(false);
 
-        Response response = eventHandler.processEvent(createEvent("fuu"), annotation, stats, eventStats);
+        final Response response = eventHandler.processEvent(createEvent("fuu"), annotation, stats, eventStats);
         assertRejectedEvent(response);
     }
 
-    private void assertSuccessfulEvent(Response res)
+    private void assertSuccessfulEvent(final Response res)
     {
         assertStats(1, 0, 0, 0);
         Assert.assertEquals(collector.getEventList().size(), 1);
@@ -125,7 +125,7 @@ public class TestEventHandlerImpl
         assertNoCache(res);
     }
 
-    void assertFailedEvent(Response res)
+    void assertFailedEvent(final Response res)
     {
         assertStats(0, 1, 0, 0);
         Assert.assertEquals(collector.getEventList().size(), 0);
@@ -133,7 +133,7 @@ public class TestEventHandlerImpl
         assertNoCache(res);
     }
 
-    void assertRejectedEvent(Response res)
+    void assertRejectedEvent(final Response res)
     {
         assertStats(0, 0, 1, 0);
         Assert.assertEquals(collector.getEventList().size(), 0);
@@ -141,7 +141,7 @@ public class TestEventHandlerImpl
         assertNoCache(res);
     }
 
-    void assertFilteredEvent(Response res)
+    void assertFilteredEvent(final Response res)
     {
         assertStats(0, 0, 0, 1);
         Assert.assertEquals(collector.getEventList().size(), 0);
@@ -149,7 +149,7 @@ public class TestEventHandlerImpl
         assertNoCache(res);
     }
 
-    void assertStats(int success, int failed, int rejected, int filtered)
+    void assertStats(final int success, final int failed, final int rejected, final int filtered)
     {
         Assert.assertEquals(stats.getSuccessfulParseEvents(), success);
         Assert.assertEquals(stats.getFailedToParseEvents(), failed);
@@ -157,9 +157,9 @@ public class TestEventHandlerImpl
         Assert.assertEquals(stats.getFilteredEvents(), filtered);
     }
 
-    void assertNoCache(Response res)
+    void assertNoCache(final Response res)
     {
-        CacheControl control = (CacheControl) res.getMetadata().getFirst("Cache-Control");
+        final CacheControl control = (CacheControl) res.getMetadata().getFirst("Cache-Control");
         Assert.assertTrue(control.isNoCache());
         Assert.assertTrue(control.isPrivate());
         Assert.assertTrue(control.isProxyRevalidate());

@@ -54,12 +54,7 @@ public class BufferingEventCollector implements EventCollector
 
                 log.info("Stop accepting new events");
                 // Stop accepting events and flush all events in memory to disk
-                try {
-                    shutdown();
-                }
-                catch (InterruptedException e) {
-                    log.warn("Interrupted while trying to shutdown the main collector thread", e);
-                }
+                shutdown();
             }
         });
     }
@@ -71,10 +66,8 @@ public class BufferingEventCollector implements EventCollector
      * the AMQ hook
      * the workers queue of disk write operations
      * <p/>
-     *
-     * @throws InterruptedException if we are interrupted while waiting for the queue of workers to be shutdown
      */
-    public void shutdown() throws InterruptedException
+    public void shutdown()
     {
         // Disable AMQ hook
         activeMQController.stop();

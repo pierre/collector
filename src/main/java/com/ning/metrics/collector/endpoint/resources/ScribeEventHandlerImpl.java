@@ -52,10 +52,10 @@ class ScribeEventHandlerImpl implements ScribeEventHandler
     public boolean processEvent(final Event event, final EventStats eventStats)
     {
         assert event != null;
-        final boolean success;
 
         stats.updateTotalEvents();
 
+        final boolean success;
         if (scribeCollectionEnabled) {
             logger.debug(String.format("Processing event of type [%s], collection enabled", event.getName()));
 

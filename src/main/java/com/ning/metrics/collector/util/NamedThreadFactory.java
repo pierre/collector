@@ -26,12 +26,12 @@ public class NamedThreadFactory implements ThreadFactory
 
     private final ThreadFactory delegate;
 
-    public NamedThreadFactory(String name)
+    public NamedThreadFactory(final String name)
     {
         this(name, new LoggingThreadFactory());
     }
 
-    private NamedThreadFactory(String name, ThreadFactory delegate)
+    private NamedThreadFactory(final String name, final ThreadFactory delegate)
     {
         this.delegate = delegate;
         this.name = name;
@@ -39,7 +39,7 @@ public class NamedThreadFactory implements ThreadFactory
 
     public Thread newThread(final Runnable runnable)
     {
-        Thread thread = delegate.newThread(runnable);
+        final Thread thread = delegate.newThread(runnable);
         thread.setName(name + "-" + count.incrementAndGet());
 
         return thread;

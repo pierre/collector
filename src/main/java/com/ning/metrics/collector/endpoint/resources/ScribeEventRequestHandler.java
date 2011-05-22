@@ -191,7 +191,6 @@ class ScribeEventRequestHandler implements Iface
 
     private Event extractThriftEnvelopeEvent(final String category, final String message) throws TException
     {
-        Event event;
         final String[] payload = StringUtils.split(message, ":");
 
         if (payload == null || payload.length != 2) {
@@ -214,6 +213,7 @@ class ScribeEventRequestHandler implements Iface
         // This is bigger on the wire, but the interface is portable. Serialize using TBinaryProtocol
         // if you care about size (see below).
         ObjectInputStream objectInputStream = null;
+        Event event;
         try {
             objectInputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(thrift)));
             event = new ThriftEnvelopeEvent();

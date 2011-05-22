@@ -20,6 +20,7 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class MockEventCollector implements EventCollector
@@ -28,14 +29,14 @@ public class MockEventCollector implements EventCollector
     private boolean acceptsEvents;
     private boolean throwsException;
 
-    public MockEventCollector(boolean acceptsEvents, boolean throwsException)
+    public MockEventCollector(final boolean acceptsEvents, final boolean throwsException)
     {
         this.acceptsEvents = acceptsEvents;
         this.throwsException = throwsException;
     }
 
     @Override
-    public boolean collectEvent(Event event, EventStats eventStats)
+    public boolean collectEvent(final Event event, final EventStats eventStats)
     {
         if (throwsException) {
             throw new RuntimeException();
@@ -48,17 +49,17 @@ public class MockEventCollector implements EventCollector
         return acceptsEvents;
     }
 
-    public List<Event> getEventList()
+    public Collection<Event> getEventList()
     {
         return eventList;
     }
 
-    public void setAcceptsEvents(boolean acceptsEvents)
+    public void setAcceptsEvents(final boolean acceptsEvents)
     {
         this.acceptsEvents = acceptsEvents;
     }
 
-    public void setThrowsException(boolean throwsException)
+    public void setThrowsException(final boolean throwsException)
     {
         this.throwsException = throwsException;
     }

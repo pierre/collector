@@ -45,14 +45,14 @@ public class SynchronizedTimeWindowStatistics extends DescriptiveStatistics
     private static final long serialVersionUID = 1L;
 
     // Discard samples older than this many ms ago
-    private long timeWindow;
+    private final long timeWindow;
     // All the access methods are synchronized, so we can use the fastest representation.
-    private Queue<Long> queuedTimes = new ArrayDeque<Long>();
+    private final Queue<Long> queuedTimes = new ArrayDeque<Long>();
 
     /**
      * @param timeWindow window size in milliseconds
      */
-    public SynchronizedTimeWindowStatistics(long timeWindow)
+    public SynchronizedTimeWindowStatistics(final long timeWindow)
     {
         this.timeWindow = timeWindow;
     }
@@ -62,13 +62,13 @@ public class SynchronizedTimeWindowStatistics extends DescriptiveStatistics
         flushOlderThan(System.currentTimeMillis() - timeWindow);
     }
 
-    private void flushOlderThan(long time)
+    private void flushOlderThan(final long time)
     {
         Long oldestQueuedTime;
         while ((oldestQueuedTime = queuedTimes.peek()) != null && oldestQueuedTime < time) {
             queuedTimes.remove();
         }
-        int sampleCount = queuedTimes.size();
+        final int sampleCount = queuedTimes.size();
         if (sampleCount == 0) {
             super.clear();
         }
@@ -78,11 +78,11 @@ public class SynchronizedTimeWindowStatistics extends DescriptiveStatistics
     }
 
     @Override
-    public synchronized void addValue(double value)
+    public synchronized void addValue(final double value)
     {
         final long time = System.currentTimeMillis();
         flushOlderThan(time - timeWindow);
-        int sampleCount = queuedTimes.size();
+        final int sampleCount = queuedTimes.size();
         // Make room for the new sample
         setWindowSize(sampleCount + 1);
         queuedTimes.add(time);
@@ -100,14 +100,14 @@ public class SynchronizedTimeWindowStatistics extends DescriptiveStatistics
     // and then invoke the superclass method
 
     @Override
-    public synchronized double apply(UnivariateStatistic stat)
+    public synchronized double apply(final UnivariateStatistic stat)
     {
         flushOldSamples();
         return super.apply(stat);
     }
 
     @Override
-    public synchronized double getElement(int index)
+    public synchronized double getElement(final int index)
     {
         flushOldSamples();
         return super.getElement(index);
@@ -135,7 +135,7 @@ public class SynchronizedTimeWindowStatistics extends DescriptiveStatistics
     }
 
     @Override
-    public synchronized double getPercentile(double p)
+    public synchronized double getPercentile(final double p)
     {
         flushOldSamples();
         return super.getPercentile(p);

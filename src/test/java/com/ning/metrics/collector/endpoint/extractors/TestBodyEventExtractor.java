@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.MockHttpHeaders;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.serialization.event.Event;
@@ -23,7 +24,6 @@ import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
 import com.ning.metrics.serialization.thrift.ThriftFieldListSerializer;
-import org.apache.thrift.TException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -32,20 +32,21 @@ import javax.ws.rs.WebApplicationException;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class TestBodyEventExtractor
 {
     private BodyEventExtractor extractor = null;
-    private ArrayList<ThriftField> data = null;
+    private List<ThriftField> data = null;
     private String eventType = null;
     private byte[] payload = null;
     private int payloadSize = 0;
 
     @BeforeMethod(alwaysRun = true)
-    void setup() throws TException, org.apache.thrift.TException
+    void setup() throws org.apache.thrift.TException
     {
         extractor = new BodyEventExtractor();
-        ThriftFieldListSerializer serializer = new ThriftFieldListSerializer();
+        final ThriftFieldListSerializer serializer = new ThriftFieldListSerializer();
 
         data = new ArrayList<ThriftField>();
         data.add(ThriftField.createThriftField("Fuu", (short) 1));
@@ -62,7 +63,7 @@ public class TestBodyEventExtractor
     @Test(groups = "fast")
     public void testValidRequest() throws Exception
     {
-        ParsedRequest validRequest = new ParsedRequest(
+        final ExtractedAnnotation validRequest = new ParsedRequest(
             eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             new ByteArrayInputStream(payload),
@@ -70,14 +71,14 @@ public class TestBodyEventExtractor
             null,
             null
         );
-        Collection<? extends Event> events = extractor.extractEvent(validRequest);
+        final Collection<? extends Event> events = extractor.extractEvent(validRequest);
 
-        for (Event event : events) {
+        for (final Event event : events) {
             Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
-            ThriftEnvelopeEvent thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
+            final Event thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
 
             Assert.assertEquals(thriftEnvelopeEvent.getName(), eventType);
-            ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
+            final ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
             Assert.assertEquals(envelope.getTypeName(), eventType);
             Assert.assertEquals(envelope.getPayload(), data);
         }
@@ -86,7 +87,7 @@ public class TestBodyEventExtractor
     @Test(groups = "fast")
     public void testValidRequestWithRoute() throws Exception
     {
-        ParsedRequest routedRequest = new ParsedRequest(
+        final ExtractedAnnotation routedRequest = new ParsedRequest(
             eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             new ByteArrayInputStream(payload),
@@ -95,14 +96,14 @@ public class TestBodyEventExtractor
             null
         );
 
-        Collection<? extends Event> events = extractor.extractEvent(routedRequest);
+        final Collection<? extends Event> events = extractor.extractEvent(routedRequest);
 
-        for (Event event : events) {
+        for (final Event event : events) {
             Assert.assertEquals(event.getClass(), ThriftEnvelopeEvent.class);
-            ThriftEnvelopeEvent thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
+            final Event thriftEnvelopeEvent = (ThriftEnvelopeEvent) event;
 
             Assert.assertEquals(thriftEnvelopeEvent.getName(), eventType);
-            ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
+            final ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
             Assert.assertEquals(envelope.getTypeName(), eventType);
             Assert.assertEquals(envelope.getPayload(), data);
         }
@@ -112,7 +113,7 @@ public class TestBodyEventExtractor
     public void testNoNameParameter() throws Exception
     {
         try {
-            ParsedRequest missingNameRequest = new ParsedRequest(
+            final ParsedRequest missingNameRequest = new ParsedRequest(
                 null,
                 new MockHttpHeaders(null, null, null, payloadSize),
                 null,
@@ -130,7 +131,7 @@ public class TestBodyEventExtractor
     @Test(groups = "fast")
     public void testGetInputThrowsIOException() throws Exception
     {
-        ParsedRequest throwsIOExceptionRequest = new ParsedRequest(
+        final ExtractedAnnotation throwsIOExceptionRequest = new ParsedRequest(
             eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", payloadSize),
             null,
@@ -151,8 +152,8 @@ public class TestBodyEventExtractor
     @Test(groups = "fast")
     public void testGetInputThrowsParseException() throws Exception
     {
-        byte[] invalidBytes = {1, 2, 3};
-        ParsedRequest throwsParseExceptionRequest = new ParsedRequest(
+        final byte[] invalidBytes = {1, 2, 3};
+        final ExtractedAnnotation throwsParseExceptionRequest = new ParsedRequest(
             eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13"),
             new ByteArrayInputStream(invalidBytes),
@@ -173,7 +174,7 @@ public class TestBodyEventExtractor
     @Test(groups = "fast")
     public void testInvalidContentType() throws Exception
     {
-        ParsedRequest invalidContentTypeRequest = new ParsedRequest(
+        final ExtractedAnnotation invalidContentTypeRequest = new ParsedRequest(
             eventType,
             new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", "10.11.12.13", null),
             new ByteArrayInputStream(payload),
@@ -194,9 +195,9 @@ public class TestBodyEventExtractor
     @Test(groups = "fast")
     public void testManuallySetIp() throws Exception
     {
-        MockHttpHeaders headers = new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", null, payloadSize);
+        final MockHttpHeaders headers = new MockHttpHeaders("http://appname.ning.com/path", "my-user-agent", null, payloadSize);
 
-        ParsedRequest request = new ParsedRequest(
+        final ExtractedAnnotation request = new ParsedRequest(
             eventType,
             headers,
             new ByteArrayInputStream(payload),

@@ -23,11 +23,11 @@ import java.util.concurrent.ThreadFactory;
 
 class LoggingThreadFactory implements ThreadFactory
 {
-    private final static Logger log = LogManager.getLogger(LoggingThreadFactory.class);
+    private static final Logger log = LogManager.getLogger(LoggingThreadFactory.class);
 
     private final ThreadFactory delegate;
 
-    private LoggingThreadFactory(ThreadFactory delegate)
+    private LoggingThreadFactory(final ThreadFactory delegate)
     {
         this.delegate = delegate;
     }
@@ -39,7 +39,7 @@ class LoggingThreadFactory implements ThreadFactory
 
     public Thread newThread(final Runnable runnable)
     {
-        Runnable wrapped = new LoggingRunnable(runnable);
+        final Runnable wrapped = new LoggingRunnable(runnable);
 
         return delegate.newThread(wrapped);
     }
@@ -48,7 +48,7 @@ class LoggingThreadFactory implements ThreadFactory
     {
         private final Runnable runnable;
 
-        public LoggingRunnable(Runnable runnable)
+        public LoggingRunnable(final Runnable runnable)
         {
             this.runnable = runnable;
         }
@@ -68,7 +68,7 @@ class LoggingThreadFactory implements ThreadFactory
             }
 
             if (log.isDebugEnabled()) {
-                boolean interrupted = Thread.interrupted();
+                final boolean interrupted = Thread.interrupted();
                 log.debug(String.format("Thread %s finished executing", Thread.currentThread().getName()));
                 if (interrupted) {
                     Thread.currentThread().interrupt();

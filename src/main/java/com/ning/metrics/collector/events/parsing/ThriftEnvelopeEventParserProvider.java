@@ -14,13 +14,12 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.binder.providers;
+package com.ning.metrics.collector.events.parsing;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
-import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.NumberConverter;
 
 public class ThriftEnvelopeEventParserProvider implements Provider<ThriftEnvelopeEventParser>

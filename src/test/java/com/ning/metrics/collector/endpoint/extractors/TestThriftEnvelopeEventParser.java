@@ -48,7 +48,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testBase64Parsing() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase64("event-name", "sstring,b0,b1,100,2A0,4B0B0,8C0C0C0,d3.1459");
+        final ThriftEnvelope result = parseThriftEnvelopeBase64("event-name", "sstring,b0,b1,100,2A0,4B0B0,8C0C0C0,d3.1459");
 
         Assert.assertEquals(result.getPayload().size(), 8);
         Assert.assertEquals(result.getPayload().get(0).getDataItem().getString(), "string");
@@ -64,7 +64,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testParseBoolean() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "b0,b1,b0");
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "b0,b1,b0");
 
         Assert.assertEquals(result.getPayload().size(), 3);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -80,7 +80,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testParseByte() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "11,12,1127,1-128");
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "11,12,1127,1-128");
 
         Assert.assertEquals(result.getPayload().size(), 4);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -97,7 +97,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testParseShort() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "21,22,2127,2-128,232767,2-32768");
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "21,22,2127,2-128,232767,2-32768");
 
         Assert.assertEquals(result.getPayload().size(), 6);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -116,7 +116,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testParseInteger() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "41,42,4127,4-128,432767,4-32768,42147483647,4-2147483648");
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "41,42,4127,4-128,432767,4-32768,42147483647,4-2147483648");
 
         Assert.assertEquals(result.getPayload().size(), 8);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -137,7 +137,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testParseLong() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "81,82,8127,8-128,432767,8-32768,82147483647,8-2147483648,810000000000,8-20000000000");
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "81,82,8127,8-128,432767,8-32768,82147483647,8-2147483648,810000000000,8-20000000000");
 
         Assert.assertEquals(result.getPayload().size(), 10);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -158,7 +158,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testParseDouble() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "d1.0,d1,d0,d-1,d-2.72,d3.14");
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "d1.0,d1,d0,d-1,d-2.72,d3.14");
 
         Assert.assertEquals(result.getPayload().size(), 6);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -175,7 +175,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testParseString() throws Exception
     {
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "sa very long string,sanother-string");
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "sa very long string,sanother-string");
 
         Assert.assertEquals(result.getPayload().size(), 2);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -183,7 +183,7 @@ public class TestThriftEnvelopeEventParser
         Assert.assertEquals(result.getPayload().get(1).getDataItem().getString(), "another-string");
     }
 
-    private void testParseFail(String eventName, String eventString)
+    private void testParseFail(final String eventName, final String eventString)
     {
         try {
             parseThriftEnvelopeBase10(eventName, eventString);
@@ -197,8 +197,8 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testFunctionParse() throws Exception
     {
-        ExtractedAnnotation annotation = createDefaultAnnotation();
-        ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "xdate,xhost,xpath,xip,xua");
+        final ExtractedAnnotation annotation = createDefaultAnnotation();
+        final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "xdate,xhost,xpath,xip,xua");
 
         Assert.assertEquals(result.getPayload().size(), 5);
         Assert.assertEquals(result.getTypeName(), "event-name");
@@ -209,24 +209,24 @@ public class TestThriftEnvelopeEventParser
         Assert.assertEquals(result.getPayload().get(4).getDataItem().getString(), annotation.getUserAgent());
     }
 
-    private ThriftEnvelope parseThriftEnvelopeBase64(String eventType, String eventString) throws EventParsingException
+    private ThriftEnvelope parseThriftEnvelopeBase64(final String eventType, final String eventString) throws EventParsingException
     {
         return parseThriftEnvelope(base64Parser, eventType, eventString);
     }
 
-    private ThriftEnvelope parseThriftEnvelopeBase10(String eventType, String eventString) throws EventParsingException
+    private ThriftEnvelope parseThriftEnvelopeBase10(final String eventType, final String eventString) throws EventParsingException
     {
         return parseThriftEnvelope(base10Parser, eventType, eventString);
     }
 
-    private ThriftEnvelope parseThriftEnvelope(ThriftEnvelopeEventParser parser, String eventType, String eventString) throws EventParsingException
+    private ThriftEnvelope parseThriftEnvelope(final ThriftEnvelopeEventParser parser, final String eventType, final String eventString) throws EventParsingException
     {
-        ThriftEnvelopeEvent event = parseThriftEnvelopeEvent(parser, eventType, eventString);
+        final ThriftEnvelopeEvent event = parseThriftEnvelopeEvent(parser, eventType, eventString);
 
         return (ThriftEnvelope) event.getData();
     }
 
-    private ThriftEnvelopeEvent parseThriftEnvelopeEvent(ThriftEnvelopeEventParser parser, String eventType, String eventString) throws EventParsingException
+    private ThriftEnvelopeEvent parseThriftEnvelopeEvent(final ThriftEnvelopeEventParser parser, final String eventType, final String eventString) throws EventParsingException
     {
         return (ThriftEnvelopeEvent) parser.parseThriftEvent(eventType, eventString, annotation);
     }
@@ -246,7 +246,7 @@ public class TestThriftEnvelopeEventParser
         private final String referrerPath;
         private final String userAgent;
 
-        private ConcreteAnnotation(DateTime dateTime, String ip, String referrerHost, String referrerPath, String userAgent)
+        private ConcreteAnnotation(final DateTime dateTime, final String ip, final String referrerHost, final String referrerPath, final String userAgent)
         {
             this.dateTime = dateTime;
             this.ip = ip;

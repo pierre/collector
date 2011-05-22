@@ -58,10 +58,10 @@ public class TestHadoopFileEventWriter
             throw new IOException(String.format("unable to mkdir %s", finalDir));
         }
 
-        Configuration conf = new Configuration();
+        final Configuration conf = new Configuration();
         conf.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(), HadoopThriftEnvelopeSerialization.class.getName(), "org.apache.hadoop.io.serializer.WritableSerialization");
 
-        FileSystemAccess fsAccess = new FileSystemAccess(conf, LocalFileSystem.class);
+        final FileSystemAccess fsAccess = new FileSystemAccess(conf, LocalFileSystem.class);
 
         eventWriter = new HadoopFileEventWriter(
             finalDir.getAbsolutePath(),
@@ -102,7 +102,7 @@ public class TestHadoopFileEventWriter
         Assert.assertTrue(Arrays.equals(listTempDir(), new String[]{"fuu1", "fuu2", "fuu3"}));
         eventWriter.forceCommit();
 
-        String[] files = finalDir.list();
+        final String[] files = finalDir.list();
 
         Arrays.sort(files);
         Assert.assertTrue(Arrays.equals(files, new String[]{"fuu1", "fuu2", "fuu3"}));
@@ -110,8 +110,8 @@ public class TestHadoopFileEventWriter
 
     private String[] listTempDir()
     {
-        File dir = new File(tempDir, finalDir.getAbsolutePath());
-        String[] files = dir.list();
+        final File dir = new File(tempDir, finalDir.getAbsolutePath());
+        final String[] files = dir.list();
 
         Arrays.sort(files);
 
@@ -123,7 +123,7 @@ public class TestHadoopFileEventWriter
         return new ThriftEnvelopeEvent()
         {
             @Override
-            public String getOutputDir(String prefix)
+            public String getOutputDir(final String prefix)
             {
                 return String.format("%s/%s/%s", prefix, eventName, suffix);
             }
@@ -131,7 +131,7 @@ public class TestHadoopFileEventWriter
             @Override
             public Object getData()
             {
-                List<ThriftField> thriftFieldList = new ImmutableList.Builder<ThriftField>()
+                final List<ThriftField> thriftFieldList = new ImmutableList.Builder<ThriftField>()
                     .add(ThriftField.createThriftField("value", (short) 1))
                     .build();
 
@@ -146,13 +146,13 @@ public class TestHadoopFileEventWriter
         };
     }
 
-    private boolean deleteDirectory(File path)
+    private boolean deleteDirectory(final File path)
     {
         if (path.exists()) {
-            File[] files = path.listFiles();
+            final File[] files = path.listFiles();
 
 
-            for (File file : files) {
+            for (final File file : files) {
                 if (file.isDirectory()) {
                     deleteDirectory(file);
                 }

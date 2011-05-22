@@ -109,7 +109,7 @@ class LocalQueueAndWriter
      *
      * @return underlying eventwriter
      */
-    protected EventWriter getEventWriter()
+    EventWriter getEventWriter()
     {
         return eventWriter;
     }

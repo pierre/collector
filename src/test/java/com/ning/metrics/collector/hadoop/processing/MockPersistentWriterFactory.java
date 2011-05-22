@@ -21,16 +21,16 @@ import com.ning.metrics.serialization.writer.MockEventWriter;
 
 public class MockPersistentWriterFactory implements PersistentWriterFactory
 {
-    private boolean commitThrowsException;
-    private boolean rollbackThrowsException;
-    private boolean writeThrowsException;
+    private final boolean commitThrowsException;
+    private final boolean rollbackThrowsException;
+    private final boolean writeThrowsException;
 
     public MockPersistentWriterFactory()
     {
         this(false, false, false);
     }
 
-    public MockPersistentWriterFactory(final boolean commitThrowsException, final boolean rollbackThrowsException, final boolean writeThrowsException)
+    private MockPersistentWriterFactory(final boolean commitThrowsException, final boolean rollbackThrowsException, final boolean writeThrowsException)
     {
         this.commitThrowsException = commitThrowsException;
         this.rollbackThrowsException = rollbackThrowsException;

@@ -75,7 +75,7 @@ public class HadoopFileEventWriter implements EventWriter
         }
     };
     private static final TBooleanWritable BOOL_WRITABLE = new TBooleanWritable(true);
-    private AtomicLong eventsWritten = new AtomicLong(0);
+    private final AtomicLong eventsWritten = new AtomicLong(0);
 
     @Inject
     public HadoopFileEventWriter(

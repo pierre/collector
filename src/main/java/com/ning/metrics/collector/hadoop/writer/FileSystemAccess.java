@@ -35,12 +35,12 @@ class FileSystemAccess
     private static final long MAX_WAIT_TIME = 600000; // 10 minutes
 
     @Inject
-    public FileSystemAccess(Configuration hdfsConfig)
+    public FileSystemAccess(final Configuration hdfsConfig)
     {
         this(hdfsConfig, FileSystem.class);
     }
 
-    public FileSystemAccess(Configuration hdfsConfig, Class<? extends FileSystem> fsClass)
+    public FileSystemAccess(final Configuration hdfsConfig, final Class<? extends FileSystem> fsClass)
     {
         this.hdfsConfig = hdfsConfig;
         this.fsClass = fsClass;
@@ -52,9 +52,9 @@ class FileSystemAccess
             return getFileSystemSafe();
         }
         catch (IOException e) {
-            long waitTime = MIN_WAIT_TIME;
 
             synchronized (connectionLock) {
+                long waitTime = MIN_WAIT_TIME;
                 while (true) {
                     try {
                         // try to set up the FileSystem
@@ -97,7 +97,7 @@ class FileSystemAccess
     private void setFileSystem() throws IOException
     {
         try {
-            Method getMethod = fsClass.getMethod("get", Configuration.class);
+            final Method getMethod = fsClass.getMethod("get", Configuration.class);
             fs = (FileSystem) getMethod.invoke(null, hdfsConfig);
         }
         catch (NoSuchMethodException e) {

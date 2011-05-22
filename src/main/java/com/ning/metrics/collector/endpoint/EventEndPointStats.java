@@ -50,12 +50,12 @@ public class EventEndPointStats
     private final int rateWindowSizeMinutes;
 
     @Inject
-    public EventEndPointStats(CollectorConfig config)
+    public EventEndPointStats(final CollectorConfig config)
     {
         this(config.getRateWindowSizeMinutes());
     }
 
-    public EventEndPointStats(int rateWindowSizeMinutes)
+    public EventEndPointStats(final int rateWindowSizeMinutes)
     {
         this.rateWindowSizeMinutes = rateWindowSizeMinutes;
         eventParseRate = new EventRate(Period.minutes(rateWindowSizeMinutes));
@@ -77,18 +77,18 @@ public class EventEndPointStats
         successfulEventParseRate.increment();
     }
 
-    public void updateSuccesfulEventCounters(Event event)
+    public void updateSuccesfulEventCounters(final Event event)
     {
-        String eventTypeString = String.format("%s(%s)", event.getName(), event.getVersion());
+        final String eventTypeString = String.format("%s(%s)", event.getName(), event.getVersion());
 
         updateSuccessfulEvents();
         updateSuccessfulEventsByType(eventTypeString);
     }
 
-    void updateSuccessfulEventsByType(String eventType)
+    void updateSuccessfulEventsByType(final String eventType)
     {
-        AtomicLong zeroCounter = new AtomicLong(0);
-        AtomicLong counter = successfulEventsByType.putIfAbsent(eventType, zeroCounter);
+        final AtomicLong zeroCounter = new AtomicLong(0);
+        final AtomicLong counter = successfulEventsByType.putIfAbsent(eventType, zeroCounter);
 
         if (counter == null) {
             zeroCounter.incrementAndGet();
@@ -154,9 +154,9 @@ public class EventEndPointStats
     @Managed
     public List<String> getSuccessfulParseEventsByType()
     {
-        List<String> resultStringList = new ArrayList<String>();
+        final List<String> resultStringList = new ArrayList<String>();
 
-        for (Map.Entry<String, AtomicLong> entry : successfulEventsByType.entrySet()) {
+        for (final Map.Entry<String, AtomicLong> entry : successfulEventsByType.entrySet()) {
             resultStringList.add(String.format("%s = %d", entry.getKey(), entry.getValue().get()));
         }
 

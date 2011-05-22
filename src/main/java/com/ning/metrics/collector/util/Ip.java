@@ -20,15 +20,15 @@ import java.util.regex.Pattern;
 
 public class Ip
 {
-    private final static Pattern DOT = Pattern.compile("\\.");
+    private static final Pattern DOT = Pattern.compile("\\.");
 
-    public static int ipToInt(String ip)
+    public static int ipToInt(final String ip)
     {
         if (ip == null) {
             return 0;
         }
 
-        String[] parts = DOT.split(ip);
+        final String[] parts = DOT.split(ip);
         if (parts.length == 4) {
             try {
                 return (Integer.parseInt(parts[0]) << 24) | (Integer.parseInt(parts[1]) << 16)
@@ -40,9 +40,9 @@ public class Ip
         return 0;
     }
 
-    public static String intToIp(int ip)
+    public static String intToIp(final int ip)
     {
-        StringBuilder sb = new StringBuilder(15);
+        final StringBuilder sb = new StringBuilder(15);
         sb.append(ip >>> 24);
         sb.append('.');
         sb.append((ip >> 16) & 0xFF);

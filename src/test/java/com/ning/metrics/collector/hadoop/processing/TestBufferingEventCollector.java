@@ -40,6 +40,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.testng.Assert.assertEquals;
@@ -56,7 +57,7 @@ public class TestBufferingEventCollector
     private BufferingEventCollector collector;
     private EventQueueStats stats;
     private EventQueueProcessorImpl msgSender;
-    private ReentrantLock sessionLock = new ReentrantLock();
+    private final Lock sessionLock = new ReentrantLock();
     private EventStats eventStats;
 
     @BeforeMethod(alwaysRun = true)
@@ -67,11 +68,11 @@ public class TestBufferingEventCollector
         sentEvents = new CopyOnWriteArrayList<Object>();
         eventWriter = new MockEventWriter();
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("collector.activemq.enabled", "true");
         config = new ConfigurationObjectFactory(properties).build(CollectorConfig.class);
 
-        EventQueueConnectionFactory factory = new EventQueueConnectionFactory()
+        final EventQueueConnectionFactory factory = new EventQueueConnectionFactory()
         {
             @Override
             public EventQueueConnection createConnection()
@@ -84,12 +85,12 @@ public class TestBufferingEventCollector
                     }
 
                     @Override
-                    public EventQueueSession getSessionFor(String type)
+                    public EventQueueSession getSessionFor(final String type)
                     {
                         return new EventQueueSession()
                         {
                             @Override
-                            public void send(Object event)
+                            public void send(final Object event)
                             {
                                 sessionLock.lock();
                                 try {
@@ -119,7 +120,7 @@ public class TestBufferingEventCollector
         final ScheduledExecutorService executor = new StubScheduledExecutorService()
         {
             @Override
-            public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit)
+            public ScheduledFuture<?> schedule(final Runnable command, final long delay, final TimeUnit unit)
             {
                 //only flush commands come in via schedule
                 commiterCommands.add(new ScheduledCommand(command, delay, unit));
@@ -134,7 +135,7 @@ public class TestBufferingEventCollector
             }
 
             @Override
-            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
+            public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException
             {
                 // no-op
                 return true;
@@ -374,7 +375,7 @@ public class TestBufferingEventCollector
         Assert.assertEquals(collector.collectEvent(event, eventStats), false);
     }
 
-    private void assertEventCounts(int written, int committed, int quarantined, int flushed)
+    private void assertEventCounts(final int written, final int committed, final int quarantined, final int flushed)
     {
         Assert.assertEquals(eventWriter.getWrittenEventList().size(), written);
         Assert.assertEquals(eventWriter.getCommittedEventList().size(), committed);
@@ -382,7 +383,7 @@ public class TestBufferingEventCollector
         Assert.assertEquals(eventWriter.getFlushedEventList().size(), flushed);
     }
 
-    private void submitEvents(int num)
+    private void submitEvents(final int num)
     {
         for (int i = 0; i < num; i++) {
             Assert.assertEquals(collector.collectEvent(event, eventStats), true);
@@ -393,7 +394,7 @@ public class TestBufferingEventCollector
     {
         private final Runnable command;
 
-        private ScheduledCommand(Runnable command, long delay, TimeUnit unit)
+        private ScheduledCommand(final Runnable command, final long delay, final TimeUnit unit)
         {
             this.command = command;
         }

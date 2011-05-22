@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.MockHttpHeaders;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import org.joda.time.DateTime;
@@ -46,60 +47,60 @@ public class TestParsedRequest
     @Test(groups = "fast")
     public void testParseHost() throws Exception
     {
-        ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertEquals(parsedRequest.getReferrerHost(), host);
 
         referer = null;
-        ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertNull(emptyFieldParsedRequest.getReferrerHost());
     }
 
     @Test(groups = "fast")
     public void testParsePath() throws Exception
     {
-        ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertEquals(parsedRequest.getReferrerPath(), path);
 
         referer = null;
-        ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertNull(emptyFieldParsedRequest.getReferrerPath());
     }
 
     @Test(groups = "fast")
     public void testParseUserAgent() throws Exception
     {
-        ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertEquals(parsedRequest.getUserAgent(), userAgent);
 
         userAgent = null;
-        ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertNull(emptyFieldParsedRequest.getUserAgent());
     }
 
     @Test(groups = "fast")
     public void testParseIP() throws Exception
     {
-        ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertEquals(parsedRequest.getIpAddress(), ip);
 
         ip = null;
-        ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
+        final ParsedRequest emptyFieldParsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertNull(emptyFieldParsedRequest.getIpAddress());
     }
 
     @Test(groups = "fast")
     public void testParseDateExplicit() throws Exception
     {
-        HttpHeaders httpHeaders = createDummyHeaders();
-        ParsedRequest parsedRequest = new ParsedRequest("DummyEvent", httpHeaders, new DateTime("2001-02-03"), null, null);
+        final HttpHeaders httpHeaders = createDummyHeaders();
+        final ExtractedAnnotation parsedRequest = new ParsedRequest("DummyEvent", httpHeaders, new DateTime("2001-02-03"), null, null);
         Assert.assertEquals(parsedRequest.getDateTime(), new DateTime("2001-02-03"));
     }
 
     @Test(groups = "fast")
     public void testParseDateDefault() throws Exception
     {
-        long currentTime = System.currentTimeMillis();
-        ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
+        final long currentTime = System.currentTimeMillis();
+        final ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
         Assert.assertTrue(Math.abs(parsedRequest.getDateTime().getMillis() - currentTime) < 300);
     }
 
@@ -110,7 +111,7 @@ public class TestParsedRequest
 
     private ParsedRequest createParsedRequestWithNoQueryParameter()
     {
-        HttpHeaders httpHeaders = createDummyHeaders();
+        final HttpHeaders httpHeaders = createDummyHeaders();
         return new ParsedRequest("DummyEvent", httpHeaders, null, null, null);
     }
 }

@@ -22,15 +22,15 @@ public class ByteConverter implements Converter<Byte>
 {
     private final NumberConverter numberConverter;
 
-    public ByteConverter(NumberConverter numberConverter)
+    public ByteConverter(final NumberConverter numberConverter)
     {
         this.numberConverter = numberConverter;
     }
 
-    public Byte convert(String input) throws EventParsingException
+    public Byte convert(final String input) throws EventParsingException
     {
         try {
-            Long value = numberConverter.convert(input);
+            final Long value = numberConverter.convert(input);
 
             if (value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
                 throw new EventParsingException(String.format("Value out of range(%d, %d). Value:\"%s\"", Byte.MIN_VALUE, Byte.MAX_VALUE, input));

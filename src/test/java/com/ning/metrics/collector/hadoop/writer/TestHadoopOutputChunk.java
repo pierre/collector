@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TestHadoopOutputChunk
@@ -41,7 +42,7 @@ public class TestHadoopOutputChunk
 
     class MockFileSystem extends FileSystem
     {
-        private final List<Path> inodes = new ArrayList<Path>();
+        private final Collection<Path> inodes = new ArrayList<Path>();
         private boolean mkdirsThrowsException = false;
         private boolean renameThrowsException = false;
         private boolean deleteThrowsException = false;
@@ -49,32 +50,32 @@ public class TestHadoopOutputChunk
         private boolean renameFails = false;
         private boolean deleteFails = false;
 
-        public void setMkdirsThrowsException(boolean mkdirsThrowsException)
+        public void setMkdirsThrowsException(final boolean mkdirsThrowsException)
         {
             this.mkdirsThrowsException = mkdirsThrowsException;
         }
 
-        public void setRenameThrowsException(boolean renameThrowsException)
+        public void setRenameThrowsException(final boolean renameThrowsException)
         {
             this.renameThrowsException = renameThrowsException;
         }
 
-        public void setDeleteThrowsException(boolean deleteThrowsException)
+        public void setDeleteThrowsException(final boolean deleteThrowsException)
         {
             this.deleteThrowsException = deleteThrowsException;
         }
 
-        public void setMkdirsFails(boolean mkdirsFails)
+        public void setMkdirsFails(final boolean mkdirsFails)
         {
             this.mkdirsFails = mkdirsFails;
         }
 
-        public void setRenameFails(boolean renameFails)
+        public void setRenameFails(final boolean renameFails)
         {
             this.renameFails = renameFails;
         }
 
-        public void setDeleteFails(boolean deleteFails)
+        public void setDeleteFails(final boolean deleteFails)
         {
             this.deleteFails = deleteFails;
         }
@@ -86,38 +87,38 @@ public class TestHadoopOutputChunk
         }
 
         @Override
-        public FSDataInputStream open(Path path, int i) throws IOException
+        public FSDataInputStream open(final Path path, final int i) throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public boolean exists(Path f) throws IOException
+        public boolean exists(final Path f) throws IOException
         {
             return inodes.contains(f);
         }
 
         @Override
-        public FSDataOutputStream create(Path f) throws IOException
+        public FSDataOutputStream create(final Path f) throws IOException
         {
             inodes.add(f);
             return null;
         }
 
         @Override
-        public FSDataOutputStream create(Path path, FsPermission fsPermission, boolean b, int i, short j, long l, Progressable progressable) throws IOException
+        public FSDataOutputStream create(final Path path, final FsPermission fsPermission, final boolean b, final int i, final short j, final long l, final Progressable progressable) throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public FSDataOutputStream append(Path path, int i, Progressable progressable) throws IOException
+        public FSDataOutputStream append(final Path path, final int i, final Progressable progressable) throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public boolean rename(Path path, Path path1) throws IOException
+        public boolean rename(final Path path, final Path path1) throws IOException
         {
             if (renameThrowsException) {
                 throw new IOException("IGNORE - expected for tests");
@@ -134,7 +135,7 @@ public class TestHadoopOutputChunk
          * @deprecated
          */
         @Override
-        public boolean delete(Path path) throws IOException
+        public boolean delete(final Path path) throws IOException
         {
             if (deleteThrowsException) {
                 throw new IOException("IGNORE - expected for tests");
@@ -146,19 +147,19 @@ public class TestHadoopOutputChunk
         }
 
         @Override
-        public boolean delete(Path path, boolean b) throws IOException
+        public boolean delete(final Path path, final boolean b) throws IOException
         {
             return delete(path);
         }
 
         @Override
-        public FileStatus[] listStatus(Path path) throws IOException
+        public FileStatus[] listStatus(final Path path) throws IOException
         {
             return new FileStatus[0];  //To change body of implemented methods use File | Settings | File Templates.
         }
 
         @Override
-        public void setWorkingDirectory(Path path)
+        public void setWorkingDirectory(final Path path)
         {
             throw new UnsupportedOperationException();
         }
@@ -170,7 +171,7 @@ public class TestHadoopOutputChunk
         }
 
         @Override
-        public boolean mkdirs(Path path, FsPermission fsPermission) throws IOException
+        public boolean mkdirs(final Path path, final FsPermission fsPermission) throws IOException
         {
             if (mkdirsThrowsException) {
                 throw new IOException("IGNORE - expected for tests");
@@ -182,7 +183,7 @@ public class TestHadoopOutputChunk
         }
 
         @Override
-        public FileStatus getFileStatus(Path path) throws IOException
+        public FileStatus getFileStatus(final Path path) throws IOException
         {
             return new FileStatus();
         }

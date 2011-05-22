@@ -52,7 +52,7 @@ public abstract class TestPublicAPI
     static final String AWESOME_REFERRER_HOST = "mouraf.ning.com";
     static final String AWESOME_REFERRER_PATH = "/unit-test?pass=true&awesome=true";
 
-    final AsyncHttpClientConfig clientConfig = new AsyncHttpClientConfig.Builder()
+    private final AsyncHttpClientConfig clientConfig = new AsyncHttpClientConfig.Builder()
         .setIdleConnectionInPoolTimeoutInMs(100)
         .setConnectionTimeoutInMs(100)
         .setUserAgent(MEGATRON_2000_USER_AGENT)

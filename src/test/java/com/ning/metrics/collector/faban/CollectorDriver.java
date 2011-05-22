@@ -62,7 +62,7 @@ public class CollectorDriver
     private final Integer nbOfEventsToSend;
     private final ThriftEnvelopeEvent eventToSend;
 
-    private Logger logger;
+    private final Logger logger;
     private final DriverContext ctx;
 
     public CollectorDriver()
@@ -70,11 +70,11 @@ public class CollectorDriver
         ctx = DriverContext.getContext();
         logger = ctx.getLogger();
 
-        Injector injector = Guice.createInjector(new CollectorControllerModule());
+        final Injector injector = Guice.createInjector(new CollectorControllerModule());
         controller = injector.getInstance(CollectorController.class);
         nbOfEventsToSend = Integer.getInteger("collector.faban.events-batch-size", 50);
 
-        ArrayList<ThriftField> list = new ArrayList<ThriftField>();
+        final ArrayList<ThriftField> list = new ArrayList<ThriftField>();
         list.add(ThriftField.createThriftField(true, (short) 1));
         list.add(ThriftField.createThriftField((byte) 1, (short) 2));
         list.add(ThriftField.createThriftField((short) 2, (short) 3));

@@ -18,6 +18,7 @@ package com.ning.metrics.collector.endpoint.resources;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.MockEventHandler;
 import com.ning.metrics.collector.endpoint.MockHttpHeaders;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
@@ -51,9 +52,9 @@ public class TestEventRequestHandler
     @Test(groups = "fast")
     public void testSuccess() throws Exception
     {
-        Event event = createEvent("fuu");
+        final Event event = createEvent("fuu");
         eventExtractor.setEvent(event);
-        Response res = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
+        final Response res = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
         Assert.assertEquals(eventHandler.getProcessedEventList().get(0).getName(), "fuu");
@@ -69,7 +70,7 @@ public class TestEventRequestHandler
     public void testEventExtractorReturnsNull() throws Exception
     {
         eventExtractor.setEvent(null);
-        Response res = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
+        final Response res = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         // Test that eventHandler sees the null value
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
@@ -87,7 +88,7 @@ public class TestEventRequestHandler
     {
         eventExtractor.setThrowsEventParseException(true);
 
-        Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
+        final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.isHandleFailureCalled(), true);
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
@@ -104,7 +105,7 @@ public class TestEventRequestHandler
     {
         eventExtractor.setThrowsRuntimeException(true);
 
-        Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
+        final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.isHandleFailureCalled(), true);
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
@@ -121,7 +122,7 @@ public class TestEventRequestHandler
     {
         eventHandler.setThrowExceptionBeforeEvent(true);
 
-        Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
+        final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
 
@@ -139,7 +140,7 @@ public class TestEventRequestHandler
     {
         eventHandler.setThrowExceptionAfterEvent(true);
 
-        Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
+        final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
 
@@ -171,7 +172,7 @@ public class TestEventRequestHandler
      *
      * @return an empty annotation
      */
-    private ParsedRequest createMockRequestAnnotation()
+    private ExtractedAnnotation createMockRequestAnnotation()
     {
         return new ParsedRequest("DummyEvent", new MockHttpHeaders(), null, null, null, null);
     }

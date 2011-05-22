@@ -18,9 +18,9 @@ package com.ning.metrics.collector.events.parsing;
 
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 
-public interface Tokenizer
+interface Tokenizer
 {
-    public boolean hasNext();
+    boolean hasNext();
 
-    public Token next() throws EventParsingException;
+    Token next() throws EventParsingException;
 }

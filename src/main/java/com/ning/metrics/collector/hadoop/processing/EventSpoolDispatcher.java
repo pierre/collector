@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Manager of writer queues
  */
-public class EventSpoolDispatcher
+class EventSpoolDispatcher
 {
     private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
 
@@ -49,10 +49,8 @@ public class EventSpoolDispatcher
 
     /**
      * Close all underlying queues
-     *
-     * @throws InterruptedException if interrupted trying to close a queue
      */
-    public void shutdown() throws InterruptedException
+    public void shutdown()
     {
         log.info("Closing all local writer queues");
         for (final LocalQueueAndWriter queue : queuesPerPath.values()) {
@@ -117,7 +115,7 @@ public class EventSpoolDispatcher
      *
      * @return underlying map
      */
-    protected Map<String, LocalQueueAndWriter> getQueuesPerPath()
+    Map<String, LocalQueueAndWriter> getQueuesPerPath()
     {
         return queuesPerPath;
     }

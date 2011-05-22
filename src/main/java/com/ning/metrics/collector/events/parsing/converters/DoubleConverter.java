@@ -20,7 +20,7 @@ import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 
 public class DoubleConverter implements Converter<Double>
 {
-    public Double convert(String input) throws EventParsingException
+    public Double convert(final String input) throws EventParsingException
     {
         try {
             return Double.valueOf(input);

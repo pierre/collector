@@ -35,13 +35,13 @@ public class MockScribeEventHandler implements ScribeEventHandler
     private boolean fakeCollectorFailure = false;
     private final EventEndPointStats stats;
 
-    public MockScribeEventHandler(EventEndPointStats stats)
+    public MockScribeEventHandler(final EventEndPointStats stats)
     {
         this.stats = stats;
     }
 
     @Override
-    public boolean processEvent(Event event, EventStats eventStats)
+    public boolean processEvent(final Event event, final EventStats eventStats)
     {
         stats.updateTotalEvents();
 
@@ -66,7 +66,7 @@ public class MockScribeEventHandler implements ScribeEventHandler
     }
 
     @Override
-    public void handleFailure(LogEntry entry)
+    public void handleFailure(final LogEntry entry)
     {
         handleFailureCalled = true;
 
@@ -78,17 +78,17 @@ public class MockScribeEventHandler implements ScribeEventHandler
         stats.updateFailedEvents();
     }
 
-    public void setThrowExceptionAfterEvent(boolean throwExceptionAfterEvent)
+    public void setThrowExceptionAfterEvent(final boolean throwExceptionAfterEvent)
     {
         this.throwExceptionAfterEvent = throwExceptionAfterEvent;
     }
 
-    public void setThrowExceptionBeforeEvent(boolean throwExceptionBeforeEvent)
+    public void setThrowExceptionBeforeEvent(final boolean throwExceptionBeforeEvent)
     {
         this.throwExceptionBeforeEvent = throwExceptionBeforeEvent;
     }
 
-    public void setFakeCollectorFailure(boolean fakeCollectorFailure)
+    public void setFakeCollectorFailure(final boolean fakeCollectorFailure)
     {
         this.fakeCollectorFailure = fakeCollectorFailure;
     }
@@ -103,7 +103,7 @@ public class MockScribeEventHandler implements ScribeEventHandler
         return handleFailureCalled;
     }
 
-    public void setHandleFailureThrowsException(boolean handleFailureThrowsException)
+    public void setHandleFailureThrowsException(final boolean handleFailureThrowsException)
     {
         this.handleFailureThrowsException = handleFailureThrowsException;
     }
