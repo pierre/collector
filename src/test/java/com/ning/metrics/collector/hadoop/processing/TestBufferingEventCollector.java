@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
+import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventQueueConnection;
@@ -24,7 +25,6 @@ import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
 import com.ning.metrics.collector.realtime.EventQueueSession;
 import com.ning.metrics.collector.realtime.EventQueueStats;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.event.StubEvent;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import com.ning.metrics.serialization.writer.StubScheduledExecutorService;
 import org.skife.config.ConfigurationObjectFactory;
@@ -140,7 +140,7 @@ public class TestBufferingEventCollector
                 return true;
             }
         };
-        event = new StubEvent();
+        event = new MockEvent();
         final WriterStats stats = new WriterStats();
         final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new HadoopWriterFactory(eventWriter, config), stats, config);
         collector = new BufferingEventCollector(msgSender, dispatcher);

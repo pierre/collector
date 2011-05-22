@@ -18,13 +18,11 @@ package com.ning.metrics.collector.endpoint.resources;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
-import com.ning.metrics.collector.binder.annotations.HdfsDiskSpoolFlushExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
 import com.ning.metrics.collector.endpoint.filters.FiltersModule;
 import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueModule;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -35,8 +33,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class JettyTestModule extends AbstractModule
 {
@@ -150,8 +146,6 @@ public class JettyTestModule extends AbstractModule
             @Override
             protected void configure()
             {
-                bind(ScheduledExecutorService.class).annotatedWith(HdfsDiskSpoolFlushExecutor.class)
-                    .toInstance(new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")));
                 bind(EventWriter.class).toInstance(new MockEventWriter());
             }
         });

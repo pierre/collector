@@ -21,6 +21,7 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
+import org.apache.log4j.Logger;
 import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
@@ -29,6 +30,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BufferingEventCollector implements EventCollector
 {
+    private static final Logger log = Logger.getLogger(BufferingEventCollector.class);
+
     private final EventQueueProcessor activeMQController;
     private final EventSpoolDispatcher dispatcher;
 
@@ -42,6 +45,23 @@ public class BufferingEventCollector implements EventCollector
     {
         this.activeMQController = activeMQController;
         this.dispatcher = dispatcher;
+        Runtime.getRuntime().addShutdownHook(new Thread()
+        {
+            @Override
+            public void run()
+            {
+                log.info("Starting main shutdown sequence");
+
+                log.info("Stop accepting new events");
+                // Stop accepting events and flush all events in memory to disk
+                try {
+                    shutdown();
+                }
+                catch (InterruptedException e) {
+                    log.warn("Interrupted while trying to shutdown the main collector thread", e);
+                }
+            }
+        });
     }
 
     /**

@@ -29,11 +29,9 @@ public class EventCollectorModule implements Module
         // JMX exporter
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
-        binder.bind(BufferingEventCollector.class).asEagerSingleton();
-        builder.export(BufferingEventCollector.class).as("com.ning.metrics.collector:name=BufferingEventCollector");
-
         binder.bind(PersistentWriterFactory.class).to(HadoopWriterFactory.class);
 
-        binder.bind(EventCollector.class).toProvider(EventCollectorProvider.class).asEagerSingleton();
+        binder.bind(EventCollector.class).to(BufferingEventCollector.class).asEagerSingleton();
+        builder.export(EventCollector.class).as("com.ning.metrics.collector:name=BufferingEventCollector");
     }
 }
