@@ -21,7 +21,6 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
-import org.apache.log4j.Logger;
 import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
@@ -30,8 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BufferingEventCollector implements EventCollector
 {
-    private static final Logger log = Logger.getLogger(BufferingEventCollector.class);
-
     private final EventQueueProcessor activeMQController;
     private final EventSpoolDispatcher dispatcher;
 
@@ -74,9 +71,8 @@ public class BufferingEventCollector implements EventCollector
             activeMQController.send(event);
         }
 
-        eventStats.recordAccepted();
-
         // Update the endpoint statistics
+        eventStats.recordAccepted();
         updateEndPointsStats(eventStats);
 
         if (dispatcher.offer(event)) {
@@ -88,7 +84,7 @@ public class BufferingEventCollector implements EventCollector
         }
     }
 
-    private void updateEndPointsStats(EventStats eventStats)
+    private void updateEndPointsStats(final EventStats eventStats)
     {
         extractionStats.record(eventStats.getExtractedDelayMillis());
         acceptanceStats.record(eventStats.getAcceptedDelayMillis());
