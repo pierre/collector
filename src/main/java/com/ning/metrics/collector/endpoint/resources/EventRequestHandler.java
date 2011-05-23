@@ -159,7 +159,7 @@ public class EventRequestHandler
                 failCount++;
                 log.info(String.format("Exception while extracting or processing an event. [%s]", annotation.toString()), e);
 
-                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Invalid body formatting."));
+                eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Invalid body formatting."));
             }
             catch (RuntimeException e) {
                 failCount++;
