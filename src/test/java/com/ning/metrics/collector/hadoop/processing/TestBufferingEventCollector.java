@@ -16,175 +16,74 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import com.google.inject.servlet.GuiceFilter;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.realtime.EventQueueConnection;
-import com.ning.metrics.collector.realtime.EventQueueConnectionFactory;
+import com.ning.metrics.collector.hadoop.writer.HdfsModule;
+import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
-import com.ning.metrics.collector.realtime.EventQueueSession;
 import com.ning.metrics.collector.realtime.EventQueueStats;
+import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.writer.MockEventWriter;
-import com.ning.metrics.serialization.writer.StubScheduledExecutorService;
-import org.skife.config.ConfigurationObjectFactory;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.Collection;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static org.testng.Assert.assertEquals;
 
+@Guice(modules = {ConfigTestModule.class, EventCollectorModule.class, HdfsModule.class, RealTimeQueueTestModule.class})
 public class TestBufferingEventCollector
 {
-    private static final int REFRESH_DELAY_IN_SECONDS = 3;
-    private List<ScheduledCommand> commiterCommands;
-    private List<Runnable> writesCommands;
-    private List<Object> sentEvents;
-    private MockEventWriter eventWriter;
-    private Event event;
+    @Inject
     private CollectorConfig config;
+
+    @Inject
     private BufferingEventCollector collector;
+
+    @Inject
+    private EventQueueProcessor msgSender;
+
+    @Inject
     private EventQueueStats stats;
-    private EventQueueProcessorImpl msgSender;
-    private final Lock sessionLock = new ReentrantLock();
+
+    /**
+     * @see RealTimeQueueTestModule
+     */
+    @Inject
+    @Named("amqSessionLock")
+    private Lock sessionLock;
+
+    /**
+     * @see RealTimeQueueTestModule
+     */
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
+    @Inject
+    @Named("sentEvents")
+    private Collection sentEvents;
+
+    private Event event;
     private EventStats eventStats;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
     {
-        commiterCommands = new ArrayList<ScheduledCommand>();
-        writesCommands = new ArrayList<Runnable>();
-        sentEvents = new CopyOnWriteArrayList<Object>();
-        eventWriter = new MockEventWriter();
+        new GuiceFilter().destroy();
+        sentEvents.clear();
+        stats.clear();
 
-        final Properties properties = new Properties();
-        properties.setProperty("collector.activemq.enabled", "true");
-        config = new ConfigurationObjectFactory(properties).build(CollectorConfig.class);
-
-        final EventQueueConnectionFactory factory = new EventQueueConnectionFactory()
-        {
-            @Override
-            public EventQueueConnection createConnection()
-            {
-                return new EventQueueConnection()
-                {
-                    @Override
-                    public void reconnect()
-                    {
-                    }
-
-                    @Override
-                    public EventQueueSession getSessionFor(final String type)
-                    {
-                        return new EventQueueSession()
-                        {
-                            @Override
-                            public void send(final Object event)
-                            {
-                                sessionLock.lock();
-                                try {
-                                    sentEvents.add(event);
-                                }
-                                finally {
-                                    sessionLock.unlock();
-                                }
-                            }
-
-                            @Override
-                            public void close()
-                            {
-                            }
-                        };
-                    }
-
-                    @Override
-                    public void close()
-                    {
-                    }
-                };
-            }
-        };
-        stats = new EventQueueStats();
-        msgSender = new EventQueueProcessorImpl(config, factory, stats);
-        final ScheduledExecutorService executor = new StubScheduledExecutorService()
-        {
-            @Override
-            public ScheduledFuture<?> schedule(final Runnable command, final long delay, final TimeUnit unit)
-            {
-                //only flush commands come in via schedule
-                commiterCommands.add(new ScheduledCommand(command, delay, unit));
-
-                return null;
-            }
-
-            @Override
-            public void shutdown()
-            {
-                commiterCommands.clear();
-            }
-
-            @Override
-            public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException
-            {
-                // no-op
-                return true;
-            }
-        };
         event = new MockEvent();
-        final WriterStats stats = new WriterStats();
-        final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new HadoopWriterFactory(eventWriter, config), stats, config);
-        collector = new BufferingEventCollector(msgSender, dispatcher);
         eventStats = new EventStats();
     }
 
-    private void startCollectorThreads()
-    {
-    }
-
-    private void stopCollectorThreads() throws InterruptedException
-    {
-        collector.shutdown();
-    }
-
-    private void performCommits()
-    {
-        commiterCommands.remove(0).getCommand().run();
-    }
-
-    private void performWrites()
-    {
-        while (!writesCommands.isEmpty()) {
-            writesCommands.remove(0).run();
-        }
-    }
-
-    private void performFlushes()
-    {
-        try {
-            eventWriter.flush();
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // AMQ test
     @Test(groups = "slow")
-    public void testQueue() throws Exception
+    public void testAMQIntegration() throws Exception
     {
-        startCollectorThreads();
-
         // Message type not recognized yet
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
@@ -197,7 +96,7 @@ public class TestBufferingEventCollector
         assertEquals(stats.getErroredEvents(), 0);
 
         // Message type now recognized
-        msgSender.addTypeToCollect(event.getName());
+        ((EventQueueProcessorImpl) msgSender).addTypeToCollect(event.getName());
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
         Thread.sleep(100);
@@ -209,7 +108,7 @@ public class TestBufferingEventCollector
         assertEquals(stats.getErroredEvents(), 0);
 
         // Close the firehose
-        msgSender.disable();
+        ((EventQueueProcessorImpl) msgSender).disable();
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
         Thread.sleep(100);
@@ -221,7 +120,7 @@ public class TestBufferingEventCollector
         assertEquals(stats.getErroredEvents(), 0);
 
         // Re-open the firehose
-        msgSender.enable();
+        ((EventQueueProcessorImpl) msgSender).enable();
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
         Thread.sleep(100);
@@ -233,14 +132,11 @@ public class TestBufferingEventCollector
         assertEquals(stats.getErroredEvents(), 0);
     }
 
-    // AMQ test
     @Test(groups = "slow")
-    public void testQueueOverflow() throws Exception
+    public void testAMQQueueOverflow() throws Exception
     {
-        startCollectorThreads();
-
         // Need to force sending via AMQ even without actual schema (for testing)
-        msgSender.addTypeToCollect(event.getName());
+        ((EventQueueProcessorImpl) msgSender).addTypeToCollect(event.getName());
 
         for (int idx = 0; idx < config.getActiveMQBufferLength(); idx++) {
             collector.collectEvent(event, eventStats);
@@ -262,7 +158,7 @@ public class TestBufferingEventCollector
         finally {
             sessionLock.unlock();
         }
-        Thread.sleep(config.getActiveMQBufferLength() / 10);
+        Thread.sleep(config.getActiveMQBufferLength() / 5);
         // the lock is queried after the take() call, so the first of the second batch of events has been read already
         assertEquals(sentEvents.size(), config.getActiveMQBufferLength() + config.getActiveMQBufferLength() + 1);
         assertEquals(stats.getIgnoredEvents(), 0);
@@ -275,133 +171,23 @@ public class TestBufferingEventCollector
     @Test(groups = "slow")
     public void testCollectFlow() throws Exception
     {
-        startCollectorThreads();
-        collector.collectEvent(event, eventStats);
-        assertEventCounts(0, 0, 0, 0);
-        performWrites();
-        assertEventCounts(1, 0, 0, 0);
-        performCommits();
-        assertEventCounts(0, 1, 0, 0);
+        // TODO
+        // Regular test - make sure events are written to disk (test w/ commit, not the flush here)
     }
 
     @Test(groups = "fast")
     public void testWriteFails() throws Exception
     {
+        // TODO
+        // Test the writer library failed
         // Make sure events that have been written, but not committed yet, are not wiped when a write fails
-        startCollectorThreads();
-        submitEvents(4);
-        assertEventCounts(0, 0, 0, 0);
-        performWrites();
-        assertEventCounts(4, 0, 0, 0);
-        eventWriter.setWriteThrowsException(true); // It's lost, we can't do much about it
-        submitEvents(1);
-        performWrites();
-        assertEventCounts(4, 0, 0, 0);
-    }
 
-    @Test(groups = "fast")
-    public void testCommitFails() throws Exception
-    {
-        // If a commit fails, those writes are rolled back
-        startCollectorThreads();
-        eventWriter.setCommitThrowsException(true);
-        submitEvents(4);
-        assertEventCounts(0, 0, 0, 0);
-        performWrites();
-        assertEventCounts(4, 0, 0, 0);
-        performCommits();
-        assertEventCounts(0, 0, 4, 0);
-    }
-
-    @Test(groups = "fast")
-    public void testRollbackFails() throws Exception
-    {
-        // If rollback fails, event counts are unaltered
-        startCollectorThreads();
-        submitEvents(4);
-        performWrites();
-        assertEventCounts(4, 0, 0, 0);
-        performCommits();
-        assertEventCounts(0, 4, 0, 0);
-        eventWriter.setCommitThrowsException(true);
-        eventWriter.setRollbackThrowsException(true);
-        submitEvents(1);
-        performWrites();
-        assertEventCounts(1, 4, 0, 0);
-        stopCollectorThreads();
-        assertEventCounts(1, 4, 0, 0);
-    }
-
-    @Test(groups = "slow")
-    public void testBlockingDrain() throws Exception
-    {
-        startCollectorThreads();
-        submitEvents(5);
-        assertEventCounts(0, 0, 0, 0); // This just adds events to write (stub executor)
-        performWrites();
-        assertEventCounts(5, 0, 0, 0);
-    }
-
-    @Test(groups = "fast")
-    public void testNonBlockingDrain() throws Exception
-    {
-        startCollectorThreads();
-        submitEvents(5);
-        assertEventCounts(0, 0, 0, 0);
-        performWrites();
-        performCommits();
-        performFlushes();
-        assertEventCounts(0, 0, 0, 5);
-    }
-
-    @Test(groups = "fast")
-    public void testCommit() throws Exception
-    {
-        startCollectorThreads();
-        submitEvents(5);
-        assertEventCounts(0, 0, 0, 0);
-        performWrites();
-        assertEventCounts(5, 0, 0, 0);
-        commiterCommands.remove(0).getCommand().run();
-        assertEventCounts(0, 5, 0, 0);
     }
 
     @Test(groups = "fast")
     public void testQueueIsFull() throws Exception
     {
-        startCollectorThreads();
-        submitEvents(5);
-        Assert.assertEquals(collector.getQueueSizes(), 5);
-        Assert.assertEquals(collector.collectEvent(event, eventStats), false);
-    }
-
-    private void assertEventCounts(final int written, final int committed, final int quarantined, final int flushed)
-    {
-        Assert.assertEquals(eventWriter.getWrittenEventList().size(), written);
-        Assert.assertEquals(eventWriter.getCommittedEventList().size(), committed);
-        Assert.assertEquals(eventWriter.getQuarantinedEventList().size(), quarantined);
-        Assert.assertEquals(eventWriter.getFlushedEventList().size(), flushed);
-    }
-
-    private void submitEvents(final int num)
-    {
-        for (int i = 0; i < num; i++) {
-            Assert.assertEquals(collector.collectEvent(event, eventStats), true);
-        }
-    }
-
-    static class ScheduledCommand
-    {
-        private final Runnable command;
-
-        private ScheduledCommand(final Runnable command, final long delay, final TimeUnit unit)
-        {
-            this.command = command;
-        }
-
-        public Runnable getCommand()
-        {
-            return command;
-        }
+        // TODO
+        // Test writer queues are full
     }
 }

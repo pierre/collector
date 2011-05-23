@@ -20,7 +20,7 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.hadoop.writer.HadoopFileEventWriter;
 import com.ning.metrics.collector.hadoop.writer.HdfsModule;
-import com.ning.metrics.collector.realtime.RealTimeQueueModule;
+import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-@Guice(modules = {TestConfigModule.class, EventCollectorModule.class, HdfsModule.class, RealTimeQueueModule.class})
+@Guice(modules = {ConfigTestModule.class, EventCollectorModule.class, HdfsModule.class, RealTimeQueueTestModule.class})
 public class TestEventSpoolDispatcher
 {
     @Inject

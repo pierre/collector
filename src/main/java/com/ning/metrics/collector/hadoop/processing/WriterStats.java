@@ -48,8 +48,6 @@ public class WriterStats
     private final AtomicLong droppedEvents = new AtomicLong(0);
     private final AtomicLong writtenEvents = new AtomicLong(0);
     private final AtomicLong erroredEvents = new AtomicLong(0);
-    private final AtomicLong commits = new AtomicLong(0);
-    private final AtomicLong commitFailures = new AtomicLong(0);
     private final AtomicLong hdfsFlushes = new AtomicLong(0);
 
     public void registerEventIgnored()

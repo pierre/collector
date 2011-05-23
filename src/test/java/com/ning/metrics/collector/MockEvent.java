@@ -17,6 +17,7 @@
 package com.ning.metrics.collector;
 
 import com.ning.metrics.serialization.event.StubEvent;
+import com.ning.metrics.serialization.thrift.hadoop.TBooleanWritable;
 
 public class MockEvent extends StubEvent
 {
@@ -31,5 +32,16 @@ public class MockEvent extends StubEvent
     public void setOutputPath(final String s)
     {
         outputPath = s;
+    }
+
+    /**
+     * The basic StubEvent returns a String - which the Hadoop writer won't understand.
+     *
+     * @return stupid payload
+     */
+    @Override
+    public Object getData()
+    {
+        return new TBooleanWritable(true);
     }
 }

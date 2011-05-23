@@ -16,19 +16,23 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
+import com.google.inject.Inject;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.writer.MockEventWriter;
-import org.skife.config.ConfigurationObjectFactory;
 import org.testng.Assert;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
+@Guice(modules = ConfigTestModule.class)
 public class TestEventSpoolDispatcherWithMockWriter
 {
+    @Inject
+    private CollectorConfig collectorConfig;
+
     @Test(groups = "slow")
     public void testShutdown() throws Exception
     {
-        final CollectorConfig collectorConfig = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
         final WriterStats stats = new WriterStats();
         final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new MockPersistentWriterFactory(), stats, collectorConfig);
         final MockEvent eventA = new MockEvent();
@@ -62,7 +66,6 @@ public class TestEventSpoolDispatcherWithMockWriter
     @Test(groups = "fast")
     public void testOffer() throws Exception
     {
-        final CollectorConfig collectorConfig = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
         final WriterStats stats = new WriterStats();
         final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new MockPersistentWriterFactory(), stats, collectorConfig);
 

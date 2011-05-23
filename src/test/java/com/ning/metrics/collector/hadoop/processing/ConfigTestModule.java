@@ -17,36 +17,12 @@
 package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.AbstractModule;
+import com.ning.metrics.collector.FastCollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import org.skife.config.ConfigurationObjectFactory;
 
-public class TestConfigModule extends AbstractModule
-{    abstract static class FastCollectorConfig implements CollectorConfig
-    {
-        /**
-         * Maximum number of events per file in the temporary spooling area. Past this threshold,
-         * buffered events are promoted to the final spool queue.
-         *
-         * @return the maximum number of events per file
-         */
-        @Override
-        public long getFlushEventQueueSize()
-        {
-            return 2;
-        }
-
-        /**
-         * Delay between flushes (in seconds)
-         *
-         * @return delay between flushes to HDFS
-         */
-        @Override
-        public long getFlushIntervalInSeconds()
-        {
-            return 1L;
-        }
-    }
-
+public class ConfigTestModule extends AbstractModule
+{
     @Override
     protected void configure()
     {
