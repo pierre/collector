@@ -125,4 +125,9 @@ class LocalQueueAndWriter
             stats.registerEventDropped();
         }
     }
+
+    public boolean isEmpty()
+    {
+        return queue.size() == 0;
+    }
 }

@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class FileSystemAccess
+public class FileSystemAccess
 {
     private final Configuration hdfsConfig;
     private final Class<? extends FileSystem> fsClass;
