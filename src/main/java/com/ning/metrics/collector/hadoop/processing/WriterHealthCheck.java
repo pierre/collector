@@ -69,7 +69,8 @@ public class WriterHealthCheck implements ComponentHealthCheck
             builder.append(String.format("written: %s, ", stats.getWrittenEvents()));
             builder.append(String.format("dropped: %s, ", stats.getDroppedEvents())); // queue full
             builder.append(String.format("errored: %s, ", stats.getErroredEvents())); // I/O error
-            builder.append(String.format("ignored: %s", stats.getIgnoredEvents())); // system disabled
+            builder.append(String.format("ignored: %s, ", stats.getIgnoredEvents())); // system disabled
+            builder.append(String.format("flushes: %s", stats.getHdfsFlushes())); // HDFS flushes
 
             message = builder.toString();
 
