@@ -115,18 +115,7 @@ class EventSpoolDispatcher
      */
     public boolean offer(final Event event)
     {
-        EventType eventType = EventType.DEFAULT;
-        if (event instanceof SmileEnvelopeEvent) {
-            if (((SmileEnvelopeEvent) event).isPlainJson()) {
-                eventType = EventType.JSON;
-            }
-            else {
-                eventType = EventType.SMILE;
-            }
-        }
-        else if (event instanceof ThriftEnvelopeEvent) {
-            eventType = EventType.THRIFT;
-        }
+        SerializationType eventType = SerializationType.get(event);
 
         if (event != null && isRunning.get()) {
             final String hdfsPath = event.getOutputDir(config.getEventOutputDirectory());
@@ -184,33 +173,5 @@ class EventSpoolDispatcher
     public WriterStats getStats()
     {
         return stats;
-    }
-
-
-    private enum EventType
-    {
-        SMILE
-            {
-                @Override
-                public EventSerializer getSerializer()
-                {
-                    return new SmileEnvelopeEventSerializer(false);
-                }
-            },
-        JSON
-            {
-                @Override
-                public EventSerializer getSerializer()
-                {
-                    return new SmileEnvelopeEventSerializer(true);
-                }
-            },
-        THRIFT,
-        DEFAULT;
-
-        public EventSerializer getSerializer()
-        {
-            return new ObjectOutputEventSerializer();
-        }
     }
 }
