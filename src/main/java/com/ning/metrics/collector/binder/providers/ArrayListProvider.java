@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.filters;
+package com.ning.metrics.collector.binder.providers;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class ArrayListProvider<T> implements Provider<List<T>>
+public class ArrayListProvider<T> implements Provider<List<T>>
 {
     private Injector injector;
     private final Collection<Key<? extends T>> injectables = new ArrayList<Key<? extends T>>();
@@ -40,6 +40,12 @@ class ArrayListProvider<T> implements Provider<List<T>>
     public ArrayListProvider<T> add(final Annotation annotation, final Class<? extends T> toBeIncluded)
     {
         injectables.add(Key.get(toBeIncluded, annotation));
+        return this;
+    }
+
+    public ArrayListProvider<T> add(final Class<? extends T> toBeIncluded)
+    {
+        injectables.add(Key.get(toBeIncluded));
         return this;
     }
 

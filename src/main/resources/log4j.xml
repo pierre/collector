@@ -14,7 +14,8 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
-<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<!DOCTYPE log4j:configuration SYSTEM
+        "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
 <log4j:configuration debug="false"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
@@ -22,6 +23,7 @@
             <param name="ConversionPattern" value="%p        %d{ISO8601} %t      %c      %m%n"/>
         </layout>
     </appender>
+
     <!-- Perf4J appenders -->
     <!--
       This AsyncCoalescingStatisticsAppender groups StopWatch log messages
@@ -37,7 +39,7 @@
           the default of 30000 ms
         -->
         <param name="TimeSlice" value="10000"/>
-        <appender-ref ref="fileAppender"/>
+        <!--<appender-ref ref="fileAppender"/>-->
         <appender-ref ref="graphExecutionTimes"/>
         <appender-ref ref="graphExecutionTPS"/>
         <!-- We add the JMX Appender reference onto the CoalescingStatistics -->
@@ -45,6 +47,7 @@
     </appender>
 
     <!-- This file appender is used to output aggregated performance statistics -->
+    <!-- We turn it off by default as it can be a performance drag -->
     <appender name="fileAppender" class="org.apache.log4j.FileAppender">
         <param name="File" value="perfStats.log"/>
         <layout class="org.apache.log4j.PatternLayout">

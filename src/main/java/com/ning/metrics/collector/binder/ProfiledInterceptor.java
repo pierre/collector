@@ -18,16 +18,16 @@ package com.ning.metrics.collector.binder;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.perf4j.LoggingStopWatch;
 import org.perf4j.StopWatch;
 import org.perf4j.aop.Profiled;
+import org.perf4j.log4j.Log4JStopWatch;
 
 public class ProfiledInterceptor implements MethodInterceptor
 {
     public Object invoke(final MethodInvocation invocation) throws Throwable
     {
         final Profiled profiled = invocation.getMethod().getAnnotation(Profiled.class);
-        final StopWatch stopWatch = new LoggingStopWatch(profiled.tag(), profiled.message());
+        final StopWatch stopWatch = new Log4JStopWatch(profiled.tag(), profiled.message());
 
         try {
             return invocation.proceed();

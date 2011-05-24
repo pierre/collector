@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The serialization-writer library exposes stats on a per writer basis. This class manages stats across all writers.
- *
+ * <p/>
  * Needs to be public for JMX
  */
 public class WriterStats

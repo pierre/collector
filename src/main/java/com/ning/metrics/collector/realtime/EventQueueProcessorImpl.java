@@ -137,6 +137,16 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     }
 
     /**
+     * Show queues to for the healthcheck endpoint
+     *
+     * @return the underlying queues
+     */
+    Map<String, LocalQueueAndWorkers> getQueuesPerCategory()
+    {
+        return queuesPerCategory;
+    }
+
+    /**
      * Given en Event, create a message for ActiveMQ. This will generate JSON if Goodwill integration is enabled and
      * it knows about the event.
      *

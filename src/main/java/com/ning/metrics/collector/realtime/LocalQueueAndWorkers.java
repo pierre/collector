@@ -66,4 +66,12 @@ class LocalQueueAndWorkers
             stats.registerEventDropped();
         }
     }
+
+    /**
+     * @return underlying queue size for healthcheck endpoint
+     */
+    int queueSize()
+    {
+        return queue.size();
+    }
 }
