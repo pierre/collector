@@ -46,7 +46,7 @@ public class ThriftEnvelopeEventParser implements EventParser
     private final IntegerConverter integerConverter;
 
     @Inject
-    public ThriftEnvelopeEventParser(NumberConverter numberConverter)
+    public ThriftEnvelopeEventParser(final NumberConverter numberConverter)
     {
         this.numberConverter = numberConverter;
         this.byteConverter = new ByteConverter(numberConverter);
@@ -55,18 +55,18 @@ public class ThriftEnvelopeEventParser implements EventParser
     }
 
     @Override
-    public Event parseThriftEvent(final String eventTypeName, String input, final ExtractedAnnotation extractedAnnotation) throws EventParsingException
+    public Event parseThriftEvent(final String eventTypeName, final String input, final ExtractedAnnotation extractedAnnotation) throws EventParsingException
     {
         try {
-            Tokenizer tokenizer = new UrlDecodingTokenizer(new SplitTokenizer(input, TOKEN_SEPARATOR));
-            List<ThriftField> payload = new ArrayList<ThriftField>();
+            final Tokenizer tokenizer = new UrlDecodingTokenizer(new SplitTokenizer(input, TOKEN_SEPARATOR));
+            final List<ThriftField> payload = new ArrayList<ThriftField>();
             short id = (short) 1;
 
             while (tokenizer.hasNext()) {
-                Token token = tokenizer.next();
+                final Token token = tokenizer.next();
 
                 if (!token.isEmpty()) {
-                    ThriftField field;
+                    final ThriftField field;
 
                     switch (token.getType()) {
                         case 'b':
@@ -103,7 +103,7 @@ public class ThriftEnvelopeEventParser implements EventParser
                 id++;
             }
 
-            ThriftEnvelope thriftEnvelope = new ThriftEnvelope(eventTypeName, payload);
+            final ThriftEnvelope thriftEnvelope = new ThriftEnvelope(eventTypeName, payload);
 
             return new ThriftEnvelopeEvent(extractedAnnotation.getDateTime(), thriftEnvelope, extractedAnnotation.getBucketGranularity());
         }
@@ -112,9 +112,9 @@ public class ThriftEnvelopeEventParser implements EventParser
         }
     }
 
-    private ThriftField getAnnotatedValue(short id, Token token, ExtractedAnnotation annotation)
+    private ThriftField getAnnotatedValue(final short id, final Token token, final ExtractedAnnotation annotation)
     {
-        String function = token.getValue().toLowerCase(Locale.US);
+        final String function = token.getValue().toLowerCase(Locale.US);
         if ("date".equals(function)) {
             return ThriftField.createThriftField(annotation.getDateTime().getMillis(), id);
         }

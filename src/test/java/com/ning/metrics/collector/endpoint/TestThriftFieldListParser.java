@@ -24,6 +24,8 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class TestThriftFieldListParser
 {
@@ -32,7 +34,7 @@ public class TestThriftFieldListParser
     @Test(groups = "fast")
     public void testParse() throws Exception
     {
-        ArrayList<ThriftField> input = new ArrayList<ThriftField>();
+        final List<ThriftField> input = new ArrayList<ThriftField>();
         input.add(ThriftField.createThriftField("string", (short) 0));
         input.add(ThriftField.createThriftField(true, (short) 1));
         input.add(ThriftField.createThriftField((byte) 1, (short) 2));
@@ -41,10 +43,10 @@ public class TestThriftFieldListParser
         input.add(ThriftField.createThriftField(8L, (short) 4));
         input.add(ThriftField.createThriftField(3.14, (short) 5));
 
-        ThriftFieldListSerializer serializer = new ThriftFieldListSerializer();
-        byte[] payload = serializer.createPayload(input);
+        final ThriftFieldListSerializer serializer = new ThriftFieldListSerializer();
+        final byte[] payload = serializer.createPayload(input);
 
-        ArrayList<ThriftField> result = parser.parse(payload.length, new ByteArrayInputStream(payload));
+        final Collection<ThriftField> result = parser.parse(payload.length, new ByteArrayInputStream(payload));
 
         Assert.assertFalse(result == input);
         Assert.assertEquals(result, input);

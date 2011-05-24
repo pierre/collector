@@ -28,26 +28,26 @@ import java.util.Map;
 
 public class MockHttpHeaders implements HttpHeaders
 {
-    private MultivaluedMap<String, String> headers = new InBoundHeaders();
+    private final MultivaluedMap<String, String> headers = new InBoundHeaders();
 
     public MockHttpHeaders()
     {
     }
 
     public MockHttpHeaders(
-        String referer,
-        String userAgent,
-        String ip
+        final String referer,
+        final String userAgent,
+        final String ip
     )
     {
         this(referer, userAgent, ip, null);
     }
 
     public MockHttpHeaders(
-        String referer,
-        String userAgent,
-        String ip,
-        Integer contentLength
+        final String referer,
+        final String userAgent,
+        final String ip,
+        final Integer contentLength
     )
     {
         if (referer != null) {
@@ -67,7 +67,7 @@ public class MockHttpHeaders implements HttpHeaders
         }
     }
 
-    public void addHeader(String key, String value)
+    public void addHeader(final String key, final String value)
     {
         headers.putSingle(key, value);
     }
@@ -81,7 +81,7 @@ public class MockHttpHeaders implements HttpHeaders
      * @throws IllegalStateException if called outside the scope of a request
      */
     @Override
-    public List<String> getRequestHeader(String name)
+    public List<String> getRequestHeader(final String name)
     {
         return headers.get(name);
     }

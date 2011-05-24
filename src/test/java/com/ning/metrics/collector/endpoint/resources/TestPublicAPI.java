@@ -20,11 +20,9 @@ import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.metrics.collector.binder.annotations.HdfsEventWriter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
-import com.ning.metrics.collector.events.processing.BufferingEventCollector;
-import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
+import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.log4j.Logger;
@@ -48,17 +46,13 @@ public abstract class TestPublicAPI
     BufferingEventCollector incomingQueue;
 
     @Inject
-    DiskSpoolEventWriter spooler;
-
-    @Inject
-    @HdfsEventWriter
     EventWriter hdfsWriter;
 
     static final String MEGATRON_2000_USER_AGENT = "NING_MEGATR0N/2000";
     static final String AWESOME_REFERRER_HOST = "mouraf.ning.com";
     static final String AWESOME_REFERRER_PATH = "/unit-test?pass=true&awesome=true";
 
-    final AsyncHttpClientConfig clientConfig = new AsyncHttpClientConfig.Builder()
+    private final AsyncHttpClientConfig clientConfig = new AsyncHttpClientConfig.Builder()
         .setIdleConnectionInPoolTimeoutInMs(100)
         .setConnectionTimeoutInMs(100)
         .setUserAgent(MEGATRON_2000_USER_AGENT)
@@ -96,9 +90,7 @@ public abstract class TestPublicAPI
 
     void assertCleanQueues()
     {
-        Assert.assertEquals(incomingQueue.getQueueSize(), 0);
-        Assert.assertEquals(spooler.getDiskSpoolSize(), 0);
-        Assert.assertEquals(spooler.getQuarantineSize(), 0);
+        Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getWrittenEventList().size());
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getCommittedEventList().size());
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getQuarantinedEventList().size());
@@ -110,9 +102,7 @@ public abstract class TestPublicAPI
         Thread.sleep(2000);
 
         // Check the spooler is empty
-        Assert.assertEquals(incomingQueue.getQueueSize(), 0);
-        Assert.assertEquals(spooler.getDiskSpoolSize(), 0);
-        Assert.assertEquals(spooler.getQuarantineSize(), 0);
+        Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
 
         // Check the event was 'committed' to HDFS
         Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getWrittenEventList().size());

@@ -19,7 +19,7 @@ package com.ning.metrics.collector.events.parsing.converters;
 public class DecimalNumberConverter implements NumberConverter
 {
     @Override
-    public Long convert(String input)
+    public Long convert(final String input)
     {
         return Long.valueOf(input);
     }

@@ -30,8 +30,8 @@ public class Stats
     private final AtomicLong count = new AtomicLong(0);
     private final AtomicLong size = new AtomicLong(0);
 
-    private volatile DescriptiveStatistics millisStats;
-    private volatile DescriptiveStatistics sizeStats;
+    private final DescriptiveStatistics millisStats;
+    private final DescriptiveStatistics sizeStats;
 
     private final String windowString;
 
@@ -48,13 +48,13 @@ public class Stats
      * @param unit   unit of period
      * @return stats
      */
-    public static Stats timeWindow(long period, TimeUnit unit)
+    public static Stats timeWindow(final long period, final TimeUnit unit)
     {
-        long millis = TimeUnit.MILLISECONDS.convert(period, unit);
+        final long millis = TimeUnit.MILLISECONDS.convert(period, unit);
         return new Stats(new SynchronizedTimeWindowStatistics(millis), new SynchronizedTimeWindowStatistics(millis), WindowType.TIME, 0, period, unit);
     }
 
-    private Stats(DescriptiveStatistics millisStats, DescriptiveStatistics sizeStats, WindowType windowType, int capacity, long period, TimeUnit unit)
+    private Stats(final DescriptiveStatistics millisStats, final DescriptiveStatistics sizeStats, final WindowType windowType, final int capacity, final long period, final TimeUnit unit)
     {
         this.millisStats = millisStats;
         this.sizeStats = sizeStats;
@@ -71,7 +71,7 @@ public class Stats
      *
      * @param millis number of milliseconds the operation took
      */
-    public void record(double millis)
+    public void record(final double millis)
     {
         count.incrementAndGet();
         millisStats.addValue(millis);
@@ -105,7 +105,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisMin()
     {
-        double min = millisStats.getMin();
+        final double min = millisStats.getMin();
         return Double.isNaN(min) ? 0.0 : min;
     }
 
@@ -116,7 +116,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisMax()
     {
-        double max = millisStats.getMax();
+        final double max = millisStats.getMax();
         return Double.isNaN(max) ? 0.0 : max;
     }
 
@@ -129,7 +129,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisAvg()
     {
-        double avg = millisStats.getMean();
+        final double avg = millisStats.getMean();
         return Double.isNaN(avg) ? 0.0 : avg;
     }
 
@@ -142,7 +142,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisTP50()
     {
-        double percentile = millisStats.getPercentile(50);
+        final double percentile = millisStats.getPercentile(50);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -155,7 +155,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisTP90()
     {
-        double percentile = millisStats.getPercentile(90);
+        final double percentile = millisStats.getPercentile(90);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -167,7 +167,7 @@ public class Stats
     @Managed
     public double getMillisTP99()
     {
-        double percentile = millisStats.getPercentile(99);
+        final double percentile = millisStats.getPercentile(99);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -180,7 +180,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisTP999()
     {
-        double percentile = millisStats.getPercentile(99.9);
+        final double percentile = millisStats.getPercentile(99.9);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -193,7 +193,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisTP9999()
     {
-        double percentile = millisStats.getPercentile(99.99);
+        final double percentile = millisStats.getPercentile(99.99);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -206,7 +206,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getMillisTP99999()
     {
-        double percentile = millisStats.getPercentile(99.999);
+        final double percentile = millisStats.getPercentile(99.999);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -217,7 +217,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeMin()
     {
-        double min = sizeStats.getMin();
+        final double min = sizeStats.getMin();
         return Double.isNaN(min) ? 0.0 : min;
     }
 
@@ -228,7 +228,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeMax()
     {
-        double max = sizeStats.getMax();
+        final double max = sizeStats.getMax();
         return Double.isNaN(max) ? 0.0 : max;
     }
 
@@ -241,7 +241,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeAvg()
     {
-        double avg = sizeStats.getMean();
+        final double avg = sizeStats.getMean();
         return Double.isNaN(avg) ? 0.0 : avg;
     }
 
@@ -254,7 +254,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeTP50()
     {
-        double percentile = sizeStats.getPercentile(50);
+        final double percentile = sizeStats.getPercentile(50);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -267,7 +267,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeTP90()
     {
-        double percentile = sizeStats.getPercentile(90);
+        final double percentile = sizeStats.getPercentile(90);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -280,7 +280,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeTP99()
     {
-        double percentile = sizeStats.getPercentile(99);
+        final double percentile = sizeStats.getPercentile(99);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -293,7 +293,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeTP999()
     {
-        double percentile = sizeStats.getPercentile(99.9);
+        final double percentile = sizeStats.getPercentile(99.9);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -306,7 +306,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeTP9999()
     {
-        double percentile = sizeStats.getPercentile(99.99);
+        final double percentile = sizeStats.getPercentile(99.99);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 
@@ -319,7 +319,7 @@ public class Stats
     @SuppressWarnings("unused")
     public double getSizeTP99999()
     {
-        double percentile = sizeStats.getPercentile(99.999);
+        final double percentile = sizeStats.getPercentile(99.999);
         return Double.isNaN(percentile) ? 0.0 : percentile;
     }
 

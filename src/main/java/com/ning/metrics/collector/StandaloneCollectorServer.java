@@ -23,8 +23,8 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.binder.ProfiledInterceptor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.events.hadoop.writer.HdfsModule;
-import com.ning.metrics.collector.events.processing.EventCollectorModule;
+import com.ning.metrics.collector.hadoop.writer.HdfsModule;
+import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
 import com.ning.metrics.collector.endpoint.filters.FiltersModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueModule;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
@@ -60,7 +60,7 @@ public class StandaloneCollectorServer
     private static final Logger log = Logger.getLogger(StandaloneCollectorServer.class);
     private static Injector injector = null;
 
-    public static void main(String... args) throws Exception
+    public static void main(final String... args) throws Exception
     {
         final long startTime = System.currentTimeMillis();
 
@@ -82,10 +82,10 @@ public class StandaloneCollectorServer
                     bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
 
                     // JMX exporter
-                    ExportBuilder builder = MBeanModule.newExporter(binder());
+                    final ExportBuilder builder = MBeanModule.newExporter(binder());
 
                     // Perf4j Stuff
-                    MethodInterceptor interceptor = new ProfiledInterceptor();
+                    final MethodInterceptor interceptor = new ProfiledInterceptor();
                     bindInterceptor(any(), annotatedWith(Profiled.class), interceptor);
 
                     // F5 slb stuff
@@ -111,7 +111,7 @@ public class StandaloneCollectorServer
         );
 
         /* Start the Jetty endpoint */
-        JettyServer jetty = injector.getInstance(JettyServer.class);
+        final JettyServer jetty = injector.getInstance(JettyServer.class);
         jetty.start();
 
         // We need to wait for Jetty to be fully up (it will setup SLF4j). Otherwise, we may encounter a race condition:

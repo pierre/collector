@@ -24,7 +24,7 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.filters.Filter;
-import com.ning.metrics.collector.events.processing.EventCollector;
+import com.ning.metrics.collector.hadoop.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 import org.weakref.jmx.Managed;

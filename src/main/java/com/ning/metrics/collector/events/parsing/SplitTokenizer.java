@@ -18,12 +18,12 @@ package com.ning.metrics.collector.events.parsing;
 
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 
-public class SplitTokenizer implements Tokenizer
+class SplitTokenizer implements Tokenizer
 {
     private final String[] parts;
     private int position = 0;
 
-    public SplitTokenizer(String inputString, String tokenString)
+    public SplitTokenizer(final String inputString, final String tokenString)
     {
         parts = inputString.split(tokenString);
     }
@@ -40,8 +40,8 @@ public class SplitTokenizer implements Tokenizer
             throw new EventParsingException(String.format("request for index %d when max index is %d", position, parts.length - 1));
         }
 
-        String value = parts[position++];
-        Token token;
+        final String value = parts[position++];
+        final Token token;
 
         if (value.isEmpty()) {
             token = Token.createEmptyToken();

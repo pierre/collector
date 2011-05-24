@@ -22,7 +22,7 @@ import java.util.Map;
 public class Base64NumberConverter implements NumberConverter
 {
     @Override
-    public Long convert(String input)
+    public Long convert(final String input)
     {
         return decode(input.toCharArray());
     }
@@ -45,9 +45,8 @@ public class Base64NumberConverter implements NumberConverter
         }
     }
 
-    private static long decode(char[] input)
+    private static long decode(final char[] input)
     {
-        long value = 0L;
         boolean isNegative = false;
         int i = 0;
 
@@ -56,10 +55,11 @@ public class Base64NumberConverter implements NumberConverter
             i = 1;
         }
 
+        long value = 0L;
         for (; i < input.length; i++) {
-            char c = input[i];
+            final char c = input[i];
 
-            Integer charValue = DECODING_MAP.get(c);
+            final Integer charValue = DECODING_MAP.get(c);
 
             value <<= 6;
 

@@ -33,47 +33,47 @@ public class FailsafeScheduledExecutor extends ScheduledThreadPoolExecutor
 {
     private final Logger log = Logger.getLogger(FailsafeScheduledExecutor.class);
 
-    public FailsafeScheduledExecutor(int corePoolSize, ThreadFactory threadFactory)
+    public FailsafeScheduledExecutor(final int corePoolSize, final ThreadFactory threadFactory)
     {
         super(corePoolSize, threadFactory);
     }
 
-    public <T> Future<T> submit(Callable<T> task)
+    public <T> Future<T> submit(final Callable<T> task)
     {
         return super.submit(task);
     }
 
-    public <T> Future<T> submit(Runnable task, T result)
+    public <T> Future<T> submit(final Runnable task, final T result)
     {
         return super.submit(wrapRunnable(task), result);
     }
 
-    public Future<?> submit(Runnable task)
+    public Future<?> submit(final Runnable task)
     {
         return super.submit(wrapRunnable(task));
     }
 
-    public void execute(Runnable command)
+    public void execute(final Runnable command)
     {
         super.execute(wrapRunnable(command));
     }
 
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit)
+    public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command, final long initialDelay, final long delay, final TimeUnit unit)
     {
         return super.scheduleWithFixedDelay(wrapRunnable(command), initialDelay, delay, unit);
     }
 
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit)
+    public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay, final long period, final TimeUnit unit)
     {
         return super.scheduleAtFixedRate(wrapRunnable(command), initialDelay, period, unit);
     }
 
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit)
+    public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay, final TimeUnit unit)
     {
         return super.schedule(callable, delay, unit);
     }
 
-    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit)
+    public ScheduledFuture<?> schedule(final Runnable command, final long delay, final TimeUnit unit)
     {
         return super.schedule(wrapRunnable(command), delay, unit);
     }
@@ -91,7 +91,7 @@ public class FailsafeScheduledExecutor extends ScheduledThreadPoolExecutor
                     log.error(String.format("Thread %s ended abnormally with an exception", Thread.currentThread().getName()), e);
                 }
 
-                boolean interrupted = Thread.interrupted();
+                final boolean interrupted = Thread.interrupted();
 
                 log.debug(String.format("Thread %s finished executing (%s interrupted)", Thread.currentThread().getName(), interrupted ? "was" : "was not"));
 

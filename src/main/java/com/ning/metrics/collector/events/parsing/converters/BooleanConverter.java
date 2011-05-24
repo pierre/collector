@@ -20,7 +20,7 @@ import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 
 public class BooleanConverter implements Converter<Boolean>
 {
-    public Boolean convert(String input) throws EventParsingException
+    public Boolean convert(final String input) throws EventParsingException
     {
         if ("1".equals(input)) {
             return true;

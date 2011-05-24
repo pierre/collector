@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.events.parsing;
 
-public class Token
+class Token
 {
     private final char type;
     private final String value;
@@ -27,12 +27,12 @@ public class Token
         return new Token("", '-', true);
     }
 
-    public Token(String value, char type)
+    public Token(final String value, final char type)
     {
         this(value, type, false);
     }
 
-    private Token(String value, char type, boolean isEmpty)
+    private Token(final String value, final char type, final boolean isEmpty)
     {
         this.value = value;
         this.type = type;

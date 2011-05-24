@@ -116,11 +116,11 @@ public class EventRequestHandler
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    public Response handleJsonRequest(boolean plainJson, EventStats eventStats, ExtractedAnnotation annotation)
+    public Response handleJsonRequest(final boolean plainJson, final EventStats eventStats, final ExtractedAnnotation annotation)
     {
         // TODO right now all the events in a file are sharing the same eventStats
 
-        SmileEnvelopeEventExtractor extractor;
+        final SmileEnvelopeEventExtractor extractor;
         try {
             extractor = new SmileEnvelopeEventExtractor(annotation.getInputStream(), plainJson);
         }
@@ -141,7 +141,7 @@ public class EventRequestHandler
 
         while (true) {
             try {
-                Event event = extractor.extractNextEvent();
+                final Event event = extractor.extractNextEvent();
                 eventStats.recordExtracted(); // TODO see above TODO (all events share this eventStats object)
 
                 // if has reached EOF

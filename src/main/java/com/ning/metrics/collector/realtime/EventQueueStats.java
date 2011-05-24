@@ -85,4 +85,16 @@ public class EventQueueStats
     {
         return erroredEvents.get();
     }
+
+    /**
+     * Unit test hook
+     */
+    public synchronized void clear()
+    {
+        ignoredEvents.set(0);
+        enqueuedEvents.set(0);
+        droppedEvents.set(0);
+        sentEvents.set(0);
+        erroredEvents.set(0);
+    }
 }

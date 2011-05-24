@@ -28,11 +28,11 @@ public class MockEventHandler implements EventHandler
 
     private boolean throwExceptionBeforeEvent = false;
     private boolean throwExceptionAfterEvent = false;
-    private List<Event> processedEventList = new ArrayList<Event>();
+    private final List<Event> processedEventList = new ArrayList<Event>();
     private boolean handleFailureCalled = false;
 
     @Override
-    public Response processEvent(Event event, ExtractedAnnotation annotation, EventEndPointStats stats, EventStats eventStats)
+    public Response processEvent(final Event event, final ExtractedAnnotation annotation, final EventEndPointStats stats, final EventStats eventStats)
     {
         stats.updateTotalEvents();
 
@@ -52,7 +52,7 @@ public class MockEventHandler implements EventHandler
     }
 
     @Override
-    public Response handleFailure(Response.Status s, EventEndPointStats stats, Exception e)
+    public Response handleFailure(final Response.Status s, final EventEndPointStats stats, final Exception e)
     {
         handleFailureCalled = true;
 
@@ -63,12 +63,12 @@ public class MockEventHandler implements EventHandler
             .build();
     }
 
-    public void setThrowExceptionAfterEvent(boolean throwExceptionAfterEvent)
+    public void setThrowExceptionAfterEvent(final boolean throwExceptionAfterEvent)
     {
         this.throwExceptionAfterEvent = throwExceptionAfterEvent;
     }
 
-    public void setThrowExceptionBeforeEvent(boolean throwExceptionBeforeEvent)
+    public void setThrowExceptionBeforeEvent(final boolean throwExceptionBeforeEvent)
     {
         this.throwExceptionBeforeEvent = throwExceptionBeforeEvent;
     }

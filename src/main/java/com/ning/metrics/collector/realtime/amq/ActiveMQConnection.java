@@ -48,10 +48,6 @@ class ActiveMQConnection implements EventQueueConnection
     @Override
     public void reconnect()
     {
-        int numTries = 0;
-        int pauseInMs = 100;
-        boolean connected = false;
-
         if (connectionFactory == null) {
             logger.warn("Asked to reconnect to AMQ but no connectionFactory was configured!");
             return;
@@ -59,6 +55,9 @@ class ActiveMQConnection implements EventQueueConnection
 
         synchronized (connectionMonitor) {
             close();
+            int numTries = 0;
+            int pauseInMs = 100;
+            boolean connected = false;
             while (!connected) {
                 numTries++;
                 try {

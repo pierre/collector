@@ -28,8 +28,8 @@ public class TestEventRate
     @Test(groups = "fast")
     public void testZeroEndRate() throws Exception
     {
-        MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
-        EventRate rate = createRate(theDate, 5);
+        final MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
+        final EventRate rate = createRate(theDate, 5);
 
         rate.increment();
         rate.increment();
@@ -42,8 +42,8 @@ public class TestEventRate
     @Test(groups = "fast")
     public void testZeroInitRate() throws Exception
     {
-        MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
-        EventRate rate = createRate(theDate, 5);
+        final MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
+        final EventRate rate = createRate(theDate, 5);
 
         Assert.assertEquals(rate.getRate(), 0);
     }
@@ -51,8 +51,8 @@ public class TestEventRate
     @Test(groups = "fast")
     public void testNormalRateChange() throws Exception
     {
-        MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
-        EventRate rate = createRate(theDate, 5);
+        final MutableDateTime theDate = new MutableDateTime("2009-01-01T00:00:00");
+        final EventRate rate = createRate(theDate, 5);
 
         rate.increment();
         rate.increment();
@@ -64,7 +64,7 @@ public class TestEventRate
         Assert.assertEquals(rate.getRate(), 1);
     }
 
-    private EventRate createRate(final MutableDateTime theDate, int minutes)
+    private EventRate createRate(final MutableDateTime theDate, final int minutes)
     {
         return new EventRate(Period.minutes(minutes))
         {

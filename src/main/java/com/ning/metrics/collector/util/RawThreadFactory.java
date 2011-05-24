@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadFactory;
 
 class RawThreadFactory implements ThreadFactory
 {
-    public Thread newThread(Runnable r)
+    public Thread newThread(final Runnable r)
     {
         return new Thread(r);
     }

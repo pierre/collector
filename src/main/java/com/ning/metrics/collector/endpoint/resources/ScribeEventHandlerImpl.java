@@ -21,7 +21,7 @@ import com.ning.metrics.collector.binder.annotations.ScribeStats;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.events.processing.EventCollector;
+import com.ning.metrics.collector.hadoop.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 import org.weakref.jmx.Managed;
@@ -52,10 +52,10 @@ class ScribeEventHandlerImpl implements ScribeEventHandler
     public boolean processEvent(final Event event, final EventStats eventStats)
     {
         assert event != null;
-        final boolean success;
 
         stats.updateTotalEvents();
 
+        final boolean success;
         if (scribeCollectionEnabled) {
             logger.debug(String.format("Processing event of type [%s], collection enabled", event.getName()));
 

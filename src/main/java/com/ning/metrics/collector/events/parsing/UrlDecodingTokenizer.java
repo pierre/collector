@@ -21,11 +21,11 @@ import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-public class UrlDecodingTokenizer implements Tokenizer
+class UrlDecodingTokenizer implements Tokenizer
 {
     private final Tokenizer baseTokenizer;
 
-    public UrlDecodingTokenizer(Tokenizer baseTokenizer)
+    public UrlDecodingTokenizer(final Tokenizer baseTokenizer)
     {
         this.baseTokenizer = baseTokenizer;
     }
@@ -39,12 +39,12 @@ public class UrlDecodingTokenizer implements Tokenizer
     public Token next() throws EventParsingException
     {
         try {
-            Token baseToken = baseTokenizer.next();
+            final Token baseToken = baseTokenizer.next();
             if (baseToken.isEmpty()) {
                 return baseToken;
             }
             else {
-                String value = URLDecoder.decode(baseToken.getValue(), "UTF-8");
+                final String value = URLDecoder.decode(baseToken.getValue(), "UTF-8");
 
                 return new Token(value, baseToken.getType());
             }

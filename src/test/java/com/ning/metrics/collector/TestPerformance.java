@@ -37,22 +37,23 @@ import scribe.thrift.scribe;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class TestPerformance
 {
-    private final static int THREADPOOL_SIZE = 5;
-    private final static int NUMBER_OF_SCRIBE_CLIENTS = 5;
-    private final static int NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD = 60;
+    private static final int THREADPOOL_SIZE = 5;
+    private static final int NUMBER_OF_SCRIBE_CLIENTS = 5;
+    private static final int NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD = 60;
     private static int NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT;
 
-    private static ArrayList<LogEntry> messages;
+    private static List<LogEntry> messages;
     private static scribe.Client client;
-    private final static Logger log = Logger.getLogger(TestPerformance.class);
+    private static final Logger log = Logger.getLogger(TestPerformance.class);
 
-    static final private Object lockObject = new Object();
+    private static final Object lockObject = new Object();
 
     private static class ScribeClient implements Runnable
     {
@@ -97,11 +98,11 @@ public class TestPerformance
         }
     }
 
-    public static void main(String[] args) throws Exception
+    public static void main(final String[] args) throws Exception
     {
         final TFramedTransport transport = createScribeClient();
 
-        String message = createThriftPayload();
+        final String message = createThriftPayload();
         //String message = createSmilePayload();
 
         NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT = 2000;
@@ -121,7 +122,7 @@ public class TestPerformance
         System.exit(0);
     }
 
-    private static void doOneRun(String message)
+    private static void doOneRun(final String message)
         throws InterruptedException
     {
         messages = new ArrayList<LogEntry>(NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD);
@@ -130,9 +131,9 @@ public class TestPerformance
         }
         log.debug("Scribe payload created");
 
-        int messageSize = message.length();
+        final int messageSize = message.length();
 
-        long startTime = scheduleScribeAgents();
+        final long startTime = scheduleScribeAgents();
 
         final long runTimeSeconds = (System.currentTimeMillis() - startTime) / 1000;
         //final double throughput = 8 / 1024. * messageSize * NUMBER_OF_SCRIBE_CLIENTS * NUMBER_OF_MESSAGES_PER_SCRIBE_PAYLOAD * NUMBER_OF_MESSAGES_PER_SCRIBE_CLIENT / runTimeSeconds;
@@ -144,9 +145,9 @@ public class TestPerformance
 
     private static long scheduleScribeAgents() throws InterruptedException
     {
-        ExecutorService e = Executors.newFixedThreadPool(THREADPOOL_SIZE, new NamedThreadFactory("Performance tests (Scribe client)"));
+        final ExecutorService e = Executors.newFixedThreadPool(THREADPOOL_SIZE, new NamedThreadFactory("Performance tests (Scribe client)"));
 
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         for (int i = 0; i < NUMBER_OF_SCRIBE_CLIENTS; i++) {
             e.execute(new ScribeClient());
             log.debug(String.format("Thread %d/%d submitted", i + 1, NUMBER_OF_SCRIBE_CLIENTS));
@@ -161,7 +162,7 @@ public class TestPerformance
     {
         final TSocket sock = new TSocket("127.0.0.1", 7911);
         final TFramedTransport transport = new TFramedTransport(sock);
-        TBinaryProtocol protocol = new TBinaryProtocol(transport, false, false);
+        final TBinaryProtocol protocol = new TBinaryProtocol(transport, false, false);
         client = new scribe.Client(protocol, protocol);
         transport.open();
         return transport;
@@ -169,7 +170,7 @@ public class TestPerformance
 
     private static String createThriftPayload() throws TException
     {
-        ArrayList<ThriftField> data = new ArrayList<ThriftField>();
+        final List<ThriftField> data = new ArrayList<ThriftField>();
         data.add(ThriftField.createThriftField("Fuu", (short) 1));
         data.add(ThriftField.createThriftField(true, (short) 2));
         data.add(ThriftField.createThriftField(3.1459, (short) 3));
@@ -180,8 +181,8 @@ public class TestPerformance
     private static String createSmilePayload() throws IOException
     {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        SmileFactory f = new SmileFactory();
-        JsonGenerator g = f.createJsonGenerator(stream);
+        final SmileFactory f = new SmileFactory();
+        final JsonGenerator g = f.createJsonGenerator(stream);
 
         g.writeStartObject();
         g.writeNumberField(SmileEnvelopeEvent.SMILE_EVENT_DATETIME_TOKEN_NAME, new DateTime().getMillis());

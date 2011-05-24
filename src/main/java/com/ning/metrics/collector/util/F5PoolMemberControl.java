@@ -55,7 +55,7 @@ public class F5PoolMemberControl
     private final String poolName;
 
     @Inject
-    public F5PoolMemberControl(CollectorConfig config)
+    public F5PoolMemberControl(final CollectorConfig config)
     {
         hostname = config.getF5Hostname();
         username = config.getF5Username();
@@ -63,9 +63,9 @@ public class F5PoolMemberControl
         poolName = config.getF5PoolName();
     }
 
-    private static Interfaces getInterface(String hostname, String username, String password)
+    private static Interfaces getInterface(final String hostname, final String username, final String password)
     {
-        Interfaces m_interfaces = new Interfaces();
+        final Interfaces m_interfaces = new Interfaces();
         m_interfaces.initialize(hostname, username, password);
 
         return m_interfaces;
@@ -93,7 +93,7 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of available pools")
-    public String[] getPoolList(String hostname, String username, String password) throws Exception
+    public String[] getPoolList(final String hostname, final String username, final String password) throws Exception
     {
         log.info(String.format("Retrieving pool list for %s (username: %s)", hostname, username));
         try {
@@ -132,12 +132,12 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of members in a pool")
-    public String[] getPoolMembers(String poolName, String hostname, String username, String password) throws Exception
+    public String[] getPoolMembers(final String poolName, final String hostname, final String username, final String password) throws Exception
     {
         log.info(String.format("Retrieving pool members for %s (hostname: %s, username: %s)", poolName, hostname, username));
 
-        String[] poolNames = {poolName};
-        CommonIPPortDefinition[][] membersDefinitions;
+        final String[] poolNames = {poolName};
+        final CommonIPPortDefinition[][] membersDefinitions;
         try {
             membersDefinitions = getInterface(hostname, username, password).getLocalLBPool().get_member(poolNames);
         }
@@ -151,9 +151,9 @@ public class F5PoolMemberControl
         }
         log.info(String.format("Found pool members for %s (hostname: %s, username: %s): %s", poolName, hostname, username, toString(membersDefinitions)));
 
-        ArrayList<String> res = new ArrayList<String>();
-        for (CommonIPPortDefinition[] memberDefinitions : membersDefinitions) {
-            for (CommonIPPortDefinition memberDefinition : memberDefinitions) {
+        final ArrayList<String> res = new ArrayList<String>();
+        for (final CommonIPPortDefinition[] memberDefinitions : membersDefinitions) {
+            for (final CommonIPPortDefinition memberDefinition : memberDefinitions) {
                 res.add(String.format("%s:%d", memberDefinition.getAddress(), memberDefinition.getPort()));
             }
         }
@@ -169,7 +169,7 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of members in a pool")
-    public String[] getPoolMemberStatuses(String memberAddress) throws Exception
+    public String[] getPoolMemberStatuses(final String memberAddress) throws Exception
     {
         return getPoolMemberStatuses(memberAddress, poolName, hostname, username, password);
     }
@@ -186,13 +186,13 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Get the list of members in a pool")
-    public String[] getPoolMemberStatuses(String memberAddress, String poolName, String hostname, String username, String password) throws Exception
+    public String[] getPoolMemberStatuses(final String memberAddress, final String poolName, final String hostname, final String username, final String password) throws Exception
     {
-        String[] poolNames = {poolName};
-        ArrayList<String> memberStatuses = new ArrayList<String>();
+        final String[] poolNames = {poolName};
+        final ArrayList<String> memberStatuses = new ArrayList<String>();
 
         log.info(String.format("Retrieving pool member status for %s (pool: %s, hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
-        LocalLBPoolMemberMemberObjectStatus[][] members;
+        final LocalLBPoolMemberMemberObjectStatus[][] members;
         try {
             members = getInterface(hostname, username, password).getLocalLBPoolMember().get_object_status(poolNames);
         }
@@ -205,8 +205,8 @@ public class F5PoolMemberControl
             throw e;
         }
 
-        for (LocalLBPoolMemberMemberObjectStatus[] statuses : members) {
-            for (LocalLBPoolMemberMemberObjectStatus status : statuses) {
+        for (final LocalLBPoolMemberMemberObjectStatus[] statuses : members) {
+            for (final LocalLBPoolMemberMemberObjectStatus status : statuses) {
                 if (status.getMember().getAddress().equals(memberAddress)) {
                     memberStatuses.add(toString(status.getObject_status()));
                 }
@@ -227,7 +227,7 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Add a member to a pool")
-    public String[] addPoolMember(String memberAddress, int memberPort) throws Exception
+    public String[] addPoolMember(final String memberAddress, final int memberPort) throws Exception
     {
         return addPoolMember(memberAddress, memberPort, poolName, hostname, username, password);
     }
@@ -245,14 +245,14 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Add a member to a pool")
-    public String[] addPoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
+    public String[] addPoolMember(final String memberAddress, final int memberPort, final String poolName, final String hostname, final String username, final String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
         final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, (long) memberPort);
 
-        String[] poolNames = {poolName};
-        CommonIPPortDefinition[] definitions = {definition};
-        CommonIPPortDefinition[][] membersDefinitions = {definitions};
+        final String[] poolNames = {poolName};
+        final CommonIPPortDefinition[] definitions = {definition};
+        final CommonIPPortDefinition[][] membersDefinitions = {definitions};
         try {
             m_interfaces.getLocalLBPool().add_member(poolNames, membersDefinitions);
             log.info(String.format("Added %s to pool %s (hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
@@ -279,7 +279,7 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Enable a member in a pool")
-    public String[] enablePoolMember(String memberAddress, int memberPort) throws Exception
+    public String[] enablePoolMember(final String memberAddress, final int memberPort) throws Exception
     {
         return enablePoolMember(memberAddress, memberPort, poolName, hostname, username, password);
     }
@@ -298,7 +298,7 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Enable a member in a pool")
-    public String[] enablePoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
+    public String[] enablePoolMember(final String memberAddress, final int memberPort, final String poolName, final String hostname, final String username, final String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
         final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, (long) memberPort);
@@ -322,7 +322,7 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Disable a member from a pool")
-    public String[] disablePoolMember(String memberAddress, int memberPort) throws Exception
+    public String[] disablePoolMember(final String memberAddress, final int memberPort) throws Exception
     {
         return disablePoolMember(memberAddress, memberPort, poolName, hostname, username, password);
     }
@@ -340,7 +340,7 @@ public class F5PoolMemberControl
      * @throws Exception generic exception if something goes wrong
      */
     @Managed(description = "Disable a member from a pool")
-    public String[] disablePoolMember(String memberAddress, int memberPort, String poolName, String hostname, String username, String password) throws Exception
+    public String[] disablePoolMember(final String memberAddress, final int memberPort, final String poolName, final String hostname, final String username, final String password) throws Exception
     {
         final Interfaces m_interfaces = getInterface(hostname, username, password);
         final CommonIPPortDefinition definition = new CommonIPPortDefinition(memberAddress, (long) memberPort);
@@ -349,13 +349,13 @@ public class F5PoolMemberControl
         setSessionState(m_interfaces, definition, poolName, CommonEnabledState.STATE_DISABLED);
 
         log.info(String.format("Waiting for current connections to drop to zero for %s in pool %s (hostname: %s, username: %s)", memberAddress, poolName, hostname, username));
-        CommonIPPortDefinition[] memberDefinitions = {definition};
-        CommonIPPortDefinition[][] membersDefinitions = {memberDefinitions};
+        final CommonIPPortDefinition[] memberDefinitions = {definition};
+        final CommonIPPortDefinition[][] membersDefinitions = {memberDefinitions};
 
         long cur_connections = 1L;
         final String[] poolNames = {poolName};
         while (cur_connections > 0L) {
-            LocalLBPoolMemberMemberStatistics[] memberStatistics;
+            final LocalLBPoolMemberMemberStatistics[] memberStatistics;
             try {
                 memberStatistics = m_interfaces.getLocalLBPoolMember().get_statistics(poolNames, membersDefinitions);
             }
@@ -368,16 +368,16 @@ public class F5PoolMemberControl
                 throw e;
             }
 
-            LocalLBPoolMemberMemberStatistics memberStats = memberStatistics[0];
+            final LocalLBPoolMemberMemberStatistics memberStats = memberStatistics[0];
 
-            LocalLBPoolMemberMemberStatisticEntry[] statisticEntries = memberStats.getStatistics();
-            LocalLBPoolMemberMemberStatisticEntry statisticEntry = statisticEntries[0];
+            final LocalLBPoolMemberMemberStatisticEntry[] statisticEntries = memberStats.getStatistics();
+            final LocalLBPoolMemberMemberStatisticEntry statisticEntry = statisticEntries[0];
 
-            CommonStatistic[] statistics = statisticEntry.getStatistics();
+            final CommonStatistic[] statistics = statisticEntry.getStatistics();
 
-            for (CommonStatistic stats : statistics) {
-                CommonStatisticType type = stats.getType();
-                CommonULong64 value64 = stats.getValue();
+            for (final CommonStatistic stats : statistics) {
+                final CommonStatisticType type = stats.getType();
+                final CommonULong64 value64 = stats.getValue();
 
                 if (type.equals(CommonStatisticType.STATISTIC_SERVER_SIDE_CURRENT_CONNECTIONS)) {
                     cur_connections = value64.getLow();
@@ -394,14 +394,14 @@ public class F5PoolMemberControl
         return getPoolMemberStatuses(poolName, memberAddress, hostname, username, password);
     }
 
-    private static void setSessionState(Interfaces m_interfaces, CommonIPPortDefinition definition, String poolName, CommonEnabledState state) throws Exception
+    private static void setSessionState(final Interfaces m_interfaces, final CommonIPPortDefinition definition, final String poolName, final CommonEnabledState state) throws Exception
     {
         final String[] poolNames = {poolName};
 
-        LocalLBPoolMemberMemberSessionState memberSessionState = new LocalLBPoolMemberMemberSessionState(definition, state);
+        final LocalLBPoolMemberMemberSessionState memberSessionState = new LocalLBPoolMemberMemberSessionState(definition, state);
 
-        LocalLBPoolMemberMemberSessionState[] memberSessionStates = {memberSessionState};
-        LocalLBPoolMemberMemberSessionState[][] membersSessionStates = {memberSessionStates};
+        final LocalLBPoolMemberMemberSessionState[] memberSessionStates = {memberSessionState};
+        final LocalLBPoolMemberMemberSessionState[][] membersSessionStates = {memberSessionStates};
 
         log.info(String.format("Updating SLB VIP session state: %s", toString(memberSessionState)));
         try {
@@ -418,14 +418,14 @@ public class F5PoolMemberControl
         }
     }
 
-    private static void setMonitorState(Interfaces m_interfaces, CommonIPPortDefinition definition, String poolName, CommonEnabledState state) throws Exception
+    private static void setMonitorState(final Interfaces m_interfaces, final CommonIPPortDefinition definition, final String poolName, final CommonEnabledState state) throws Exception
     {
         final String[] poolNames = {poolName};
 
-        LocalLBPoolMemberMemberMonitorState memberMonitorState = new LocalLBPoolMemberMemberMonitorState(definition, state);
+        final LocalLBPoolMemberMemberMonitorState memberMonitorState = new LocalLBPoolMemberMemberMonitorState(definition, state);
 
-        LocalLBPoolMemberMemberMonitorState[] memberMonitorStates = {memberMonitorState};
-        LocalLBPoolMemberMemberMonitorState[][] membersMonitorStates = {memberMonitorStates};
+        final LocalLBPoolMemberMemberMonitorState[] memberMonitorStates = {memberMonitorState};
+        final LocalLBPoolMemberMemberMonitorState[][] membersMonitorStates = {memberMonitorStates};
 
         log.info(String.format("Updating SLB VIP monitor state: %s", toString(memberMonitorState)));
         try {
@@ -442,38 +442,38 @@ public class F5PoolMemberControl
         }
     }
 
-    private String toString(CommonIPPortDefinition[][] membersDefinitions)
+    private String toString(final CommonIPPortDefinition[][] membersDefinitions)
     {
         String res = "";
-        for (CommonIPPortDefinition[] memberDefinitions : membersDefinitions) {
-            for (CommonIPPortDefinition memberDefinition : memberDefinitions) {
+        for (final CommonIPPortDefinition[] memberDefinitions : membersDefinitions) {
+            for (final CommonIPPortDefinition memberDefinition : memberDefinitions) {
                 res = String.format("%s%s,", res, toString(memberDefinition));
             }
         }
         return StringUtils.chomp(res, ",");
     }
 
-    private static String toString(LocalLBPoolMemberMemberMonitorState state)
+    private static String toString(final LocalLBPoolMemberMemberMonitorState state)
     {
         return String.format("LocalLBPoolMemberMemberMonitorState{member=%s, monitor_state=%s}", toString(state.getMember()), toString(state.getMonitor_state()));
     }
 
-    private static String toString(CommonEnabledState monitor_state)
+    private static String toString(final CommonEnabledState monitor_state)
     {
         return String.format("CommonEnabledState{value=%s}", monitor_state.getValue());
     }
 
-    private static String toString(CommonIPPortDefinition member)
+    private static String toString(final CommonIPPortDefinition member)
     {
         return String.format("CommonIPPortDefinition{address=%s, port=%d}", member.getAddress(), member.getPort());
     }
 
-    private static String toString(LocalLBPoolMemberMemberSessionState memberSessionState)
+    private static String toString(final LocalLBPoolMemberMemberSessionState memberSessionState)
     {
         return String.format("LocalLBPoolMemberMemberSessionState{member=%s, session_state=%s}", toString(memberSessionState.getMember()), toString(memberSessionState.getSession_state()));
     }
 
-    private String toString(LocalLBObjectStatus object_status)
+    private String toString(final LocalLBObjectStatus object_status)
     {
         return String.format("LocalLBObjectStatus{availability=%s, enabled=%s, description=%s}",
             object_status.getAvailability_status(), object_status.getEnabled_status(), object_status.getStatus_description());

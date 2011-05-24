@@ -22,15 +22,15 @@ public class ShortConverter implements Converter<Short>
 {
     private final NumberConverter numberConverter;
 
-    public ShortConverter(NumberConverter numberConverter)
+    public ShortConverter(final NumberConverter numberConverter)
     {
         this.numberConverter = numberConverter;
     }
 
-    public Short convert(String input) throws EventParsingException
+    public Short convert(final String input) throws EventParsingException
     {
         try {
-            Long value = numberConverter.convert(input);
+            final Long value = numberConverter.convert(input);
 
             if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
                 throw new EventParsingException(String.format("Value out of range(%d, %d). Value:\"%s\"", Short.MIN_VALUE, Short.MAX_VALUE, input));
