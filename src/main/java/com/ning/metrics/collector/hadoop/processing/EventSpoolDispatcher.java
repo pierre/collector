@@ -58,35 +58,35 @@ class EventSpoolDispatcher
         // Background committer (close the current open file and promote it to the final spool area for flush)
         final ScheduledExecutorService scheduledExecutor = new FailsafeScheduledExecutor(1, new NamedThreadFactory("queueReaper"));
         scheduledExecutor.schedule(new Runnable()
-        {
-            @Override
-            public void run()
             {
-                try {
-                    for (String queuePath : queuesPerPath.keySet()) {
-                        LocalQueueAndWriter queueAndWriter = queuesPerPath.get(queuePath);
-                        if (queueAndWriter.isEmpty()) {
-                            boolean isRemoved = false;
-                            // synchronized to avoid conflicts when we get a queue to offer an event to
-                            synchronized (queueMapMonitor) {
-                                if (queueAndWriter.isEmpty()) {
-                                    queuesPerPath.remove(queuePath);
-                                    isRemoved = true;
+                @Override
+                public void run()
+                {
+                    try {
+                        for (String queuePath : queuesPerPath.keySet()) {
+                            LocalQueueAndWriter queueAndWriter = queuesPerPath.get(queuePath);
+                            if (queueAndWriter.isEmpty()) {
+                                boolean isRemoved = false;
+                                // synchronized to avoid conflicts when we get a queue to offer an event to
+                                synchronized (queueMapMonitor) {
+                                    if (queueAndWriter.isEmpty()) {
+                                        queuesPerPath.remove(queuePath);
+                                        isRemoved = true;
+                                    }
                                 }
-                            }
-                            if (isRemoved) {
-                                // closing is expensive b/c we're destroying threads, so we don't want to do this
-                                // within the synchronized block
-                                queueAndWriter.close();
+                                if (isRemoved) {
+                                    // closing is expensive b/c we're destroying threads, so we don't want to do this
+                                    // within the synchronized block
+                                    queueAndWriter.close();
+                                }
                             }
                         }
                     }
+                    finally {
+                        scheduledExecutor.schedule(this, config.getRefreshDelayInSeconds(), TimeUnit.SECONDS);
+                    }
                 }
-                finally {
-                    scheduledExecutor.schedule(this, config.getRefreshDelayInSeconds(), TimeUnit.SECONDS);
-                }
-            }
-        }, 1, TimeUnit.HOURS);
+            }, 1, TimeUnit.HOURS);
     }
 
     /**
@@ -117,7 +117,12 @@ class EventSpoolDispatcher
     {
         EventType eventType = EventType.DEFAULT;
         if (event instanceof SmileEnvelopeEvent) {
-            eventType = EventType.SMILE;
+            if (((SmileEnvelopeEvent) event).isPlainJson()) {
+                eventType = EventType.JSON;
+            }
+            else {
+                eventType = EventType.SMILE;
+            }
         }
         else if (event instanceof ThriftEnvelopeEvent) {
             eventType = EventType.THRIFT;
