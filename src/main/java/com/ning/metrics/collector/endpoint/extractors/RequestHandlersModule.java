@@ -18,23 +18,31 @@ package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.ning.metrics.collector.binder.annotations.Base64ExternalEventRequestHandler;
 import com.ning.metrics.collector.binder.annotations.ExternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
 import com.ning.metrics.collector.binder.annotations.InternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
-import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
-import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParserProvider;
+import com.ning.metrics.collector.binder.providers.ArrayListProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
+import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import com.ning.metrics.collector.endpoint.resources.EventHandlerImpl;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
+import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParserProvider;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
-import com.ning.metrics.collector.endpoint.resources.EventHandler;
+import com.ning.metrics.collector.hadoop.processing.WriterHealthCheck;
+import com.ning.metrics.collector.hadoop.writer.HadoopHealthCheck;
+import com.ning.metrics.collector.realtime.RealtimeHealthCheck;
+import com.ning.metrics.collector.util.ComponentHealthCheck;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
+
+import java.util.List;
 
 public class RequestHandlersModule implements Module
 {
@@ -83,5 +91,14 @@ public class RequestHandlersModule implements Module
 
         binder.bind(EventHandler.class).to(EventHandlerImpl.class).asEagerSingleton();
         builder.export(EventHandlerImpl.class).as("com.ning.metrics.collector:name=EventHandler");
+
+        // Healthchecks
+        binder.bind(new TypeLiteral<List<ComponentHealthCheck>>()
+        {
+        })
+            .toProvider(new ArrayListProvider<ComponentHealthCheck>()
+                .add(WriterHealthCheck.class)
+                .add(RealtimeHealthCheck.class)
+                .add(HadoopHealthCheck.class));
     }
 }

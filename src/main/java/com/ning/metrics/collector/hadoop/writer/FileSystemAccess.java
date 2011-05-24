@@ -52,7 +52,6 @@ class FileSystemAccess
             return getFileSystemSafe();
         }
         catch (IOException e) {
-
             synchronized (connectionLock) {
                 long waitTime = MIN_WAIT_TIME;
                 while (true) {
