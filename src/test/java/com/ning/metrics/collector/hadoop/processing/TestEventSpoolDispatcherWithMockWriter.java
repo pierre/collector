@@ -76,24 +76,24 @@ public class TestEventSpoolDispatcherWithMockWriter
         eventB.setOutputPath("/b");
 
         // Generic event will use DEFAULT serialization
-        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("/b|bin"));
 
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("/b|bin"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 1);
         Assert.assertEquals(stats.getEnqueuedEvents(), 1);
 
         dispatcher.offer(eventB);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b|bin"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
         Assert.assertEquals(stats.getEnqueuedEvents(), 2);
 
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b|bin"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
         Assert.assertEquals(stats.getEnqueuedEvents(), 3);
     }

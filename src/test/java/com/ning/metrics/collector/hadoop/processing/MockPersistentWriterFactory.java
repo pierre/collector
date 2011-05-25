@@ -49,7 +49,7 @@ public class MockPersistentWriterFactory implements PersistentWriterFactory
     }
 
     @Override
-    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String path)
+    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String path, final String fileExtension)
     {
         if (writer == null) {
             return new MockEventWriter(commitThrowsException, rollbackThrowsException, writeThrowsException);
