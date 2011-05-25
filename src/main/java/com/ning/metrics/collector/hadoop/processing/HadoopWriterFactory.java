@@ -67,6 +67,7 @@ class HadoopWriterFactory implements PersistentWriterFactory
                 }
 
                 handler.onSuccess(file);
+                stats.registerHdfsFlush();
             }
         }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")),
             SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(),

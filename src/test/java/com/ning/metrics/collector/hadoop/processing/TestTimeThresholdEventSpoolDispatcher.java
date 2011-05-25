@@ -18,14 +18,13 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.hadoop.writer.HadoopFileEventWriter;
+import com.ning.metrics.collector.hadoop.writer.FileSystemAccess;
 import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
-import com.ning.metrics.serialization.writer.EventWriter;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.Guice;
@@ -35,19 +34,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Guice(modules = {ConfigTestModule.class, EventCollectorModule.class, HdfsModule.class, RealTimeQueueTestModule.class})
-public class TestEventSpoolDispatcher
+public class TestTimeThresholdEventSpoolDispatcher
 {
     @Inject
     CollectorConfig collectorConfig;
 
     @Inject
-    EventWriter hdfsWriter;
-
-    @Inject
     EventSpoolDispatcher dispatcher;
 
+    @Inject
+    FileSystemAccess hdfsAccess;
+
     @Test(groups = "slow")
-    public void testFlushSizeThreshold() throws Exception
+    public void testFlushTimeThreshold() throws Exception
     {
         final List<ThriftField> fields = new ArrayList<ThriftField>();
         fields.add(ThriftField.createThriftField("hello", (short) 1));
@@ -58,16 +57,21 @@ public class TestEventSpoolDispatcher
         dispatcher.offer(eventA);
         Thread.sleep(200);
         Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 1);
-        Assert.assertEquals(((HadoopFileEventWriter) hdfsWriter).getEventsWritten(), 0);
+        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 0);
 
         // Send another event and wait for the dequeuer to work. The threshold being two in FastCollectorConfig,
-        // we should have triggered a commit
+        // we should not have triggered a commit yet, however, since we waited for more than 1 second (time threshold),
+        // it will trigger a flush.
+        Thread.sleep(900);
         dispatcher.offer(eventA);
-        Thread.sleep(200);
+        Thread.sleep(1500);
         Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 2);
+        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 1);
 
-        // Wait for the flush (1 second) and give Hadoop a little time to write
-        Thread.sleep(1100);
-        Assert.assertEquals(((HadoopFileEventWriter) hdfsWriter).getEventsWritten(), 2);
+        // We now cross the size threshold, it will flush again
+        dispatcher.offer(eventA);
+        Thread.sleep(1500);
+        Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 3);
+        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 2);
     }
 }

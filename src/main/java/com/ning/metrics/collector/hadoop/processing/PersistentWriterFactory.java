@@ -28,7 +28,7 @@ interface PersistentWriterFactory
      * all ClickEvent Thrift events during an hour will use the same writer.
      *
      * @param stats stats object to count flushes
-     * @param serializer
+     * @param serializer serializer to use
      * @param path destination path (only really relevant for hadoop...)
      * @return eventWriter specific to an event type and serialization type
      */

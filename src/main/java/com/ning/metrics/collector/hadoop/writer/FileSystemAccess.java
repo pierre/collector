@@ -52,6 +52,18 @@ public class FileSystemAccess
     public FileSystem get()
     {
         try {
+            if (fs == null) {
+                synchronized (connectionLock) {
+                    if (fs == null) {
+                        try {
+                            setFileSystem();
+                        }
+                        catch (IOException e) {
+                            log.warn(String.format("Got I/O exception when setting up HDFS for the first time: %s", e.getLocalizedMessage()));
+                        }
+                    }
+                }
+            }
             return getFileSystemSafe();
         }
         catch (IOException e) {
@@ -87,6 +99,7 @@ public class FileSystemAccess
     }
 
     // throws an IOException if the current FileSystem isn't working
+
     private FileSystem getFileSystemSafe() throws IOException
     {
         try {
