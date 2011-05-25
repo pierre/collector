@@ -28,6 +28,8 @@ import com.ning.metrics.serialization.smile.SmileEnvelopeEventSerializer;
 import com.ning.metrics.serialization.writer.ObjectOutputEventSerializer;
 import org.apache.log4j.Logger;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -117,17 +119,26 @@ class EventSpoolDispatcher
     {
         SerializationType eventType = SerializationType.get(event);
 
+        String ip;
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        }
+        catch (UnknownHostException e) {
+            ip = "unknown-ip";
+        }
+
+
         if (event != null && isRunning.get()) {
-            final String hdfsPath = event.getOutputDir(config.getEventOutputDirectory());
-            String key = String.format("%s|%s", eventType.name(), hdfsPath);
-            LocalQueueAndWriter queue = queuesPerPath.get(key);
+            // path name contains IP address & serialization type to avoid naming collisions in hadoop
+            final String hdfsPath = String.format("%s%s.%s.bin", event.getOutputDir(config.getEventOutputDirectory()), ip, eventType.name());
+            LocalQueueAndWriter queue = queuesPerPath.get(hdfsPath);
 
             if (queue == null) {
                 synchronized (queueMapMonitor) {
-                    queue = queuesPerPath.get(key);
+                    queue = queuesPerPath.get(hdfsPath);
                     if (queue == null) {
                         queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats, eventType.getSerializer(), hdfsPath), stats);
-                        queuesPerPath.put(key, queue);
+                        queuesPerPath.put(hdfsPath, queue);
                     }
                 }
             }
