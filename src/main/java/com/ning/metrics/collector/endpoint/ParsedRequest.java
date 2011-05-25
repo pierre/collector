@@ -104,10 +104,6 @@ public class ParsedRequest implements ExtractedAnnotation
         final String contentType
     )
     {
-        if (eventName == null) {
-            log.warn(String.format("Event name not specified"));
-            throw new WebApplicationException(new Throwable("Event name not specified"), Response.Status.INTERNAL_SERVER_ERROR);
-        }
         this.eventName = eventName;
 
         this.eventDateTime = eventExtractorUtil.dateFromDateTime(eventDateTime);

@@ -28,7 +28,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.WebApplicationException;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -106,25 +105,6 @@ public class TestBodyEventExtractor
             final ThriftEnvelope envelope = (ThriftEnvelope) thriftEnvelopeEvent.getData();
             Assert.assertEquals(envelope.getTypeName(), eventType);
             Assert.assertEquals(envelope.getPayload(), data);
-        }
-    }
-
-    @Test(groups = "fast")
-    public void testNoNameParameter() throws Exception
-    {
-        try {
-            final ParsedRequest missingNameRequest = new ParsedRequest(
-                null,
-                new MockHttpHeaders(null, null, null, payloadSize),
-                null,
-                null,
-                null,
-                null
-            );
-            Assert.fail();
-        }
-        catch (WebApplicationException e) {
-            Assert.assertTrue(true);
         }
     }
 
