@@ -34,7 +34,7 @@ public class FileSystemAccess
     private FileSystem fs = null;
     private final Object connectionLock = new Object();
 
-    private static final long MIN_WAIT_TIME = 1000; // 1 second
+    private static final long START_WAIT_INTERVAL = 1000; // 1 second
     private static final long MAX_WAIT_TIME = 600000; // 10 minutes
 
     @Inject
@@ -49,7 +49,7 @@ public class FileSystemAccess
         this.fsClass = fsClass;
     }
 
-    public FileSystem get()
+    public FileSystem get() throws IOException
     {
         try {
             if (fs == null) {
@@ -70,7 +70,8 @@ public class FileSystemAccess
             log.warn(String.format("Got IOException trying to connect to HDFS: %s", e.getLocalizedMessage()));
 
             synchronized (connectionLock) {
-                long waitTime = MIN_WAIT_TIME;
+                long waitTime = START_WAIT_INTERVAL;
+                long timeSpentWaiting = 0;
                 while (true) {
                     try {
                         // try to set up the FileSystem
@@ -81,16 +82,22 @@ public class FileSystemAccess
                         // exp backoff
                         try {
                             Thread.sleep(waitTime);
+                            timeSpentWaiting += waitTime;
                         }
                         catch (InterruptedException e2) {
                             e2.printStackTrace();
                         }
 
-                        if (waitTime <= MAX_WAIT_TIME / 2) {
-                            waitTime *= 2;
+                        // give up after MAX_WAIT_TIME
+                        if (timeSpentWaiting >= MAX_WAIT_TIME) {
+                            throw new IOException(String.format("Cannot access File System. Gave up after trying for %d:%d", timeSpentWaiting / 60000, timeSpentWaiting / 1000 % 60));
                         }
-                        else {
-                            waitTime = MAX_WAIT_TIME;
+
+                        waitTime *= 2;
+
+                        if (timeSpentWaiting + waitTime > MAX_WAIT_TIME) {
+                            // check
+                            waitTime = MAX_WAIT_TIME - timeSpentWaiting;
                         }
                     }
                 }
