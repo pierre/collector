@@ -30,6 +30,10 @@ import com.ning.metrics.serialization.writer.SyncType;
 import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,17 +54,28 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     }
 
     @Override
-    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String hdfsPath)
+    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String hdfsPath, final String fileExtension)
     {
+        final DateTime timeStamp = new DateTime();
         final EventWriter eventWriter = new DiskSpoolEventWriter<Event>(new EventHandler()
         {
+            private int flushCount = 0;
+
             @Override
             public void handle(final File file, final CallbackHandler handler)
             {
                 log.info("Flushing locally buffered events to HDFS");
 
                 try {
-                    hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(hdfsPath));
+                    /* fileName includes a number of things to avoid collisions:
+                       ip  to avoid conflicts between machines
+                       fileExtension  (serialization-type-specific) so multiple file extensions can be written to same directory
+                       flushCount  so the same queue can write multiple times
+                       queueCreationTimestamp  so if, for instance, we shut down and restart the collector within an hour, their writes won't conflict
+                    */
+                    final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss").withZone(DateTimeZone.UTC);
+                    String outputPath = String.format("%s%s-%d-%s-f%d.%s", hdfsPath, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), flushCount, fileExtension);
+                    hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(outputPath));
                 }
                 catch (IOException e) {
                     handler.onError(e, file);
@@ -68,6 +83,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
 
                 handler.onSuccess(file);
                 stats.registerHdfsFlush();
+                flushCount++;
             }
         }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")),
             SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(),

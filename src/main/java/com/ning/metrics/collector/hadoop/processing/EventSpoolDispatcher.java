@@ -39,8 +39,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class EventSpoolDispatcher
 {
     private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
-    // We can't use ISO format due to the crc code
-    private final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss").withZone(DateTimeZone.UTC);
 
     private final PersistentWriterFactory factory;
     private final WriterStats stats;
@@ -119,16 +117,16 @@ class EventSpoolDispatcher
         final SerializationType eventType = SerializationType.get(event);
 
         if (event != null && isRunning.get()) {
-            // path name contains IP address & serialization type to avoid naming collisions in hadoop
-            final String hdfsPath = String.format("%s/%s-%s-%d.%s", event.getOutputDir(config.getEventOutputDirectory()), dateFormatter.print(new DateTime()), config.getLocalIp(), config.getLocalPort(), eventType.getFileSuffix());
-            LocalQueueAndWriter queue = queuesPerPath.get(hdfsPath);
+            final String hdfsPath = event.getOutputDir(config.getEventOutputDirectory());
+            final String key = String.format("%s|%s", event.getOutputDir(config.getEventOutputDirectory()), eventType.getFileSuffix());
+            LocalQueueAndWriter queue = queuesPerPath.get(key);
 
             if (queue == null) {
                 synchronized (queueMapMonitor) {
-                    queue = queuesPerPath.get(hdfsPath);
+                    queue = queuesPerPath.get(key);
                     if (queue == null) {
-                        queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats, eventType.getSerializer(), hdfsPath), stats);
-                        queuesPerPath.put(hdfsPath, queue);
+                        queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats, eventType.getSerializer(), hdfsPath, eventType.getFileSuffix()), stats);
+                        queuesPerPath.put(key, queue);
                     }
                 }
             }
