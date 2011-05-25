@@ -41,7 +41,7 @@ public class TestCollectorResource extends TestPublicAPI
     {
         sendGetEvent("/1?v=Hello,sWorld");
 
-        final Event event = ((MockEventWriter) hdfsWriter).getCommittedEventList().get(0);
+        final Event event = (Event) ((MockEventWriter) hdfsWriter).getCommittedEventList().toArray()[0];
         Assert.assertEquals(event.getName(), "Hello");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
@@ -55,7 +55,7 @@ public class TestCollectorResource extends TestPublicAPI
         sendGetEvent("/1?v=ComplicatedEvent,xdate,xhost,xpath,xua,xip,scookie,ssubdomain,sscreename,ssection,b1,b1,b0,81231956164000");
         final long dateTimeAfterSend = System.currentTimeMillis();
 
-        final Event event = ((MockEventWriter) hdfsWriter).getCommittedEventList().get(0);
+        final Event event = (Event) ((MockEventWriter) hdfsWriter).getCommittedEventList().toArray()[0];
         Assert.assertEquals(event.getName(), "ComplicatedEvent");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();

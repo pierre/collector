@@ -43,7 +43,7 @@ public class TestBodyResource extends TestPublicAPI
         final ByteArrayOutputStream out = generateThriftPayload(alert);
         sendPostEvent(out, "OpsAlert", null, "ning/thrift");
 
-        final Event event = ((MockEventWriter) hdfsWriter).getCommittedEventList().get(0);
+        final Event event = (Event) ((MockEventWriter) hdfsWriter).getCommittedEventList().toArray()[0];
         Assert.assertEquals(event.getName(), "OpsAlert");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
@@ -62,7 +62,7 @@ public class TestBodyResource extends TestPublicAPI
         final ByteArrayOutputStream out = generateThriftPayload(alert);
         sendPostEvent(out, "OpsAlert", "2009-01-02T03:04:05.006Z", "ning/thrift");
 
-        final Event event = ((MockEventWriter) hdfsWriter).getCommittedEventList().get(0);
+        final Event event = (Event) ((MockEventWriter) hdfsWriter).getCommittedEventList().toArray()[0];
         Assert.assertEquals(event.getName(), "OpsAlert");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
