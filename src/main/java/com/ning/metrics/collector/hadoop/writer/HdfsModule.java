@@ -18,9 +18,6 @@ package com.ning.metrics.collector.hadoop.writer;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.metrics.serialization.writer.EventWriter;
-import org.weakref.jmx.guice.ExportBuilder;
-import org.weakref.jmx.guice.MBeanModule;
 
 /**
  * This module provides the wiring for the back-end writers to Hadoop
@@ -30,12 +27,6 @@ public class HdfsModule implements Module
     @Override
     public void configure(final Binder binder)
     {
-        // JMX exporter
-        final ExportBuilder builder = MBeanModule.newExporter(binder);
-
-        binder.bind(EventWriter.class).to(HadoopFileEventWriter.class).asEagerSingleton();
-        builder.export(HadoopFileEventWriter.class).as("com.ning.metrics.collector:name=HadoopFileEventWriter");
-
         // HDFS raw access
         binder.bind(FileSystemAccess.class).toProvider(FileSystemAccessProvider.class).asEagerSingleton();
     }
