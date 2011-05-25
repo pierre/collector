@@ -31,6 +31,12 @@ enum SerializationType
             {
                 return new SmileEnvelopeEventSerializer(false);
             }
+
+            @Override
+            public String getFileSuffix()
+            {
+                return "smile";
+            }
         },
     JSON
         {
@@ -39,8 +45,21 @@ enum SerializationType
             {
                 return new SmileEnvelopeEventSerializer(true);
             }
+
+            @Override
+            public String getFileSuffix()
+            {
+                return "json";
+            }
         },
-    THRIFT,
+    THRIFT
+        {
+            @Override
+            public String getFileSuffix()
+            {
+                return "thrift";
+            }
+        },
     DEFAULT;
 
     public EventSerializer getSerializer()
@@ -48,7 +67,8 @@ enum SerializationType
         return new ObjectOutputEventSerializer();
     }
 
-    public static SerializationType get(Event event) {
+    public static SerializationType get(final Event event)
+    {
         if (event instanceof SmileEnvelopeEvent) {
             if (((SmileEnvelopeEvent) event).isPlainJson()) {
                 return JSON;
@@ -63,5 +83,10 @@ enum SerializationType
         else {
             return DEFAULT;
         }
+    }
+
+    public String getFileSuffix()
+    {
+        return "bin";
     }
 }

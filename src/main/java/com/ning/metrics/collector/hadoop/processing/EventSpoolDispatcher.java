@@ -22,6 +22,10 @@ import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +39,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class EventSpoolDispatcher
 {
     private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
+    // We can't use ISO format due to the crc code
+    private final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss").withZone(DateTimeZone.UTC);
 
     private final PersistentWriterFactory factory;
     private final WriterStats stats;
@@ -114,7 +120,7 @@ class EventSpoolDispatcher
 
         if (event != null && isRunning.get()) {
             // path name contains IP address & serialization type to avoid naming collisions in hadoop
-            final String hdfsPath = String.format("%s/%s-%d.%s.%s", event.getOutputDir(config.getEventOutputDirectory()), config.getLocalIp(), config.getLocalPort(), eventType.name(), eventType.getFileSuffix());
+            final String hdfsPath = String.format("%s/%s-%s-%d.%s", event.getOutputDir(config.getEventOutputDirectory()), dateFormatter.print(new DateTime()), config.getLocalIp(), config.getLocalPort(), eventType.getFileSuffix());
             LocalQueueAndWriter queue = queuesPerPath.get(hdfsPath);
 
             if (queue == null) {
