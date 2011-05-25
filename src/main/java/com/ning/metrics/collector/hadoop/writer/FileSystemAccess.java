@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -26,6 +27,8 @@ import java.lang.reflect.Method;
 
 public class FileSystemAccess
 {
+    private static final Logger log = Logger.getLogger(FileSystemAccess.class);
+
     private final Configuration hdfsConfig;
     private final Class<? extends FileSystem> fsClass;
     private FileSystem fs = null;
@@ -52,6 +55,8 @@ public class FileSystemAccess
             return getFileSystemSafe();
         }
         catch (IOException e) {
+            log.warn(String.format("Got IOException trying to connect to HDFS: %s", e.getLocalizedMessage()));
+
             synchronized (connectionLock) {
                 long waitTime = MIN_WAIT_TIME;
                 while (true) {
