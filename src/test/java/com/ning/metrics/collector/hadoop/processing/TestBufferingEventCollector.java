@@ -18,7 +18,6 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.google.inject.servlet.GuiceFilter;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
@@ -73,7 +72,6 @@ public class TestBufferingEventCollector
     @BeforeMethod(alwaysRun = true)
     void setup()
     {
-        new GuiceFilter().destroy();
         sentEvents.clear();
         stats.clear();
 
@@ -158,7 +156,7 @@ public class TestBufferingEventCollector
         finally {
             sessionLock.unlock();
         }
-        Thread.sleep(config.getActiveMQBufferLength() / 5);
+        Thread.sleep(config.getActiveMQBufferLength() / 2);
         // the lock is queried after the take() call, so the first of the second batch of events has been read already
         assertEquals(sentEvents.size(), config.getActiveMQBufferLength() + config.getActiveMQBufferLength() + 1);
         assertEquals(stats.getIgnoredEvents(), 0);
