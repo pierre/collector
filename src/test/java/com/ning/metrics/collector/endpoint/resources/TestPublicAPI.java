@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.endpoint.resources;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.ning.http.client.AsyncHttpClient;
@@ -32,7 +33,6 @@ import org.testng.annotations.BeforeClass;
 
 import java.io.IOException;
 
-@org.testng.annotations.Guice(modules = JettyTestModule.class)
 public abstract class TestPublicAPI
 {
     private static final Logger log = Logger.getLogger(TestPublicAPI.class);
@@ -63,6 +63,8 @@ public abstract class TestPublicAPI
     @BeforeClass(alwaysRun = true)
     public void setUp() throws Exception
     {
+        Guice.createInjector(new JettyTestModule()).injectMembers(this);
+
         server.start();
 
         while (!server.isInitialized()) {
