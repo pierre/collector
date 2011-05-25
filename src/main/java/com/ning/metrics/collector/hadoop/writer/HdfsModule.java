@@ -18,6 +18,8 @@ package com.ning.metrics.collector.hadoop.writer;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.ning.metrics.collector.hadoop.processing.HadoopWriterFactory;
+import com.ning.metrics.collector.hadoop.processing.PersistentWriterFactory;
 
 /**
  * This module provides the wiring for the back-end writers to Hadoop
@@ -27,6 +29,8 @@ public class HdfsModule implements Module
     @Override
     public void configure(final Binder binder)
     {
+        binder.bind(PersistentWriterFactory.class).to(HadoopWriterFactory.class);
+
         // HDFS raw access
         binder.bind(FileSystemAccess.class).toProvider(FileSystemAccessProvider.class).asEagerSingleton();
     }

@@ -19,7 +19,7 @@ package com.ning.metrics.collector.hadoop.processing;
 import com.ning.metrics.serialization.event.EventSerializer;
 import com.ning.metrics.serialization.writer.EventWriter;
 
-interface PersistentWriterFactory
+public interface PersistentWriterFactory
 {
     /**
      * Create an EventWriter specific to events sharing the same serialization format

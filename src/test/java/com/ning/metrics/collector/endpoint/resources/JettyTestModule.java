@@ -23,9 +23,11 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
 import com.ning.metrics.collector.endpoint.filters.FiltersModule;
 import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
+import com.ning.metrics.collector.hadoop.processing.MockPersistentWriterFactory;
+import com.ning.metrics.collector.hadoop.processing.PersistentWriterFactory;
 import com.ning.metrics.collector.realtime.RealTimeQueueModule;
-import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
+import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.skife.config.ConfigurationObjectFactory;
@@ -81,13 +83,9 @@ public class JettyTestModule extends AbstractModule
         });
 
         // ...except for the Hadoop flusher that we Mock
-        install(new AbstractModule()
-        {
-            @Override
-            protected void configure()
-            {
-                bind(EventWriter.class).toInstance(new MockEventWriter());
-            }
-        });
+        final MockEventWriter writer = new MockEventWriter();
+        bind(MockEventWriter.class).toInstance(writer);
+        // Wrap around ThresholdEventWriter to trigger commits
+        bind(PersistentWriterFactory.class).toInstance(new MockPersistentWriterFactory(new ThresholdEventWriter(writer, 0, 0)));
     }
 }

@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-class HadoopWriterFactory implements PersistentWriterFactory
+public class HadoopWriterFactory implements PersistentWriterFactory
 {
     private final Logger log = Logger.getLogger(HadoopWriterFactory.class);
 

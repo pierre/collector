@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
+import com.google.inject.Inject;
 import com.ning.metrics.serialization.event.EventSerializer;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
@@ -26,9 +27,18 @@ public class MockPersistentWriterFactory implements PersistentWriterFactory
     private final boolean rollbackThrowsException;
     private final boolean writeThrowsException;
 
+    private EventWriter writer = null;
+
+    @Inject
     public MockPersistentWriterFactory()
     {
         this(false, false, false);
+    }
+
+    public MockPersistentWriterFactory(final EventWriter writer)
+    {
+        this(false, false, false);
+        this.writer = writer;
     }
 
     private MockPersistentWriterFactory(final boolean commitThrowsException, final boolean rollbackThrowsException, final boolean writeThrowsException)
@@ -39,8 +49,13 @@ public class MockPersistentWriterFactory implements PersistentWriterFactory
     }
 
     @Override
-    public EventWriter createPersistentWriter(WriterStats stats, EventSerializer serializer, String path)
+    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String path)
     {
-        return new MockEventWriter(commitThrowsException, rollbackThrowsException, writeThrowsException);
+        if (writer == null) {
+            return new MockEventWriter(commitThrowsException, rollbackThrowsException, writeThrowsException);
+        }
+        else {
+            return writer;
+        }
     }
 }

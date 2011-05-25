@@ -22,7 +22,6 @@ import com.ning.metrics.collector.endpoint.OpsAlert;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
-import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.testng.Assert;
@@ -43,7 +42,7 @@ public class TestBodyResource extends TestPublicAPI
         final ByteArrayOutputStream out = generateThriftPayload(alert);
         sendPostEvent(out, "OpsAlert", null, "ning/thrift");
 
-        final Event event = (Event) ((MockEventWriter) hdfsWriter).getCommittedEventList().toArray()[0];
+        final Event event = getSentEvent();
         Assert.assertEquals(event.getName(), "OpsAlert");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
@@ -62,7 +61,7 @@ public class TestBodyResource extends TestPublicAPI
         final ByteArrayOutputStream out = generateThriftPayload(alert);
         sendPostEvent(out, "OpsAlert", "2009-01-02T03:04:05.006Z", "ning/thrift");
 
-        final Event event = (Event) ((MockEventWriter) hdfsWriter).getCommittedEventList().toArray()[0];
+        final Event event = getSentEvent();
         Assert.assertEquals(event.getName(), "OpsAlert");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();

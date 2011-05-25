@@ -23,12 +23,12 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
-import com.ning.metrics.serialization.writer.EventWriter;
+import com.ning.metrics.collector.hadoop.processing.WriterStats;
+import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 
 @org.testng.annotations.Guice(modules = JettyTestModule.class)
@@ -46,7 +46,10 @@ public abstract class TestPublicAPI
     BufferingEventCollector incomingQueue;
 
     @Inject
-    EventWriter hdfsWriter;
+    WriterStats stats;
+
+    @Inject
+    MockEventWriter hdfsWriter;
 
     static final String MEGATRON_2000_USER_AGENT = "NING_MEGATR0N/2000";
     static final String AWESOME_REFERRER_HOST = "mouraf.ning.com";
@@ -82,31 +85,34 @@ public abstract class TestPublicAPI
         new GuiceFilter().destroy();
     }
 
-    @AfterMethod(alwaysRun = true)
-    public void cleanupState() throws Exception
-    {
-        ((MockEventWriter) hdfsWriter).getCommittedEventList().clear();
-    }
-
     void assertCleanQueues()
     {
         Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
-        Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getWrittenEventList().size());
-        Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getCommittedEventList().size());
-        Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getQuarantinedEventList().size());
+        Assert.assertEquals(0, stats.getWrittenEvents());
+        Assert.assertEquals(0, stats.getDroppedEvents());
+        Assert.assertEquals(0, stats.getIgnoredEvents());
+        Assert.assertEquals(0, stats.getErroredEvents());
+        Assert.assertEquals(0, stats.getHdfsFlushes());
     }
 
     void assertEventWasWrittenToHDFS() throws InterruptedException
     {
         // Give some time for the flushes
-        Thread.sleep(2000);
+        Thread.sleep(200);
 
         // Check the spooler is empty
         Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
 
         // Check the event was 'committed' to HDFS
-        Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getWrittenEventList().size());
-        Assert.assertEquals(1, ((MockEventWriter) hdfsWriter).getCommittedEventList().size());
-        Assert.assertEquals(0, ((MockEventWriter) hdfsWriter).getQuarantinedEventList().size());
+        // The MockEventWriter we're using doesn't have a flush handler, so we're technically
+        // only making sure that events were committed
+        Assert.assertEquals(hdfsWriter.getCommittedEventList().toArray().length, 1);
+    }
+
+    Event getSentEvent()
+    {
+        // The threshold for the MockEventWriter is 0, so a forceCommit is triggered
+        // for all writes
+        return (Event) hdfsWriter.getCommittedEventList().toArray()[0];
     }
 }
