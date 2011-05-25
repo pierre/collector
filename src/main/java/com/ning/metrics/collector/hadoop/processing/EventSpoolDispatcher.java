@@ -21,11 +21,6 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.event.EventSerializer;
-import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
-import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
-import com.ning.metrics.serialization.smile.SmileEnvelopeEventSerializer;
-import com.ning.metrics.serialization.writer.ObjectOutputEventSerializer;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -115,19 +110,19 @@ class EventSpoolDispatcher
      */
     public boolean offer(final Event event)
     {
-        SerializationType eventType = SerializationType.get(event);
+        final SerializationType eventType = SerializationType.get(event);
 
         if (event != null && isRunning.get()) {
-            final String hdfsPath = event.getOutputDir(config.getEventOutputDirectory());
-            final String key = String.format("%s|%s", eventType.name(), hdfsPath);
-            LocalQueueAndWriter queue = queuesPerPath.get(key);
+            // path name contains IP address & serialization type to avoid naming collisions in hadoop
+            final String hdfsPath = String.format("%s/%s-%d.%s.%s", event.getOutputDir(config.getEventOutputDirectory()), config.getLocalIp(), config.getLocalPort(), eventType.name(), eventType.getFileSuffix());
+            LocalQueueAndWriter queue = queuesPerPath.get(hdfsPath);
 
             if (queue == null) {
                 synchronized (queueMapMonitor) {
-                    queue = queuesPerPath.get(key);
+                    queue = queuesPerPath.get(hdfsPath);
                     if (queue == null) {
                         queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats, eventType.getSerializer(), hdfsPath), stats);
-                        queuesPerPath.put(key, queue);
+                        queuesPerPath.put(hdfsPath, queue);
                     }
                 }
             }
