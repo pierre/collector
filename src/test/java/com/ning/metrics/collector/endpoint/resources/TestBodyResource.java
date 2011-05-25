@@ -40,9 +40,8 @@ public class TestBodyResource extends TestPublicAPI
         final long dateTime = System.currentTimeMillis();
         final OpsAlert alert = new OpsAlert("NAGIOS", "nagios@ning.com", "pierre@ning.com", "Alerting alert", dateTime);
         final ByteArrayOutputStream out = generateThriftPayload(alert);
-        sendPostEvent(out, "OpsAlert", null, "ning/thrift");
+        final Event event = sendPostEvent(out, "OpsAlert", null, "ning/thrift");
 
-        final Event event = getSentEvent();
         Assert.assertEquals(event.getName(), "OpsAlert");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
@@ -59,9 +58,8 @@ public class TestBodyResource extends TestPublicAPI
         final long dateTime = System.currentTimeMillis();
         final OpsAlert alert = new OpsAlert("NAGIOS", "nagios@ning.com", "pierre@ning.com", "Alerting alert", dateTime);
         final ByteArrayOutputStream out = generateThriftPayload(alert);
-        sendPostEvent(out, "OpsAlert", "2009-01-02T03:04:05.006Z", "ning/thrift");
+        final Event event = sendPostEvent(out, "OpsAlert", "2009-01-02T03:04:05.006Z", "ning/thrift");
 
-        final Event event = getSentEvent();
         Assert.assertEquals(event.getName(), "OpsAlert");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
@@ -84,7 +82,7 @@ public class TestBodyResource extends TestPublicAPI
         return out;
     }
 
-    private void sendPostEvent(final ByteArrayOutputStream out, final String name, final String dateTime, final String contentType) throws IOException, ExecutionException, InterruptedException
+    private Event sendPostEvent(final ByteArrayOutputStream out, final String name, final String dateTime, final String contentType) throws IOException, ExecutionException, InterruptedException
     {
         assertCleanQueues();
 
@@ -101,6 +99,6 @@ public class TestBodyResource extends TestPublicAPI
         final Response response = requestBuilder.execute().get();
         Assert.assertEquals(response.getStatusCode(), 202);
 
-        assertEventWasWrittenToHDFS();
+        return assertEventWasWrittenToHDFS();
     }
 }

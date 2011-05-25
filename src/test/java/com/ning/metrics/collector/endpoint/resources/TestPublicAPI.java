@@ -23,13 +23,14 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
-import com.ning.metrics.collector.hadoop.processing.WriterStats;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+
+import java.io.IOException;
 
 @org.testng.annotations.Guice(modules = JettyTestModule.class)
 public abstract class TestPublicAPI
@@ -44,9 +45,6 @@ public abstract class TestPublicAPI
 
     @Inject
     BufferingEventCollector incomingQueue;
-
-    @Inject
-    WriterStats stats;
 
     @Inject
     MockEventWriter hdfsWriter;
@@ -88,14 +86,9 @@ public abstract class TestPublicAPI
     void assertCleanQueues()
     {
         Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
-        Assert.assertEquals(0, stats.getWrittenEvents());
-        Assert.assertEquals(0, stats.getDroppedEvents());
-        Assert.assertEquals(0, stats.getIgnoredEvents());
-        Assert.assertEquals(0, stats.getErroredEvents());
-        Assert.assertEquals(0, stats.getHdfsFlushes());
     }
 
-    void assertEventWasWrittenToHDFS() throws InterruptedException
+    Event assertEventWasWrittenToHDFS() throws InterruptedException
     {
         // Give some time for the flushes
         Thread.sleep(200);
@@ -107,9 +100,19 @@ public abstract class TestPublicAPI
         // The MockEventWriter we're using doesn't have a flush handler, so we're technically
         // only making sure that events were committed
         Assert.assertEquals(hdfsWriter.getCommittedEventList().toArray().length, 1);
+
+        final Event event = getSentEvent();
+        // Flush the queue to reset stats between tests
+        try {
+            hdfsWriter.flush();
+        }
+        catch (IOException ignored) {
+        }
+
+        return event;
     }
 
-    Event getSentEvent()
+    private Event getSentEvent()
     {
         // The threshold for the MockEventWriter is 0, so a forceCommit is triggered
         // for all writes

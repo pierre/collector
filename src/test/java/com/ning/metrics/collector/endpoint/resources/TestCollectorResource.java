@@ -22,7 +22,6 @@ import com.ning.metrics.collector.util.Ip;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
-import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -38,9 +37,8 @@ public class TestCollectorResource extends TestPublicAPI
 
     public void testGetSimpleEvent() throws Exception
     {
-        sendGetEvent("/1?v=Hello,sWorld");
+        final Event event = sendGetEvent("/1?v=Hello,sWorld");
 
-        final Event event = getSentEvent();
         Assert.assertEquals(event.getName(), "Hello");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
@@ -51,10 +49,9 @@ public class TestCollectorResource extends TestPublicAPI
     {
         // TODO datetime?
         final long dateTimeBeforeSend = System.currentTimeMillis();
-        sendGetEvent("/1?v=ComplicatedEvent,xdate,xhost,xpath,xua,xip,scookie,ssubdomain,sscreename,ssection,b1,b1,b0,81231956164000");
+        final Event event = sendGetEvent("/1?v=ComplicatedEvent,xdate,xhost,xpath,xua,xip,scookie,ssubdomain,sscreename,ssection,b1,b1,b0,81231956164000");
         final long dateTimeAfterSend = System.currentTimeMillis();
 
-        final Event event = getSentEvent();
         Assert.assertEquals(event.getName(), "ComplicatedEvent");
 
         final List<ThriftField> payload = ((ThriftEnvelope) event.getData()).getPayload();
@@ -77,7 +74,7 @@ public class TestCollectorResource extends TestPublicAPI
         Assert.assertEquals(payload.get(12).getDataItem().getLong(), new Long(1231956164000L));
     }
 
-    private void sendGetEvent(final String path) throws InterruptedException, ExecutionException, IOException
+    private Event sendGetEvent(final String path) throws InterruptedException, ExecutionException, IOException
     {
         assertCleanQueues();
 
@@ -87,6 +84,6 @@ public class TestCollectorResource extends TestPublicAPI
         final Response response = requestBuilder.execute().get();
         Assert.assertEquals(response.getStatusCode(), 202);
 
-        assertEventWasWrittenToHDFS();
+        return assertEventWasWrittenToHDFS();
     }
 }
