@@ -130,7 +130,7 @@ class EventSpoolDispatcher
 
         if (event != null && isRunning.get()) {
             final String hdfsPath = event.getOutputDir(config.getEventOutputDirectory());
-            String key = String.format("%s|%s", eventType.name(), hdfsPath);
+            final String key = String.format("%s|%s", eventType.name(), hdfsPath);
             LocalQueueAndWriter queue = queuesPerPath.get(key);
 
             if (queue == null) {

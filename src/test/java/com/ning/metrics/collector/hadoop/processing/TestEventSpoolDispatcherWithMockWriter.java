@@ -19,6 +19,7 @@ package com.ning.metrics.collector.hadoop.processing;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.testng.Assert;
 import org.testng.annotations.Guice;
@@ -35,8 +36,7 @@ public class TestEventSpoolDispatcherWithMockWriter
     {
         final WriterStats stats = new WriterStats();
         final EventSpoolDispatcher dispatcher = new EventSpoolDispatcher(new MockPersistentWriterFactory(), stats, collectorConfig);
-        final MockEvent eventA = new MockEvent();
-        eventA.setOutputPath("/a");
+        final Event eventA = new MockEvent();
 
         Assert.assertTrue(dispatcher.isRunning());
         Assert.assertEquals(stats.getIgnoredEvents(), 0);
@@ -75,24 +75,25 @@ public class TestEventSpoolDispatcherWithMockWriter
         final MockEvent eventB = new MockEvent();
         eventB.setOutputPath("/b");
 
-        Assert.assertNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("/b"));
+        // Generic event will use DEFAULT serialization
+        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
 
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 1);
         Assert.assertEquals(stats.getEnqueuedEvents(), 1);
 
         dispatcher.offer(eventB);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
         Assert.assertEquals(stats.getEnqueuedEvents(), 2);
 
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
         Assert.assertEquals(stats.getEnqueuedEvents(), 3);
     }
