@@ -162,7 +162,7 @@ public class EventRequestHandler
             }
             catch (RuntimeException e) {
                 failCount++;
-                log.warn(String.format("Exception while extracting or processing an event. [%s] [%s]", annotation.toString(), e.getLocalizedMessage());
+                log.warn(String.format("Exception while extracting or processing an event. [%s] [%s]", annotation.toString(), e.getLocalizedMessage()));
 
                 // We don't care about the Response returned here, but we do care about incrementing stats about failed events
                 eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
