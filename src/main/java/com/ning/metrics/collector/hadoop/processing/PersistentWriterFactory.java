@@ -29,8 +29,9 @@ public interface PersistentWriterFactory
      *
      * @param stats stats object to count flushes
      * @param serializer serializer to use
-     * @param path destination path (only really relevant for hadoop...)
+     * @param localPath local destination path (only really relevant for serialization library...)
+     * @param hdfsPath destination path (only really relevant for hadoop...)
      * @return eventWriter specific to an event type and serialization type
      */
-    EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String path);
+    EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String localPath, final String hdfsPath);
 }

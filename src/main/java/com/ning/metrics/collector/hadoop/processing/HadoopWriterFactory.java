@@ -50,7 +50,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     }
 
     @Override
-    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String hdfsPath)
+    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String localPath, final String hdfsPath)
     {
         final EventWriter eventWriter = new DiskSpoolEventWriter<Event>(new EventHandler()
         {
@@ -69,9 +69,8 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 handler.onSuccess(file);
                 stats.registerHdfsFlush();
             }
-        }, config.getSpoolDirectoryName(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("spool to HDFS promoter")),
-            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(),
-            serializer);
+        }, String.format("%s/%s", config.getSpoolDirectoryName(), localPath), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("spool to HDFS promoter")),
+            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(), serializer);
         return new ThresholdEventWriter(eventWriter, config.getFlushEventQueueSize(), config.getRefreshDelayInSeconds());
     }
 }

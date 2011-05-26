@@ -120,14 +120,18 @@ class EventSpoolDispatcher
 
         if (event != null && isRunning.get()) {
             // path name contains IP address & serialization type to avoid naming collisions in hadoop
-            final String hdfsPath = String.format("%s/%s-%s-%d.%s", event.getOutputDir(config.getEventOutputDirectory()), dateFormatter.print(new DateTime()), config.getLocalIp(), config.getLocalPort(), eventType.getFileSuffix());
+
+            final String hdfsOutputdir = event.getOutputDir(config.getEventOutputDirectory());
+            final String hdfsFilename = String.format("%s-%s-%d.%s", dateFormatter.print(new DateTime()), config.getLocalIp(), config.getLocalPort(), eventType.getFileSuffix());
+            final String hdfsPath = String.format("%s/%s", hdfsOutputdir, hdfsFilename);
             LocalQueueAndWriter queue = queuesPerPath.get(hdfsPath);
 
             if (queue == null) {
                 synchronized (queueMapMonitor) {
                     queue = queuesPerPath.get(hdfsPath);
                     if (queue == null) {
-                        queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats, eventType.getSerializer(), hdfsPath), stats);
+                        final String localSpoolPath = String.format("%s-%s", event.getName(), hdfsFilename);
+                        queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats, eventType.getSerializer(), localSpoolPath, hdfsPath), stats);
                         queuesPerPath.put(hdfsPath, queue);
                     }
                 }
