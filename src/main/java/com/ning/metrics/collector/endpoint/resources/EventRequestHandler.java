@@ -64,12 +64,12 @@ public class EventRequestHandler
             eventStats.recordExtracted();
         }
         catch (EventParsingException e) {
-            log.info(String.format("Unable to extract event: %s [%s]", eventName, annotation.toString()), e);
+            log.warn(String.format("Unable to extract event: %s [%s]\n%s", eventName, annotation.toString(), e.toString()));
             // If one event fails, the entire collection of events is rejected
             return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
         }
         catch (RuntimeException e) {
-            log.info(String.format("Unable to extract event: %s [%s]", eventName, annotation.toString()), e);
+            log.warn(String.format("Unable to extract event: %s [%s]\n%s", eventName, annotation.toString(), e.toString()));
             // If one event fails, the entire collection of events is rejected
             return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
         }
@@ -96,7 +96,7 @@ public class EventRequestHandler
             }
             catch (RuntimeException e) {
                 failCount++;
-                log.info(String.format("Exception while processing event: %s [%s]", eventName, annotation.toString()), e);
+                log.warn(String.format("Exception while processing event: %s [%s]\n%s", eventName, annotation.toString(), e.toString()));
                 // We don't care about the Response returned here, but we do care about incrementing stats about failed events
                 eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
             }
@@ -125,18 +125,17 @@ public class EventRequestHandler
             extractor = new SmileEnvelopeEventExtractor(annotation.getInputStream(), plainJson);
         }
         catch (RuntimeException e) {
-            log.info(String.format("Unable to extract event. [%s]", annotation.toString()), e);
+            log.warn(String.format("Unable to extract event. [%s]\n%s", annotation.toString(), e.toString()));
             // If one event fails, the entire collection of events is rejected
             return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
         }
         catch (IOException e) {
             // TODO
-            log.info(String.format("Unable to extract event. [%s]", annotation.toString()), e);
+            log.warn(String.format("Unable to extract event. [%s]\n%s", annotation.toString(), e.toString()));
             // If one event fails, the entire collection of events is rejected
             return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
         }
 
-        int failCount = 0;
         int successCount = 0;
 
         while (true) {
@@ -146,7 +145,7 @@ public class EventRequestHandler
 
                 // if has reached EOF
                 if (event == null) {
-                    break;
+                    return Response.status(Response.Status.ACCEPTED).build();
                 }
 
                 log.debug(String.format("Processing event %s", event));
@@ -156,37 +155,13 @@ public class EventRequestHandler
             }
             // IOExceptions are thrown by extractEvent
             catch (IOException e) {
-                failCount++;
-                log.info(String.format("Exception while extracting or processing an event. [%s]", annotation.toString()), e);
-
-                eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Invalid body formatting."));
+                log.warn(String.format("Exception while extracting or processing an event. [%s]\n%s", annotation.toString(), e.toString()));
+                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, String.format("[%d successes] %s", successCount, e));
             }
             catch (RuntimeException e) {
-                failCount++;
-                log.info(String.format("Exception while extracting or processing an event. [%s]", annotation.toString()), e);
-
-                // We don't care about the Response returned here, but we do care about incrementing stats about failed events
-                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
+                log.warn(String.format("Exception while extracting or processing an event. [%s]\n%s", annotation.toString(), e.toString()));
+                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, String.format("[%d successes] %s", successCount, e));
             }
         }
-
-        // if no events specified
-        if (failCount == 0 && successCount == 0) {
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("No events specified."));
-        }
-        // if all fail
-        else if (successCount == 0) {
-            // TODO give a more appropriate response & exception
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("No valid events specified."));
-        }
-        // if some fail but some succeed
-        else if (failCount > 0) {
-            log.warn(String.format("%d total exceptions while processing events. [%s]", failCount, annotation.toString()));
-        }
-
-        // if we accept at least one event, return a 202.
-        // i.e. we drop the failed events
-        return Response.status(Response.Status.ACCEPTED).build();
-
     }
 }
