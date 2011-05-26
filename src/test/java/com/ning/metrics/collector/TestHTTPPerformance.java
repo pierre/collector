@@ -31,16 +31,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 
 public class TestHTTPPerformance
 {
     private static final Logger log = Logger.getLogger(TestHTTPPerformance.class);
 
-    private static final int NB_EVENTS = 20;
-    private static final int NB_RUNS = 20;
+    private static final int NB_EVENTS = 1000;
+    private static final int NB_RUNS = 10;
     private static final HashMap<String, Object> payload = new HashMap<String, Object>();
     private static final BlockingQueue<Event> eventQueue = new ArrayBlockingQueue<Event>(NB_EVENTS);
+    private static CollectorController controller;
+    private static FailsafeScheduledExecutor executor;
 
     private static class SenderWorker implements Runnable
     {
@@ -69,6 +70,21 @@ public class TestHTTPPerformance
 
     public static void main(final String[] args) throws Exception
     {
+        System.setProperty("eventtracker.type", "COLLECTOR");
+        System.setProperty("eventtracker.collector.host", "127.0.0.1");
+        System.setProperty("eventtracker.collector.port", "8080");
+        System.setProperty("eventtracker.event-type", "JSON");
+
+        final Injector injector = Guice.createInjector(new CollectorControllerModule());
+        controller = injector.getInstance(CollectorController.class);
+
+        executor = new FailsafeScheduledExecutor(1, new NamedThreadFactory("sender"));
+        executor.submit(new SenderWorker(controller));
+
+        payload.put("message", "World");
+        payload.put("method", "GET");
+        payload.put("uri", "/foo/bar?uri=1242");
+
         int runs = NB_RUNS;
         while (runs-- > 0) {
             doOneRun();
@@ -79,20 +95,6 @@ public class TestHTTPPerformance
 
     private static void doOneRun() throws IOException, InterruptedException
     {
-        System.setProperty("eventtracker.type", "COLLECTOR");
-        System.setProperty("eventtracker.collector.host", "127.0.0.1");
-        System.setProperty("eventtracker.collector.port", "8080");
-        System.setProperty("eventtracker.event-type", "JSON");
-
-        final Injector injector = Guice.createInjector(new CollectorControllerModule());
-        final CollectorController controller = injector.getInstance(CollectorController.class);
-
-        final ExecutorService executor = new FailsafeScheduledExecutor(1, new NamedThreadFactory("sender"));
-        executor.submit(new SenderWorker(controller));
-
-        payload.put("message", "World");
-        payload.put("method", "GET");
-        payload.put("uri", "/foo/bar?uri=1242");
         for (int i = 0; i < NB_EVENTS; i++) {
             eventQueue.offer(new SmileEnvelopeEvent("TestCollectorScalability", new DateTime(), payload));
         }
@@ -101,10 +103,9 @@ public class TestHTTPPerformance
             log.info(String.format("Queue size is %d, sleeping 1 second", eventQueue.size()));
             Thread.sleep(1000);
         }
+
         controller.commit();
         controller.flush();
-
-        Thread.sleep(1000);
         executor.shutdownNow();
     }
 }
