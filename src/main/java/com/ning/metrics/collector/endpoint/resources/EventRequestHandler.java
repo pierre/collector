@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -156,11 +155,11 @@ public class EventRequestHandler
             // IOExceptions are thrown by extractEvent
             catch (IOException e) {
                 log.warn(String.format("Exception while extracting or processing an event. [%s]\n%s", annotation.toString(), e.toString()));
-                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, String.format("[%d successes] %s", successCount, e));
+                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", successCount, e.getMessage())));
             }
             catch (RuntimeException e) {
                 log.warn(String.format("Exception while extracting or processing an event. [%s]\n%s", annotation.toString(), e.toString()));
-                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, String.format("[%d successes] %s", successCount, e));
+                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", successCount, e.getMessage())));
             }
         }
     }
