@@ -191,4 +191,20 @@ public class ParsedRequest implements ExtractedAnnotation
     {
         return inputStream;
     }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(String.format("name: %s, ", eventName == null ? "NULL" : eventName));
+        builder.append(String.format("date: %s, ", eventDateTime == null ? "NULL" : eventDateTime));
+        builder.append(String.format("referrerHost: %s, ", referrerHost == null ? "NULL" : referrerHost));
+        builder.append(String.format("referrerPath: %s, ", referrerPath == null ? "NULL" : referrerPath));
+        builder.append(String.format("ip: %s, ", ipAddress == null ? "NULL" : ipAddress));
+        builder.append(String.format("ua: %s, ", userAgent == null ? "NULL" : userAgent));
+        builder.append(String.format("granularity: %s, ", granularity == null ? "NULL" : granularity));
+        builder.append(String.format("contentLength: %d, ", contentLength));
+        builder.append(String.format("contentType: %s", contentType == null ? "NULL" :  contentType));
+        return builder.toString();
+    }
 }

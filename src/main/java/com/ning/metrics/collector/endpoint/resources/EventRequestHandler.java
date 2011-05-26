@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -157,13 +156,13 @@ public class EventRequestHandler
             // IOExceptions are thrown by extractEvent
             catch (IOException e) {
                 failCount++;
-                log.info(String.format("Exception while extracting or processing an event. [%s]", annotation.toString()), e);
+                log.warn(String.format("Exception while extracting or processing an event: [%s] [%s]", annotation.toString(), e.getLocalizedMessage()));
 
                 eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Invalid body formatting."));
             }
             catch (RuntimeException e) {
                 failCount++;
-                log.info(String.format("Exception while extracting or processing an event. [%s]", annotation.toString()), e);
+                log.warn(String.format("Exception while extracting or processing an event. [%s] [%s]", annotation.toString(), e.getLocalizedMessage());
 
                 // We don't care about the Response returned here, but we do care about incrementing stats about failed events
                 eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
