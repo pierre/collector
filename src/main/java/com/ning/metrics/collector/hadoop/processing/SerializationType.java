@@ -24,43 +24,30 @@ import com.ning.metrics.serialization.writer.ObjectOutputEventSerializer;
 
 enum SerializationType
 {
-    SMILE
+    SMILE("smile")
         {
             @Override
             public EventSerializer getSerializer()
             {
                 return new SmileEnvelopeEventSerializer(false);
             }
-
-            @Override
-            public String getFileSuffix()
-            {
-                return "smile";
-            }
         },
-    JSON
+    JSON("json")
         {
             @Override
             public EventSerializer getSerializer()
             {
                 return new SmileEnvelopeEventSerializer(true);
             }
+        },
+    THRIFT("thrift"),
+    DEFAULT("bin");
 
-            @Override
-            public String getFileSuffix()
-            {
-                return "json";
-            }
-        },
-    THRIFT
-        {
-            @Override
-            public String getFileSuffix()
-            {
-                return "thrift";
-            }
-        },
-    DEFAULT;
+    private final String suffix;
+
+    private SerializationType(String suffix) {
+        this.suffix = suffix;
+    }
 
     public EventSerializer getSerializer()
     {
@@ -85,8 +72,7 @@ enum SerializationType
         }
     }
 
-    public String getFileSuffix()
-    {
-        return "bin";
+    public String getFileSuffix() {
+        return suffix;
     }
 }

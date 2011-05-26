@@ -21,7 +21,6 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.hadoop.writer.FileSystemAccess;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.event.EventSerializer;
 import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventHandler;
@@ -30,6 +29,10 @@ import com.ning.metrics.serialization.writer.SyncType;
 import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +40,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class HadoopWriterFactory implements PersistentWriterFactory
 {
-    private final Logger log = Logger.getLogger(HadoopWriterFactory.class);
+    private static final Logger log = Logger.getLogger(HadoopWriterFactory.class);
+    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss").withZone(DateTimeZone.UTC);
 
     private final CollectorConfig config;
     private final FileSystemAccess hdfsAccess;
@@ -50,17 +54,29 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     }
 
     @Override
-    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String localPath, final String hdfsPath)
+    public EventWriter createPersistentWriter(final WriterStats stats, final SerializationType serializationType, final String eventName, final String hdfsDir)
     {
+        final DateTime timeStamp = new DateTime();
+        final String localFilename = String.format("%s-%d-%s.%s", config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), serializationType.getFileSuffix());
+
         final EventWriter eventWriter = new DiskSpoolEventWriter<Event>(new EventHandler()
         {
+            private int flushCount = 0;
+
             @Override
             public void handle(final File file, final CallbackHandler handler)
             {
                 log.info("Flushing locally buffered events to HDFS");
 
                 try {
-                    hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(hdfsPath));
+                    /* fileName includes a number of things to avoid collisions:
+                       ip  to avoid conflicts between machines
+                       fileExtension  (serialization-type-specific) so multiple file extensions can be written to same directory
+                       flushCount  so the same queue can write multiple times
+                       queueCreationTimestamp  so if, for instance, we shut down and restart the collector within an hour, their writes won't conflict
+                    */
+                    final String outputPath = String.format("%s/%s-%d-%s-f%d.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), flushCount, serializationType.getFileSuffix());
+                    hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(outputPath));
                 }
                 catch (IOException e) {
                     handler.onError(e, file);
@@ -68,9 +84,10 @@ public class HadoopWriterFactory implements PersistentWriterFactory
 
                 handler.onSuccess(file);
                 stats.registerHdfsFlush();
+                flushCount++;
             }
-        }, String.format("%s/%s", config.getSpoolDirectoryName(), localPath), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("spool to HDFS promoter")),
-            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(), serializer);
+        }, String.format("%s/%s", config.getSpoolDirectoryName(), localFilename), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("spool to HDFS promoter")),
+            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(), serializationType.getSerializer());
         return new ThresholdEventWriter(eventWriter, config.getFlushEventQueueSize(), config.getRefreshDelayInSeconds());
     }
 }

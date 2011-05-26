@@ -17,7 +17,6 @@
 package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.serialization.event.EventSerializer;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 
@@ -49,7 +48,7 @@ public class MockPersistentWriterFactory implements PersistentWriterFactory
     }
 
     @Override
-    public EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String localPath, final String hdfsPath)
+    public EventWriter createPersistentWriter(final WriterStats stats, final SerializationType serializationType, final String eventName, final String hdfsDir)
     {
         if (writer == null) {
             return new MockEventWriter(commitThrowsException, rollbackThrowsException, writeThrowsException);

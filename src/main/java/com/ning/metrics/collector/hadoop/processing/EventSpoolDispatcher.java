@@ -22,10 +22,6 @@ import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +35,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class EventSpoolDispatcher
 {
     private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
-    // We can't use ISO format due to the crc code
-    private final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss").withZone(DateTimeZone.UTC);
 
     private final PersistentWriterFactory factory;
     private final WriterStats stats;
@@ -119,20 +113,16 @@ class EventSpoolDispatcher
         final SerializationType eventType = SerializationType.get(event);
 
         if (event != null && isRunning.get()) {
-            // path name contains IP address & serialization type to avoid naming collisions in hadoop
-
-            final String hdfsOutputdir = event.getOutputDir(config.getEventOutputDirectory());
-            final String hdfsFilename = String.format("%s-%s-%d.%s", dateFormatter.print(new DateTime()), config.getLocalIp(), config.getLocalPort(), eventType.getFileSuffix());
-            final String hdfsPath = String.format("%s/%s", hdfsOutputdir, hdfsFilename);
-            LocalQueueAndWriter queue = queuesPerPath.get(hdfsPath);
+            final String hdfsDir = event.getOutputDir(config.getEventOutputDirectory());
+            final String key = String.format("%s|%s", event.getOutputDir(config.getEventOutputDirectory()), eventType.getFileSuffix());
+            LocalQueueAndWriter queue = queuesPerPath.get(key);
 
             if (queue == null) {
                 synchronized (queueMapMonitor) {
-                    queue = queuesPerPath.get(hdfsPath);
+                    queue = queuesPerPath.get(key);
                     if (queue == null) {
-                        final String localSpoolPath = String.format("%s-%s", event.getName(), hdfsFilename);
-                        queue = new LocalQueueAndWriter(config, hdfsPath, factory.createPersistentWriter(stats, eventType.getSerializer(), localSpoolPath, hdfsPath), stats);
-                        queuesPerPath.put(hdfsPath, queue);
+                        queue = new LocalQueueAndWriter(config, hdfsDir, factory.createPersistentWriter(stats, eventType, event.getName(), hdfsDir), stats);
+                        queuesPerPath.put(key, queue);
                     }
                 }
             }

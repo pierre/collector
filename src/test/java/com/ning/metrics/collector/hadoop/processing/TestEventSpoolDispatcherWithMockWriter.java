@@ -16,20 +16,27 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.testng.Assert;
-import org.testng.annotations.Guice;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Guice(modules = ConfigTestModule.class)
+//@Guice(modules = ConfigTestModule.class)
 public class TestEventSpoolDispatcherWithMockWriter
 {
     @Inject
     private CollectorConfig collectorConfig;
+
+    @BeforeClass
+    public void setup() {
+        Guice.createInjector(new ConfigTestModule()).injectMembers(this);
+    }
 
     @Test(groups = "slow")
     public void testShutdown() throws Exception
@@ -76,24 +83,24 @@ public class TestEventSpoolDispatcherWithMockWriter
         eventB.setOutputPath("/b");
 
         // Generic event will use DEFAULT serialization
-        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("/b|bin"));
 
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNull(dispatcher.getQueuesSizes().get("/b|bin"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 1);
         Assert.assertEquals(stats.getEnqueuedEvents(), 1);
 
         dispatcher.offer(eventB);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b|bin"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
         Assert.assertEquals(stats.getEnqueuedEvents(), 2);
 
         dispatcher.offer(eventA);
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/a"));
-        Assert.assertNotNull(dispatcher.getQueuesSizes().get("DEFAULT|/b"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/a|bin"));
+        Assert.assertNotNull(dispatcher.getQueuesSizes().get("/b|bin"));
         Assert.assertEquals(dispatcher.getQueuesSizes().keySet().size(), 2);
         Assert.assertEquals(stats.getEnqueuedEvents(), 3);
     }

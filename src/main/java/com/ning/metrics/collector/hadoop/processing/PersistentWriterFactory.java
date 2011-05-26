@@ -16,7 +16,6 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
-import com.ning.metrics.serialization.event.EventSerializer;
 import com.ning.metrics.serialization.writer.EventWriter;
 
 public interface PersistentWriterFactory
@@ -28,10 +27,9 @@ public interface PersistentWriterFactory
      * all ClickEvent Thrift events during an hour will use the same writer.
      *
      * @param stats stats object to count flushes
-     * @param serializer serializer to use
-     * @param localPath local destination path (only really relevant for serialization library...)
-     * @param hdfsPath destination path (only really relevant for hadoop...)
+     * @param serializationType serialization type to use
+     * @param eventName event name
      * @return eventWriter specific to an event type and serialization type
      */
-    EventWriter createPersistentWriter(final WriterStats stats, final EventSerializer serializer, final String localPath, final String hdfsPath);
+    EventWriter createPersistentWriter(final WriterStats stats, final SerializationType serializationType, final String eventName, final String hdfsDir);
 }
