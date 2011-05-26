@@ -61,7 +61,7 @@
         <!-- Possible GraphTypes are Mean, Min, Max, StdDev, Count and TPS -->
         <param name="GraphType" value="Mean"/>
         <!-- The tags of the timed execution blocks to graph are specified here -->
-        <param name="TagNamesToGraph" value="jmx,secondBlock"/>
+        <param name="TagNamesToGraph" value="acceptance"/>
         <appender-ref ref="graphsFileAppender"/>
     </appender>
 
@@ -72,7 +72,7 @@
     <appender name="graphExecutionTPS"
               class="org.perf4j.log4j.GraphingStatisticsAppender">
         <param name="GraphType" value="TPS"/>
-        <param name="TagNamesToGraph" value="jmx,secondBlock"/>
+        <param name="TagNamesToGraph" value="acceptance,secondBlock"/>
         <appender-ref ref="graphsFileAppender"/>
     </appender>
 

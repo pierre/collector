@@ -77,7 +77,7 @@ public class BufferingEventCollector implements EventCollector
     }
 
     @Override
-    @Profiled(tag = "jmx", message = "Time to collect an event")
+    @Profiled(tag = "acceptance", message = "Time to collect an event")
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {
         if (activeMQController != null && event != null) {
