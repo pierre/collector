@@ -38,7 +38,7 @@ public class ScribeModule implements Module
         binder.bind(scribe.Iface.class).to(ScribeEventRequestHandler.class);
 
         binder.bind(EventEndPointStats.class).annotatedWith(ScribeStats.class).toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
-        builder.export(EventEndPointStats.class).as("com.ning.metrics.collector:name=ScribeEventEndPointStats");
+        builder.export(EventEndPointStats.class).as("com.ning.metrics.collector:name=ScribeAPIStats");
 
         binder.bind(ScribeEventHandler.class).to(ScribeEventHandlerImpl.class);
     }
