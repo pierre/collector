@@ -32,7 +32,7 @@ public class EventCollectorModule implements Module
         binder.bind(EventSpoolDispatcher.class).asEagerSingleton();
 
         binder.bind(WriterStats.class).asEagerSingleton();
-        builder.export(WriterStats.class).as("com.ning.metrics.collector:name=WriterStats");
+        builder.export(WriterStats.class).as("com.ning.metrics.collector:name=WriterQueueStats");
 
         binder.bind(EventCollector.class).to(BufferingEventCollector.class).asEagerSingleton();
         builder.export(EventCollector.class).as("com.ning.metrics.collector:name=BufferingEventCollector");

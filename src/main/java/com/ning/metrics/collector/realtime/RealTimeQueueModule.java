@@ -31,7 +31,7 @@ public class RealTimeQueueModule implements Module
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         binder.bind(EventQueueStats.class).asEagerSingleton();
-        builder.export(EventQueueStats.class).as("com.ning.metrics.collector:name=QueueStats");
+        builder.export(EventQueueStats.class).as("com.ning.metrics.collector:name=RTQueueStats");
 
         binder.bind(EventQueueConnectionFactory.class).to(ActiveMQConnectionFactory.class).asEagerSingleton();
 
