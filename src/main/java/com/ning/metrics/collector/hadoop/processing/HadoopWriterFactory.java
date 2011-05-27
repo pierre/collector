@@ -66,8 +66,6 @@ public class HadoopWriterFactory implements PersistentWriterFactory
             @Override
             public void handle(final File file, final CallbackHandler handler)
             {
-                log.info("Flushing locally buffered events to HDFS");
-
                 try {
                     /* fileName includes a number of things to avoid collisions:
                        ip  to avoid conflicts between machines
@@ -76,6 +74,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                        queueCreationTimestamp  so if, for instance, we shut down and restart the collector within an hour, their writes won't conflict
                     */
                     final String outputPath = String.format("%s/%s-%d-%s-f%d.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), flushCount, serializationType.getFileSuffix());
+                    log.info(String.format("Flushing events to HDFS: [%s] -> [%s]", file.getAbsolutePath(), outputPath));
                     hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(outputPath));
                 }
                 catch (IOException e) {

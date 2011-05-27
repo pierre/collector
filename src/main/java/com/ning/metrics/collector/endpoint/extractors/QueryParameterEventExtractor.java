@@ -21,20 +21,27 @@ import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.events.parsing.EventParser;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.Managed;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * API versions 1 and 2: query parameters-based API (via GET).
  * The lower level extraction business happens in EventParser.
+ * <p/>
+ * The class needs to be public for JMX.
  *
  * @see EventParser
  */
-class QueryParameterEventExtractor implements EventExtractor
+public class QueryParameterEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventExtractor.class);
+
     private final EventParser thriftEventParser;
+    private final AtomicLong thriftSuccess = new AtomicLong(0);
+    private final AtomicLong thriftFailure = new AtomicLong(0);
 
     @Inject
     public QueryParameterEventExtractor(final EventParser thriftEventParser)
@@ -55,10 +62,31 @@ class QueryParameterEventExtractor implements EventExtractor
             log.debug(String.format("Event type [%s], event string [%s]", type, eventTypeString));
 
             // This API only supports sending one event at a time
-            return Collections.singletonList(thriftEventParser.parseThriftEvent(type, eventTypeString, annotation));
+            try {
+                final Event event = thriftEventParser.parseThriftEvent(type, eventTypeString, annotation);
+                thriftSuccess.incrementAndGet();
+
+                return Collections.singletonList(event);
+            }
+            catch (EventParsingException e) {
+                thriftFailure.incrementAndGet();
+                throw e;
+            }
         }
         else {
-            return null;
+            throw new EventParsingException("Event name not specified");
         }
+    }
+
+    @Managed(description = "Number of Thrift events the collector successfully deserialized")
+    public long getThriftSuccess()
+    {
+        return thriftSuccess.get();
+    }
+
+    @Managed(description = "Number of Thrift events the collector couldn't deserialize")
+    public long getThriftFailure()
+    {
+        return thriftFailure.get();
     }
 }

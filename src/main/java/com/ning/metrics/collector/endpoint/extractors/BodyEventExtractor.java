@@ -25,21 +25,31 @@ import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
 import com.ning.metrics.serialization.thrift.ThriftFieldListParser;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.Managed;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Stream-based API (POST).
  * Serialization is done in the eventtracker library. The shared code for serialization/deserialization
  * is in the com.ning:metrics.serialization-* libraries.
+ * <p/>
+ * The class needs to be public for JMX.
  */
-class BodyEventExtractor implements EventExtractor
+public class BodyEventExtractor implements EventExtractor
 {
     private static final Logger log = Logger.getLogger(BodyEventExtractor.class);
+
+    private final AtomicLong thriftSuccess = new AtomicLong(0);
+    private final AtomicLong thriftFailure = new AtomicLong(0);
+    private final AtomicLong smileSuccess = new AtomicLong(0);
+    private final AtomicLong smileFailure = new AtomicLong(0);
+    private final AtomicLong invalidEvents = new AtomicLong(0);
 
     @Override
     public Collection<? extends Event> extractEvent(final ExtractedAnnotation annotation) throws EventParsingException
@@ -60,12 +70,15 @@ class BodyEventExtractor implements EventExtractor
 
                 try {
                     thriftFieldList = new ThriftFieldListParser().parse(annotation.getContentLength(), annotation.getInputStream());
+                    thriftSuccess.incrementAndGet();
                 }
                 catch (IOException e) {
-                    throw new EventParsingException(String.format("IOException while trying to parse event from post body"), e);
+                    thriftFailure.incrementAndGet();
+                    throw new EventParsingException(String.format("IOException while trying to parse event from post body: [%s]", e.toString()));
                 }
                 catch (IllegalArgumentException e) {
-                    throw new EventParsingException(String.format("Parse exception while trying to parse event from post body"), e);
+                    thriftFailure.incrementAndGet();
+                    throw new EventParsingException(String.format("Parse exception while trying to parse event from post body: [%s]", annotation.toString(), e.toString()));
                 }
 
                 return Collections.singletonList(new ThriftEnvelopeEvent(
@@ -80,18 +93,51 @@ class BodyEventExtractor implements EventExtractor
                 try {
                     // JsonStreamToSmileBucketEvent extracts Json or Smile
                     smileEvents = JsonStreamToSmileBucketEvent.extractEvent(eventType, annotation.getInputStream());
+                    smileSuccess.addAndGet(smileEvents.size());
                 }
                 catch (IOException e) {
-                    throw new EventParsingException(String.format("IOException while trying to parse event from post body"), e);
+                    smileFailure.incrementAndGet();
+                    throw new EventParsingException(String.format("IOException while trying to parse event from post body: %s", e.toString()));
                 }
 
                 return smileEvents;
             }
             else {
+                invalidEvents.incrementAndGet();
                 log.warn(String.format("Content-Type [%s] not supported", annotation.getContentType()));
             }
         }
 
         return null;
+    }
+
+    @Managed(description = "Number of Thrift events the collector successfully deserialized")
+    public long getThriftSuccess()
+    {
+        return thriftSuccess.get();
+    }
+
+    @Managed(description = "Number of Thrift events the collector couldn't deserialize")
+    public long getThriftFailure()
+    {
+        return thriftFailure.get();
+    }
+
+    @Managed(description = "Number of Smile events the collector successfully deserialized")
+    public long getSmileSuccess()
+    {
+        return smileSuccess.get();
+    }
+
+    @Managed(description = "Number of Smile requests the collector couldn't deserialize")
+    public long getSmileFailure()
+    {
+        return smileFailure.get();
+    }
+
+    @Managed(description = "Number of events the collector didn't understand")
+    public long getInvalidEvents()
+    {
+        return invalidEvents.get();
     }
 }

@@ -52,32 +52,30 @@ public class RequestHandlersModule implements Module
         // JMX exporter
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
-        binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base10"), ExternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
-            .as("com.ning.metrics.collector:name=ExternalEventHandler");
-
-        binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base64"))
-            .toProvider(new ThriftEnvelopeEventParserProvider(Base64NumberConverter.class)).asEagerSingleton();
-
-        binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
-            .toProvider(new QueryParameterEventExtractorProvider(Names.named("base64"))).asEagerSingleton();
-
+        // Base10 GET Api
         binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base10"))
             .toProvider(new ThriftEnvelopeEventParserProvider(DecimalNumberConverter.class)).asEagerSingleton();
-
         binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
             .toProvider(new QueryParameterEventExtractorProvider(Names.named("base10"))).asEagerSingleton();
+        builder.export(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
+            .as("com.ning.metrics.collector:name=Base10GETAPIStats");
+        binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
+            .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base10"), ExternalEventEndPointStats.class)).asEagerSingleton();
 
+        // Base64 GET Api
+        binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base64"))
+            .toProvider(new ThriftEnvelopeEventParserProvider(Base64NumberConverter.class)).asEagerSingleton();
+        binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
+            .toProvider(new QueryParameterEventExtractorProvider(Names.named("base64"))).asEagerSingleton();
+        builder.export(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
+            .as("com.ning.metrics.collector:name=Base64GETAPIStats");
         binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base64"), ExternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
-            .as("com.ning.metrics.collector:name=Base64ExternalEventHandler");
 
+        // POST Api
         binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(BodyEventExtractor.class, InternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
-            .as("com.ning.metrics.collector:name=InternalEventHandler");
+        builder.export(BodyEventExtractor.class).as("com.ning.metrics.collector:name=POSTAPIStats");
 
         binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
             .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
