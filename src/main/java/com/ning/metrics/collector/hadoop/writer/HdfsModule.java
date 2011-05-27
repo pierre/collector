@@ -20,6 +20,8 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.ning.metrics.collector.hadoop.processing.HadoopWriterFactory;
 import com.ning.metrics.collector.hadoop.processing.PersistentWriterFactory;
+import org.weakref.jmx.guice.ExportBuilder;
+import org.weakref.jmx.guice.MBeanModule;
 
 /**
  * This module provides the wiring for the back-end writers to Hadoop
@@ -29,7 +31,10 @@ public class HdfsModule implements Module
     @Override
     public void configure(final Binder binder)
     {
+        final ExportBuilder builder = MBeanModule.newExporter(binder);
+
         binder.bind(PersistentWriterFactory.class).to(HadoopWriterFactory.class);
+        builder.export(HadoopWriterFactory.class).as("com.ning.metrics.collector:name=HDFSWriter");
 
         // HDFS raw access
         binder.bind(FileSystemAccess.class).toProvider(FileSystemAccessProvider.class).asEagerSingleton();
