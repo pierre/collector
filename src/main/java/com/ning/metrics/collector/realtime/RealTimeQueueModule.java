@@ -30,12 +30,12 @@ public class RealTimeQueueModule implements Module
         // JMX exporter
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
-        binder.bind(EventQueueStats.class).asEagerSingleton();
-        builder.export(EventQueueStats.class).as("com.ning.metrics.collector:name=RTQueueStats");
+        binder.bind(GlobalEventQueueStats.class).asEagerSingleton();
+        builder.export(GlobalEventQueueStats.class).as("com.ning.metrics.collector:name=RTQueueStats");
 
         binder.bind(EventQueueConnectionFactory.class).to(ActiveMQConnectionFactory.class).asEagerSingleton();
 
         binder.bind(EventQueueProcessor.class).to(EventQueueProcessorImpl.class).asEagerSingleton();
-        builder.export(EventQueueProcessorImpl.class).as("com.ning.metrics.collector:name=EventQueueProcessor");
+        builder.export(EventQueueProcessorImpl.class).as("com.ning.metrics.collector:name=RTSubsystem");
     }
 }

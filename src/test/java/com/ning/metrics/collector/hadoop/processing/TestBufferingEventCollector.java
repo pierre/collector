@@ -25,6 +25,7 @@ import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
 import com.ning.metrics.collector.realtime.EventQueueStats;
+import com.ning.metrics.collector.realtime.GlobalEventQueueStats;
 import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;
 import org.testng.annotations.BeforeMethod;
@@ -49,7 +50,7 @@ public class TestBufferingEventCollector
     private EventQueueProcessor msgSender;
 
     @Inject
-    private EventQueueStats stats;
+    private GlobalEventQueueStats stats;
 
     /**
      * @see RealTimeQueueTestModule

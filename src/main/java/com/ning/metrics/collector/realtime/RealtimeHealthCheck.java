@@ -26,11 +26,11 @@ import java.util.Set;
 public class RealtimeHealthCheck implements ComponentHealthCheck
 {
     private final EventQueueProcessorImpl processor;
-    private final EventQueueStats stats;
+    private final GlobalEventQueueStats stats;
     private final CollectorConfig config;
 
     @Inject
-    public RealtimeHealthCheck(final EventQueueProcessor processor, final EventQueueStats stats, final CollectorConfig config)
+    public RealtimeHealthCheck(final EventQueueProcessor processor, final GlobalEventQueueStats stats, final CollectorConfig config)
     {
         this.processor = (EventQueueProcessorImpl) processor;
         this.stats = stats;
@@ -52,11 +52,11 @@ public class RealtimeHealthCheck implements ComponentHealthCheck
 
             builder.append("queue sizes: {");
             int i = 1;
-            final Set<String> eventTypes = processor.getQueuesPerCategory().keySet();
-            for (final String queue : eventTypes) {
-                final LocalQueueAndWorkers worker = processor.getQueuesPerCategory().get(queue);
-                builder.append(String.format("%s: %d", queue, worker.queueSize()));
-                if (worker.queueSize() == config.getActiveMQBufferLength()) {
+            final Set<String> eventTypes = stats.getAllStats().keySet();
+            for (final String eventType : eventTypes) {
+                final long queueSize = stats.getAllStats().get(eventType).getQueueSize();
+                builder.append(String.format("%s: %d", eventType, queueSize));
+                if (queueSize == config.getActiveMQBufferLength()) {
                     builder.append(" [FULL]");
                 }
 

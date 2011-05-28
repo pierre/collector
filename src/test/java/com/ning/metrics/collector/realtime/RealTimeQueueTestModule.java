@@ -36,7 +36,7 @@ public class RealTimeQueueTestModule extends AbstractModule
         bind(Lock.class).annotatedWith(Names.named("amqSessionLock")).toInstance(sessionLock);
         bind(Collection.class).annotatedWith(Names.named("sentEvents")).toInstance(sentEvents);
 
-        bind(EventQueueStats.class).asEagerSingleton();
+        bind(GlobalEventQueueStats.class).asEagerSingleton();
 
         final EventQueueConnectionFactory factory = new EventQueueConnectionFactory()
         {

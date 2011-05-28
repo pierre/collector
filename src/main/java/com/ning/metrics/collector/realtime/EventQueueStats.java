@@ -18,6 +18,7 @@ package com.ning.metrics.collector.realtime;
 
 import org.weakref.jmx.Managed;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -25,15 +26,16 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class EventQueueStats
 {
-    private final AtomicLong ignoredEvents = new AtomicLong(0);
     private final AtomicLong enqueuedEvents = new AtomicLong(0);
     private final AtomicLong droppedEvents = new AtomicLong(0);
     private final AtomicLong sentEvents = new AtomicLong(0);
     private final AtomicLong erroredEvents = new AtomicLong(0);
 
-    public void registerEventIgnored()
+    private final Collection<Object> queue;
+
+    public EventQueueStats(final Collection<Object> queue)
     {
-        ignoredEvents.incrementAndGet();
+        this.queue = queue;
     }
 
     public void registerEventEnqueued()
@@ -54,12 +56,6 @@ public class EventQueueStats
     public void registerEventSendingErrored()
     {
         erroredEvents.incrementAndGet();
-    }
-
-    @Managed(description = "Number of ignored events")
-    public long getIgnoredEvents()
-    {
-        return ignoredEvents.get();
     }
 
     @Managed(description = "Number of locally enqueued events")
@@ -86,12 +82,17 @@ public class EventQueueStats
         return erroredEvents.get();
     }
 
+    @Managed(description = "Size of the underlying queue")
+    public long getQueueSize()
+    {
+        return queue.size();
+    }
+
     /**
      * Unit test hook
      */
     public synchronized void clear()
     {
-        ignoredEvents.set(0);
         enqueuedEvents.set(0);
         droppedEvents.set(0);
         sentEvents.set(0);

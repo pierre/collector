@@ -56,11 +56,11 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     private final Map<String, LocalQueueAndWorkers> queuesPerCategory = new HashMap<String, LocalQueueAndWorkers>();
     private final Object queueMapMonitor = new Object();
     private final AtomicReference<Set<String>> typesToCollect = new AtomicReference<Set<String>>();
-    private final EventQueueStats stats;
+    private final GlobalEventQueueStats stats;
     private CachingGoodwillAccessor goodwillAccessor = null;
 
     @Inject
-    public EventQueueProcessorImpl(final CollectorConfig config, final EventQueueConnectionFactory factory, final EventQueueStats stats)
+    public EventQueueProcessorImpl(final CollectorConfig config, final EventQueueConnectionFactory factory, final GlobalEventQueueStats stats)
     {
         this.config = config;
         this.stats = stats;
@@ -134,16 +134,6 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         else {
             stats.registerEventIgnored();
         }
-    }
-
-    /**
-     * Show queues to for the healthcheck endpoint
-     *
-     * @return the underlying queues
-     */
-    Map<String, LocalQueueAndWorkers> getQueuesPerCategory()
-    {
-        return queuesPerCategory;
     }
 
     /**
