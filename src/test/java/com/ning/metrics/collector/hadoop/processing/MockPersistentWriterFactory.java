@@ -20,6 +20,8 @@ import com.google.inject.Inject;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 
+import java.io.IOException;
+
 public class MockPersistentWriterFactory implements PersistentWriterFactory
 {
     private final boolean commitThrowsException;
@@ -56,5 +58,10 @@ public class MockPersistentWriterFactory implements PersistentWriterFactory
         else {
             return writer;
         }
+    }
+
+    @Override
+    public void processLeftBelowFiles() throws IOException
+    {
     }
 }
