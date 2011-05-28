@@ -74,6 +74,7 @@ public class TestHTTPPerformance
         System.setProperty("eventtracker.collector.host", "127.0.0.1");
         System.setProperty("eventtracker.collector.port", "8080");
         System.setProperty("eventtracker.event-type", "JSON");
+        System.setProperty("eventtracker.collector.max-wait-time-millis", "80000");
 
         final Injector injector = Guice.createInjector(new CollectorControllerModule());
         controller = injector.getInstance(CollectorController.class);
