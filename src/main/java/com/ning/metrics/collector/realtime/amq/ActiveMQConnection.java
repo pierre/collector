@@ -41,7 +41,7 @@ class ActiveMQConnection implements EventQueueConnection
         this.config = config;
         if (config.getActiveMQUri() != null) {
             this.connectionFactory = new ActiveMQConnectionFactory(config.getActiveMQUri());
-            this.connectionFactory.setUseAsyncSend(true);
+            this.connectionFactory.setUseAsyncSend(false);
         }
     }
 
