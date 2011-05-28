@@ -58,7 +58,7 @@ public class RequestHandlersModule implements Module
         binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
             .toProvider(new QueryParameterEventExtractorProvider(Names.named("base10"))).asEagerSingleton();
         builder.export(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
-            .as("com.ning.metrics.collector:name=Base10GETAPIStats");
+            .as("com.ning.metrics.collector:name=HTTP,Type=Base10GETAPIStats");
         binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base10"), ExternalEventEndPointStats.class)).asEagerSingleton();
 
@@ -68,14 +68,14 @@ public class RequestHandlersModule implements Module
         binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
             .toProvider(new QueryParameterEventExtractorProvider(Names.named("base64"))).asEagerSingleton();
         builder.export(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
-            .as("com.ning.metrics.collector:name=Base64GETAPIStats");
+            .as("com.ning.metrics.collector:name=HTTP,Type=Base64GETAPIStats");
         binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base64"), ExternalEventEndPointStats.class)).asEagerSingleton();
 
         // POST Api
         binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(BodyEventExtractor.class, InternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(BodyEventExtractor.class).as("com.ning.metrics.collector:name=POSTAPIStats");
+        builder.export(BodyEventExtractor.class).as("com.ning.metrics.collector:name=HTTP,Type=POSTAPIStats");
 
         binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
             .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
