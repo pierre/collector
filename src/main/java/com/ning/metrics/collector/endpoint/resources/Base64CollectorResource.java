@@ -21,6 +21,7 @@ import com.ning.metrics.collector.binder.annotations.Base64ExternalEventRequestH
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
+import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
@@ -61,7 +62,7 @@ public class Base64CollectorResource
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
         final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, eventDateTime,
-            eventGranularity, request.getRemoteAddr());
+            eventGranularity, request.getRemoteAddr(), DeserializationType.BASE_64_QUERY);
         return requestHandler.handleEventRequest(annotation, eventStats);
     }
 }

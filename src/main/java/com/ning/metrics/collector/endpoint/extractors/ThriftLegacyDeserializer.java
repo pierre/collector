@@ -26,13 +26,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 // this class is one big hack to let the legacy endpoint continue to exist
-public class ThriftLegacyDeserializer implements EventDeserializer<ThriftEnvelopeEvent>
+public class ThriftLegacyDeserializer implements EventDeserializer
 {
     // hack. returns false after one event is extracted
     private boolean hasNextEvent = true;
     ExtractedAnnotation annotation;
 
-    public ThriftLegacyDeserializer(ExtractedAnnotation annotation) {
+    public ThriftLegacyDeserializer(ExtractedAnnotation annotation)
+    {
         this.annotation = annotation;
     }
 
@@ -48,23 +49,20 @@ public class ThriftLegacyDeserializer implements EventDeserializer<ThriftEnvelop
         if (!hasNextEvent) {
             throw new IOException("No more events left to deserialize");
         }
-
-        final ArrayList<ThriftField> thriftFieldList;
+        // can only extract one event
+        hasNextEvent = false;
 
         try {
-            thriftFieldList = new ThriftFieldListParser().parse(annotation.getContentLength(), annotation.getInputStream());
+            final ArrayList<ThriftField> thriftFieldList = new ThriftFieldListParser().parse(annotation.getContentLength(), annotation.getInputStream());
+
+            return new ThriftEnvelopeEvent(
+                annotation.getDateTime(),
+                new ThriftEnvelope(annotation.getEventName(), thriftFieldList),
+                annotation.getBucketGranularity()
+            );
         }
         catch (IllegalArgumentException e) {
             throw new IOException(String.format("Parse exception while trying to parse event from post body: %s [%s]", annotation.toString(), e.toString()));
         }
-
-        // we have extracted the one and only thrift event
-        hasNextEvent = false;
-
-        return new ThriftEnvelopeEvent(
-            annotation.getDateTime(),
-            new ThriftEnvelope(annotation.getEventName(), thriftFieldList),
-            annotation.getBucketGranularity()
-        );
     }
 }

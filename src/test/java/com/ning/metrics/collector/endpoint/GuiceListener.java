@@ -20,8 +20,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
-import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
-import com.ning.metrics.collector.endpoint.extractors.MockEventExtractor;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 import com.ning.metrics.collector.endpoint.resources.EventHandler;
@@ -45,7 +43,6 @@ public class GuiceListener extends GuiceServletContextListener
             protected void configureServlets()
             {
                 bind(EventHandler.class).to(MockEventHandler.class);
-                bind(EventExtractor.class).to(MockEventExtractor.class);
                 final Map<String, String> params = new HashMap<String, String>();
                 params.put("com.sun.jersey.config.property.packages", "com.ning.metrics.collector.endpoint");
                 serve("/*").with(GuiceContainer.class, params);

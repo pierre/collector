@@ -17,16 +17,6 @@
 package com.ning.metrics.collector.endpoint.resources;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.event.Granularity;
-import com.ning.metrics.serialization.event.SmileBucketEvent;
-import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
-import com.ning.metrics.serialization.smile.SmileBucket;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.smile.SmileFactory;
-import org.codehaus.jackson.smile.SmileGenerator;
-import org.codehaus.jackson.smile.SmileParser;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -34,8 +24,6 @@ import org.testng.annotations.Test;
 import scribe.thrift.LogEntry;
 import scribe.thrift.ResultCode;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,23 +43,6 @@ public class TestScribeEventRequestHandler
         stats = new EventEndPointStats(5);
         eventHandler = new MockScribeEventHandler(stats);
         eventRequestHandler = new ScribeEventRequestHandler(eventHandler);
-    }
-
-    @Test(groups = "fast")
-    public void testSmileSuccess() throws Exception
-    {
-        final SmileBucketEvent smileEvent = createSmileBucketEvent();
-
-        // See ScribeSender in com.ning:metrics.eventtracker
-        final List<LogEntry> logEntries = new ArrayList<LogEntry>();
-        logEntries.add(new LogEntry(EVENT_NAME, new String(smileEvent.getSerializedEvent(), SmileEnvelopeEvent.CHARSET)));
-
-        Assert.assertEquals(eventRequestHandler.Log(logEntries), ResultCode.OK);
-        Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
-        Assert.assertEquals(eventHandler.getProcessedEventList().get(0).getName(), EVENT_NAME);
-        Assert.assertEquals(stats.getTotalEvents(), 1);
-        Assert.assertEquals(stats.getSuccessfulParseEvents(), 1);
-        Assert.assertEquals(stats.getFailedToParseEvents(), 0);
     }
 
     @Test(groups = "fast")
@@ -115,41 +86,5 @@ public class TestScribeEventRequestHandler
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
         Assert.assertEquals(stats.getFailedToParseEvents(), 1);
         Assert.assertEquals(stats.getRejectedEvents(), 0);
-    }
-
-    private SmileBucketEvent createSmileBucketEvent() throws IOException
-    {
-        final SmileBucket nodes = new SmileBucket();
-        for (int i = 0; i < 5; i++) {
-            nodes.add((JsonNode) createSmileEvent().getData());
-        }
-
-        return new SmileBucketEvent(EVENT_NAME, Granularity.HOURLY, nodes);
-    }
-
-    private Event createSmileEvent() throws IOException
-    {
-        // Use same configuration as SmileEnvelopeEvent
-        final SmileFactory f = new SmileFactory();
-        f.configure(SmileGenerator.Feature.CHECK_SHARED_NAMES, true);
-        f.configure(SmileGenerator.Feature.CHECK_SHARED_STRING_VALUES, true);
-        f.configure(SmileParser.Feature.REQUIRE_HEADER, false);
-
-        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        final JsonGenerator g = f.createJsonGenerator(stream);
-
-        g.writeStartObject();
-        g.writeStringField(SmileEnvelopeEvent.SMILE_EVENT_GRANULARITY_TOKEN_NAME, Granularity.HOURLY.toString());
-        g.writeObjectFieldStart("name");
-        g.writeStringField("first", "Joe");
-        g.writeStringField("last", "Sixpack");
-        g.writeEndObject(); // for field 'name'
-        g.writeStringField("gender", "MALE");
-        g.writeNumberField(SmileEnvelopeEvent.SMILE_EVENT_DATETIME_TOKEN_NAME, EVENT_DATE_TIME.getMillis());
-        g.writeBooleanField("verified", false);
-        g.writeEndObject();
-        g.close(); // important: will force flushing of output, close underlying output stream
-
-        return new SmileEnvelopeEvent(EVENT_NAME, stream.toByteArray(), EVENT_DATE_TIME, Granularity.HOURLY);
     }
 }

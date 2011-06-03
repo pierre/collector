@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
-public class QueryParameterEventDeserializer implements EventDeserializer<ThriftEnvelopeEvent>
+public class QueryParameterEventDeserializer implements EventDeserializer
 {
     private static final Logger log = Logger.getLogger(QueryParameterEventDeserializer.class);
 

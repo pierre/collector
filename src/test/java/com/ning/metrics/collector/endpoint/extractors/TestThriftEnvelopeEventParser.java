@@ -304,7 +304,7 @@ public class TestThriftEnvelopeEventParser
         }
 
         @Override
-        public String getContentType()
+        public DeserializationType getContentType()
         {
             return null;
         }

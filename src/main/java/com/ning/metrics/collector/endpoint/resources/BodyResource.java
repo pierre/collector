@@ -21,6 +21,7 @@ import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
+import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
@@ -44,7 +45,7 @@ import java.io.InputStream;
 public class BodyResource
 {
     private static final String APPLICATION_JSON_SMILE = "application/json+smile";
-    private static final String NING_THRIFT = "ning/thrift";
+    private static final String THRIFT = "application/thrift";
 
     private final EventRequestHandler requestHandler;
 
@@ -54,10 +55,10 @@ public class BodyResource
         this.requestHandler = requestHandler;
     }
 
+    // legacy endpoint to fall back on, for recieving single ThriftEnvelopeEvents
     @POST
-    @Consumes(NING_THRIFT)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response postThrift(
+    public Response postThriftLegacy(
         @QueryParam("name") final String eventName,
         @QueryParam("date") final String eventDateTimeString,
         @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
@@ -68,7 +69,21 @@ public class BodyResource
     {
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), NING_THRIFT);
+        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), DeserializationType.DEFAULT);
+        return requestHandler.handleEventRequest(annotation, eventStats);
+    }
+
+    @POST
+    @Consumes(THRIFT)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response postThrift(
+        final InputStream body,
+        @Context final HttpHeaders httpHeaders,
+        @Context final HttpServletRequest request
+    )
+    {
+        final EventStats eventStats = new EventStats();
+        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), DeserializationType.THRIFT);
         return requestHandler.handleEventRequest(annotation, eventStats);
     }
 
@@ -82,8 +97,8 @@ public class BodyResource
     )
     {
         final EventStats eventStats = new EventStats();
-        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), MediaType.APPLICATION_JSON);
-        return requestHandler.handleJsonRequest(true, eventStats, annotation);
+        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), DeserializationType.JSON);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 
     @POST
@@ -96,7 +111,7 @@ public class BodyResource
     )
     {
         final EventStats eventStats = new EventStats();
-        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), MediaType.APPLICATION_JSON);
-        return requestHandler.handleJsonRequest(false, eventStats, annotation);
+        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), DeserializationType.SMILE);
+        return requestHandler.handleEventRequest(annotation, eventStats);
     }
 }

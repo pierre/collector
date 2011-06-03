@@ -20,7 +20,7 @@ import com.ning.metrics.serialization.event.EventDeserializer;
 
 import java.io.IOException;
 
-public class MockEventDeserializer implements EventDeserializer<Event>
+public class MockEventDeserializer implements EventDeserializer
 {
     private boolean throwsIOException = false;
     private boolean throwsRuntimeException = false;
@@ -53,6 +53,8 @@ public class MockEventDeserializer implements EventDeserializer<Event>
     @Override
     public Event getNextEvent() throws IOException
     {
+        hasNextEvent = false;
+
         if (throwsIOException) {
             throw new IOException("IGNORE - Expected exception for tests");
         }
@@ -61,7 +63,6 @@ public class MockEventDeserializer implements EventDeserializer<Event>
             throw new RuntimeException("IGNORE - Expected exception for tests");
         }
 
-        hasNextEvent = false;
         return event;
     }
 }

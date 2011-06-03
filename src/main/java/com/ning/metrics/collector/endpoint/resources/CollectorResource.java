@@ -21,6 +21,7 @@ import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
+import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
@@ -58,7 +59,7 @@ public class CollectorResource
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
         final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, eventDateTime,
-            eventGranularity, request.getRemoteAddr());
+            eventGranularity, request.getRemoteAddr(), DeserializationType.DECIMAL_QUERY);
         return requestHandler.handleEventRequest(annotation, eventStats);
     }
 }

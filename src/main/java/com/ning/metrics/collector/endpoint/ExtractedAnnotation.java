@@ -16,11 +16,14 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
 import org.joda.time.DateTime;
 
 import java.io.InputStream;
 
+// TODO this needs some clean-up, because various fields are filled in at various times and it's unclear when, for instance,
+// we can expect eventName to actually be filled in (if at all)
 public interface ExtractedAnnotation
 {
     String getEventName();
@@ -41,5 +44,5 @@ public interface ExtractedAnnotation
 
     InputStream getInputStream();
 
-    String getContentType();
+    DeserializationType getContentType();
 }
