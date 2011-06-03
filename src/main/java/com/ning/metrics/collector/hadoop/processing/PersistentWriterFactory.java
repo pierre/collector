@@ -29,6 +29,7 @@ public interface PersistentWriterFactory
      * @param stats stats object to count flushes
      * @param serializationType serialization type to use
      * @param eventName event name
+     * @param hdfsDir output directory
      * @return eventWriter specific to an event type and serialization type
      */
     EventWriter createPersistentWriter(final WriterStats stats, final SerializationType serializationType, final String eventName, final String hdfsDir);
