@@ -52,6 +52,8 @@ public class QueryParameterEventDeserializer implements EventDeserializer<Thrift
         if (!hasNextEvent) {
             throw new IOException("No more events left to deserialize");
         }
+        // can only extract one event
+        hasNextEvent = false;
 
         final String eventName = annotation.getEventName();
 
