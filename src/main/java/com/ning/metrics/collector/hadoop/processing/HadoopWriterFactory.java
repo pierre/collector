@@ -59,7 +59,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
         final DateTime timeStamp = new DateTime();
         final String localFilename = String.format("%s-%d-%s.%s", config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), serializationType.getFileSuffix());
 
-        final EventWriter eventWriter = new DiskSpoolEventWriter<Event>(new EventHandler()
+        final EventWriter eventWriter = new DiskSpoolEventWriter(new EventHandler()
         {
             private int flushCount = 0;
 
