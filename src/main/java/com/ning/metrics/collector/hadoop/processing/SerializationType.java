@@ -15,11 +15,9 @@
  */
 package com.ning.metrics.collector.hadoop.processing;
 
-import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.event.EventSerializer;
-import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
-import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
+import com.ning.metrics.serialization.event.*;
 import com.ning.metrics.serialization.smile.SmileEnvelopeEventSerializer;
+import com.ning.metrics.serialization.thrift.ThriftEnvelopeEventSerializer;
 import com.ning.metrics.serialization.writer.ObjectOutputEventSerializer;
 
 enum SerializationType
@@ -40,19 +38,32 @@ enum SerializationType
                 return new SmileEnvelopeEventSerializer(true);
             }
         },
-    THRIFT("thrift"),
-    DEFAULT("bin");
+    THRIFT("thrift")
+        {
+            @Override
+            public EventSerializer getSerializer()
+            {
+                return new ThriftEnvelopeEventSerializer();
+            }
+        },
+    DEFAULT("bin")
+        {
+            @Override
+            public EventSerializer getSerializer()
+            {
+                // TODO since we want to stop using ObjectOutput altogether, should we instead use ThriftEnvelopeEventSerializer?
+                return new ObjectOutputEventSerializer();
+            }
+        };
 
     private final String suffix;
 
-    private SerializationType(String suffix) {
+    private SerializationType(String suffix)
+    {
         this.suffix = suffix;
     }
 
-    public EventSerializer getSerializer()
-    {
-        return new ObjectOutputEventSerializer();
-    }
+    public abstract EventSerializer getSerializer();
 
     public static SerializationType get(final Event event)
     {
@@ -72,7 +83,8 @@ enum SerializationType
         }
     }
 
-    public String getFileSuffix() {
+    public String getFileSuffix()
+    {
         return suffix;
     }
 }
