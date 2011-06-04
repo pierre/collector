@@ -99,10 +99,13 @@ public class TestParsedRequest
     @Test(groups = "fast")
     public void testParseDateDefault() throws Exception
     {
+        // TODO weird & hacky! Loading the enum for the first time is costly, so create a single ParsedRequest before testing
+        createParsedRequestWithNoQueryParameter();
+
         final long currentTime = System.currentTimeMillis();
         final ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
         final long timeDiff = Math.abs(parsedRequest.getDateTime().getMillis() - currentTime);
-        Assert.assertTrue(timeDiff < 300, String.format("took %d millis just to create the sample event", timeDiff));
+        Assert.assertTrue(timeDiff < 100, String.format("took %d millis just to create the sample event", timeDiff));
     }
 
     private HttpHeaders createDummyHeaders()
