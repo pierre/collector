@@ -36,7 +36,7 @@ class LocalQueueAndWriter
 {
     private final Logger log = Logger.getLogger(LocalQueueAndWriter.class);
 
-    private final BlockingQueue queue;
+    private final BlockingQueue<Event> queue;
     private final EventWriter eventWriter;
     private final ExecutorService executor;
     private final WriterStats stats;
