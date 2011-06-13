@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+package com.ning.metrics.collector.endpoint.extractors;
 
-package com.ning.metrics.collector.events.parsing;
-
-import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
-import com.ning.metrics.serialization.event.Event;
-
-public interface EventParser
+public enum DeserializationType
 {
-    public Event parseThriftEvent(String eventTypeName, String input, ExtractedAnnotation extractedAnnotation) throws EventParsingException;
+    // BodyResource
+    SMILE, JSON, THRIFT, DEFAULT,
+    // CollectorResource
+    DECIMAL_QUERY,
+    // Base64CollectorResource
+    BASE_64_QUERY,
 }

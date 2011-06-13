@@ -25,15 +25,15 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Worker that constantly dequeues events from its underlying queue and writes them to disk
  */
-class LocalQueueWorker<T extends Event> implements Runnable
+class LocalQueueWorker implements Runnable
 {
     private static final Logger logger = Logger.getLogger(LocalQueueWorker.class);
 
-    private final BlockingQueue<T> eventQueue;
-    private final EventWriter<T> processor;
+    private final BlockingQueue<Event> eventQueue;
+    private final EventWriter processor;
     private final WriterStats stats;
 
-    public LocalQueueWorker(final BlockingQueue<T> msgQueue, final EventWriter<T> eventWriter, final WriterStats stats)
+    public LocalQueueWorker(final BlockingQueue<Event> msgQueue, final EventWriter eventWriter, final WriterStats stats)
     {
         this.eventQueue = msgQueue;
         this.processor = eventWriter;
@@ -47,7 +47,7 @@ class LocalQueueWorker<T extends Event> implements Runnable
     {
         while (true) {
             try {
-                final T event = eventQueue.take();
+                final Event event = eventQueue.take();
                 processor.write(event);
                 stats.registerEventWritten();
             }

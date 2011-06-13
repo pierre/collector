@@ -21,6 +21,7 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;

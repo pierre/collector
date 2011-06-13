@@ -28,27 +28,15 @@ import java.lang.annotation.Annotation;
 
 class EventRequestHandlerProvider implements Provider<EventRequestHandler>
 {
-    private final Key<? extends EventExtractor> eventExtractorKey;
     private final Key<EventEndPointStats> eventEndPointStatsKey;
     private Injector injector;
+    // TODO bind EventDeserializerFactory to eager singleton, rather than using a private field?
+    private static final EventDeserializerFactory eventDeserializerFactory = new EventDeserializerFactory();
 
     public EventRequestHandlerProvider(
-        final Class<? extends EventExtractor> eventExtractorClazz,
-        final Annotation eventExtractorAnnotation,
         final Class<? extends Annotation> eventEndPointStatsAnnotation
     )
     {
-        eventExtractorKey = Key.get(eventExtractorClazz, eventExtractorAnnotation);
-        eventEndPointStatsKey = Key.get(EventEndPointStats.class, eventEndPointStatsAnnotation);
-    }
-
-
-    public EventRequestHandlerProvider(
-        final Class<? extends EventExtractor> eventExtractorClazz,
-        final Class<? extends Annotation> eventEndPointStatsAnnotation
-    )
-    {
-        eventExtractorKey = Key.get(eventExtractorClazz);
         eventEndPointStatsKey = Key.get(EventEndPointStats.class, eventEndPointStatsAnnotation);
     }
 
@@ -62,9 +50,8 @@ class EventRequestHandlerProvider implements Provider<EventRequestHandler>
     public EventRequestHandler get()
     {
         final EventHandler eventHandler = injector.getInstance(EventHandler.class);
-        final EventExtractor eventExtractor = injector.getInstance(eventExtractorKey);
         final EventEndPointStats stats = injector.getInstance(eventEndPointStatsKey);
 
-        return new EventRequestHandler(eventHandler, eventExtractor, stats);
+        return new EventRequestHandler(eventHandler, stats, eventDeserializerFactory);
     }
 }

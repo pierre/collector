@@ -26,7 +26,6 @@ import com.ning.metrics.collector.events.parsing.converters.IntegerConverter;
 import com.ning.metrics.collector.events.parsing.converters.NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.ShortConverter;
 import com.ning.metrics.collector.util.Ip;
-import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ThriftEnvelopeEventParser implements EventParser
+public class ThriftEnvelopeEventParser
 {
     private static final String TOKEN_SEPARATOR = ",";
     private static final BooleanConverter booleanConverter = new BooleanConverter();
@@ -54,8 +53,7 @@ public class ThriftEnvelopeEventParser implements EventParser
         this.integerConverter = new IntegerConverter(numberConverter);
     }
 
-    @Override
-    public Event parseThriftEvent(final String eventTypeName, final String input, final ExtractedAnnotation extractedAnnotation) throws EventParsingException
+    public ThriftEnvelopeEvent parseThriftEvent(final String eventTypeName, final String input, final ExtractedAnnotation extractedAnnotation) throws EventParsingException
     {
         try {
             final Tokenizer tokenizer = new UrlDecodingTokenizer(new SplitTokenizer(input, TOKEN_SEPARATOR));

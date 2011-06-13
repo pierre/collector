@@ -22,38 +22,45 @@ import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.MockEventHandler;
 import com.ning.metrics.collector.endpoint.MockHttpHeaders;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
-import com.ning.metrics.collector.endpoint.extractors.MockEventExtractor;
+import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
+import com.ning.metrics.collector.endpoint.extractors.MockEventDeserializer;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.EventDeserializer;
 import com.ning.metrics.serialization.event.StubEvent;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 public class TestEventRequestHandler
 {
     private EventEndPointStats stats = null;
     private MockEventHandler eventHandler = null;
-    private MockEventExtractor eventExtractor = null;
+    private MockEventDeserializer eventDeserializer = null;
     private EventRequestHandler eventRequestHandler = null;
     private EventStats eventStats = null;
+    private MockEventDeserializerFactory eventDeserializerFactory;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
     {
         eventHandler = new MockEventHandler();
         stats = new EventEndPointStats(5);
-        eventExtractor = new MockEventExtractor();
-        eventRequestHandler = new EventRequestHandler(eventHandler, eventExtractor, stats);
+        eventDeserializer = new MockEventDeserializer();
+        eventDeserializerFactory = new MockEventDeserializerFactory();
+        // Every test shares the same factory, and they all expect it to provide different types of events.
+        // so the tests can't run in parallel. Hence the "synchronized" keyword everywhere.
+        eventRequestHandler = new EventRequestHandler(eventHandler, stats, eventDeserializerFactory);
         eventStats = new EventStats();
     }
 
     @Test(groups = "fast")
-    public void testSuccess() throws Exception
+    public synchronized void testSuccess() throws Exception
     {
         final Event event = createEvent("fuu");
-        eventExtractor.setEvent(event);
+        eventDeserializer.setEvent(event);
         final Response res = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
@@ -67,9 +74,9 @@ public class TestEventRequestHandler
     }
 
     @Test(groups = "fast")
-    public void testEventExtractorReturnsNull() throws Exception
+    public synchronized void testEventExtractorReturnsNull() throws Exception
     {
-        eventExtractor.setEvent(null);
+        eventDeserializer.setEvent(null);
         final Response res = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         // Test that eventHandler sees the null value
@@ -84,9 +91,9 @@ public class TestEventRequestHandler
     }
 
     @Test(groups = "fast")
-    public void testEventExtractorThrowsEventParse() throws Exception
+    public synchronized void testEventExtractorThrowsEventParse() throws Exception
     {
-        eventExtractor.setThrowsEventParseException(true);
+        eventDeserializer.setThrowsIOException(true);
 
         final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
@@ -101,9 +108,9 @@ public class TestEventRequestHandler
     }
 
     @Test(groups = "fast")
-    public void testEventExtractorThrowsRuntimeException() throws Exception
+    public synchronized void testEventExtractorThrowsRuntimeException() throws Exception
     {
-        eventExtractor.setThrowsRuntimeException(true);
+        eventDeserializer.setThrowsRuntimeException(true);
 
         final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
@@ -118,16 +125,13 @@ public class TestEventRequestHandler
     }
 
     @Test(groups = "fast")
-    public void testEventHandlerThrowsBeforeEventProcessed() throws Exception
+    public synchronized void testEventHandlerThrowsBeforeEventProcessed() throws Exception
     {
         eventHandler.setThrowExceptionBeforeEvent(true);
 
         final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
-
-        // Server only returns statusCode != 202 when there is an issue extracting the events.
-        // Not when it fails to process an individual event.
         Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
 
         Assert.assertEquals(stats.getTotalEvents(), 1);
@@ -136,17 +140,30 @@ public class TestEventRequestHandler
     }
 
     @Test(groups = "fast")
-    public void testEventHandlerThrowsAfterEventProcessed() throws Exception
+    public synchronized void testEventHandlerThrowsAfterEventProcessed() throws Exception
     {
         eventHandler.setThrowExceptionAfterEvent(true);
 
         final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
-
-        // Server only returns statusCode != 202 when there is an issue extracting the events.
-        // Not when it fails to process an individual event.
         Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
+
+        Assert.assertEquals(stats.getTotalEvents(), 1);
+        Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
+        Assert.assertEquals(stats.getFailedToParseEvents(), 1);
+    }
+
+    @Test(groups = "fast")
+    // TODO fix the assertions. they're just copypasta right now.
+    public synchronized void testEventHandlerThrowsOnGetEventDeserializer() throws Exception
+    {
+        eventDeserializerFactory.throwsOnGetEventDeserializer = true;
+
+        final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
+
+        Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
+        Assert.assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
 
         Assert.assertEquals(stats.getTotalEvents(), 1);
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
@@ -174,6 +191,21 @@ public class TestEventRequestHandler
      */
     private ExtractedAnnotation createMockRequestAnnotation()
     {
-        return new ParsedRequest("DummyEvent", new MockHttpHeaders(), null, null, null, null);
+        return new ParsedRequest("DummyEvent", new MockHttpHeaders(), null, null, null, null, null);
+    }
+
+    private class MockEventDeserializerFactory extends EventDeserializerFactory {
+
+        public boolean throwsOnGetEventDeserializer = false;
+
+        @Override
+        public EventDeserializer getEventDeserializer(ExtractedAnnotation annotation) throws IOException {
+
+            if (throwsOnGetEventDeserializer) {
+                throw new IOException("IGNORE. Exception for tests.");
+            }
+
+            return eventDeserializer;
+        }
     }
 }

@@ -20,11 +20,9 @@ import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.event.SmileBucketEvent;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftToThriftEnvelopeEvent;
-import com.ning.metrics.serialization.smile.JsonStreamToSmileBucketEvent;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -39,11 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class ScribeEventRequestHandler implements Iface
 {
@@ -102,6 +96,7 @@ class ScribeEventRequestHandler implements Iface
 
                 // Return a collection here: in case of Smile, we may can a bucket of events that overlaps on multiple
                 // output directories
+                // TODO use EventDeserializer here!
                 final Collection<? extends Event> events = extractEvent(entry.getCategory(), entry.getMessage());
 
                 // We only record failure when collectors are falling over (rejecting)
@@ -165,28 +160,7 @@ class ScribeEventRequestHandler implements Iface
      */
     private Collection<? extends Event> extractEvent(final String category, final String message) throws TException, IOException
     {
-        final Collection<SmileBucketEvent> smileEvents = extractSmileBucketEvents(category, message);
-
-        if (smileEvents == null) {
-            final Collection<Event> thriftEnvelope = new ArrayList<Event>();
-            thriftEnvelope.add(extractThriftEnvelopeEvent(category, message));
-            return thriftEnvelope;
-        }
-        else {
-            return smileEvents;
-        }
-    }
-
-    private Collection<SmileBucketEvent> extractSmileBucketEvents(final String category, final String message) throws IOException
-    {
-        // See http://wiki.fasterxml.com/JacksonBinaryFormatSpec
-        // We assume for now that we are sending Smile on the wire. This may change though (lzo compression?)
-        if (message.charAt(0) == ':' && message.charAt(1) == ')' && message.charAt(2) == '\n') {
-            return JsonStreamToSmileBucketEvent.extractEvent(category, new ByteArrayInputStream(message.getBytes(CHARSET)));
-        }
-        else {
-            return null;
-        }
+        return Collections.singleton(extractThriftEnvelopeEvent(category, message));
     }
 
     private Event extractThriftEnvelopeEvent(final String category, final String message) throws TException

@@ -32,24 +32,24 @@ import java.util.concurrent.TimeUnit;
 /**
  * Writer manager for a specific queue
  */
-class LocalQueueAndWriter<T extends Event>
+class LocalQueueAndWriter
 {
     private final Logger log = Logger.getLogger(LocalQueueAndWriter.class);
 
-    private final BlockingQueue<T> queue;
-    private final EventWriter<T> eventWriter;
+    private final BlockingQueue<Event> queue;
+    private final EventWriter eventWriter;
     private final ExecutorService executor;
     private final WriterStats stats;
 
-    public LocalQueueAndWriter(final CollectorConfig config, final String path, final EventWriter<T> eventWriter, final WriterStats stats)
+    public LocalQueueAndWriter(final CollectorConfig config, final String path, final EventWriter eventWriter, final WriterStats stats)
     {
-        this.queue = new LinkedBlockingQueue<T>(config.getMaxQueueSize());
+        this.queue = new LinkedBlockingQueue<Event>(config.getMaxQueueSize());
         this.eventWriter = eventWriter;
         this.stats = stats;
 
         // Underlying dequeuer (writer)
         this.executor = new FailsafeScheduledExecutor(1, new NamedThreadFactory(path + "-writer"));
-        executor.submit(new LocalQueueWorker<T>(queue, eventWriter, stats));
+        executor.submit(new LocalQueueWorker(queue, eventWriter, stats));
     }
 
     public void close()
@@ -87,7 +87,7 @@ class LocalQueueAndWriter<T extends Event>
      * @return <tt>true</tt> if the element was added to this queue, else
      *         <tt>false</tt>
      */
-    public boolean offer(final T event)
+    public boolean offer(final Event event)
     {
         if (queue.offer(event)) {
             stats.registerEventEnqueued();

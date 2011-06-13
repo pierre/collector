@@ -86,7 +86,6 @@ public class JettyTestModule extends AbstractModule
         final MockEventWriter writer = new MockEventWriter();
         bind(MockEventWriter.class).toInstance(writer);
         // Wrap around ThresholdEventWriter to trigger commits
-        final PersistentWriterFactory writerFactory = new MockPersistentWriterFactory(new ThresholdEventWriter(writer, 0, 1));
-        bind(PersistentWriterFactory.class).toInstance(writerFactory);
+        bind(PersistentWriterFactory.class).toInstance(new MockPersistentWriterFactory(new ThresholdEventWriter(writer, 0, 1)));
     }
 }

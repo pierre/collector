@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2011 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -13,49 +13,56 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.EventDeserializer;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.io.IOException;
 
-public class MockEventExtractor implements EventExtractor
+public class MockEventDeserializer implements EventDeserializer
 {
-    private boolean throwsEventParseException = false;
+    private boolean throwsIOException = false;
     private boolean throwsRuntimeException = false;
     private Event event = null;
 
-    @Override
-    public Collection<Event> extractEvent(final ExtractedAnnotation annotation) throws EventParsingException
+    private boolean hasNextEvent = true;
+
+    public void setEvent(final Event event)
     {
-        if (throwsEventParseException) {
-            throw new EventParsingException("IGNORE - Expected exception for tests");
+        hasNextEvent = true;
+        this.event = event;
+    }
+
+    public void setThrowsIOException(final boolean throwsIOException)
+    {
+        this.throwsIOException = throwsIOException;
+    }
+
+    public void setThrowsRuntimeException(final boolean throwsRuntimeException)
+    {
+        this.throwsRuntimeException = throwsRuntimeException;
+    }
+
+    @Override
+    public boolean hasNextEvent()
+    {
+        return hasNextEvent;
+    }
+
+    @Override
+    public Event getNextEvent() throws IOException
+    {
+        hasNextEvent = false;
+
+        if (throwsIOException) {
+            throw new IOException("IGNORE - Expected exception for tests");
         }
 
         if (throwsRuntimeException) {
             throw new RuntimeException("IGNORE - Expected exception for tests");
         }
 
-        final Collection<Event> events = new LinkedList<Event>();
-        events.add(event);
-        return events;
-    }
-
-    public void setEvent(final Event event)
-    {
-        this.event = event;
-    }
-
-    public void setThrowsEventParseException(final boolean throwsEventParseException)
-    {
-        this.throwsEventParseException = throwsEventParseException;
-    }
-
-    public void setThrowsRuntimeException(final boolean throwsRuntimeException)
-    {
-        this.throwsRuntimeException = throwsRuntimeException;
+        return event;
     }
 }

@@ -19,15 +19,17 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
-import com.ning.metrics.collector.endpoint.extractors.EventExtractor;
-import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
+import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
+import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.smile.SmileEnvelopeEventExtractor;
+import com.ning.metrics.serialization.event.EventDeserializer;
 import org.apache.log4j.Logger;
+import org.weakref.jmx.Managed;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Event handler for the HTTP API (GET and POST).
@@ -36,131 +38,121 @@ public class EventRequestHandler
 {
     private static final Logger log = Logger.getLogger(EventRequestHandler.class);
 
-    private final EventExtractor eventExtractor;
     private final EventEndPointStats endPointStats;
     private final EventHandler eventHandler;
 
+    private final HashMap<String, AtomicInteger> stats = new HashMap<String, AtomicInteger>(10);
+    private EventDeserializerFactory eventDeserializerFactory;
+
     public EventRequestHandler(
         final EventHandler eventHandler,
-        final EventExtractor eventExtractor,
-        final EventEndPointStats stats
+        final EventEndPointStats stats,
+        final EventDeserializerFactory eventDeserializerFactory
     )
     {
-        this.eventExtractor = eventExtractor;
         this.endPointStats = stats;
         this.eventHandler = eventHandler;
+        this.eventDeserializerFactory = eventDeserializerFactory;
     }
 
-    // TODO the statistics we collect here are less relevant now that we're processing collections of events at a time
     public Response handleEventRequest(final ExtractedAnnotation annotation, final EventStats eventStats)
     {
-        final String eventName = annotation.getEventName();
-        final Collection<? extends Event> events;
+
+        Event event;
+        int successCount = 0;
+        EventDeserializer extractor;
+        DeserializationType type = annotation.getContentType();
 
         try {
-            // do not update stats here, while extracting events. update when processing.
-            events = eventExtractor.extractEvent(annotation);
-            eventStats.recordExtracted();
+            extractor = eventDeserializerFactory.getEventDeserializer(annotation);
         }
-        catch (EventParsingException e) {
-            log.warn(String.format("Unable to extract event: %s [%s] [%s]", eventName, annotation.toString(), e.toString()));
-            // If one event fails, the entire collection of events is rejected
+        // can occur if the deserializer fails immediately (if the stream/file doesn't begin correctly)
+        // fail fast and notify the sender that their message is improperly formatted
+        catch (IOException e) {
+            getFailures(type).incrementAndGet();
             return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
         }
-        catch (RuntimeException e) {
-            log.warn(String.format("Unable to extract event: %s [%s] [%s]", eventName, annotation.toString(), e.toString()));
-            // If one event fails, the entire collection of events is rejected
-            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
-        }
 
-        if (events == null) {
-            if (eventName == null) {
-                log.warn("No event type specified");
-                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("Event name wasn't specified."));
-            }
-            else {
-                log.warn("No event specified");
-                return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, new IllegalArgumentException("No event specified."));
-            }
-        }
+        try {
+            while (extractor.hasNextEvent()) {
+                event = extractor.getNextEvent();
 
-        // We were able to parse all events
-        int failCount = 0;
-
-        for (final Event event : events) {
-            try {
                 log.debug(String.format("Processing event %s", event));
                 // We ignore the Response here (see below)
                 eventHandler.processEvent(event, annotation, endPointStats, eventStats);
-            }
-            catch (RuntimeException e) {
-                failCount++;
-                log.warn(String.format("Exception while processing event: %s [%s] [%s]", eventName, annotation.toString(), e.toString()));
-                // We don't care about the Response returned here, but we do care about incrementing stats about failed events
-                eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
+                getSuccesses(type).incrementAndGet();
             }
         }
-
-        if (failCount > 0) {
-            log.warn(String.format("%d total exceptions while processing event: %s [%s]", failCount, eventName, annotation.toString()));
+        catch (IOException e) {
+            log.warn(String.format("Exception while extracting or processing an event. [%s] %s", annotation.toString(), e.toString()));
+            getFailures(type).incrementAndGet();
+            // send a 202, but w/ a warning message stating how many succeeded
+            return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", successCount, e.getMessage())));
         }
 
-        // Even though some events weren't processed correctly, we still return a 202.
-        // I.e. if the client sent 10 events, and we were able to process only 5 of them, we effectively
-        // drop the remaining 5 (the eventtracker library won't quarantine the original 10).
-        // Making the whole process atomic is a bit tricky and we want to avoid receiving duplicates.
-        // Also, we expect to have bad events (sent by the browser for instance). It would be suboptimal
-        // to drop the whole collection even if only a single event is bad.
-        // The only reason we won't return ACCEPTED is when the event is not parsable (see above).
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    public Response handleJsonRequest(final boolean plainJson, final EventStats eventStats, final ExtractedAnnotation annotation)
+    private AtomicInteger getSuccesses(final DeserializationType type)
     {
-        // TODO right now all the events in a file are sharing the same eventStats
+        final String key = "s|" + type.name();
+        return getStat(key);
+    }
 
-        final SmileEnvelopeEventExtractor extractor;
-        try {
-            extractor = new SmileEnvelopeEventExtractor(annotation.getInputStream(), plainJson);
+    private AtomicInteger getFailures(final DeserializationType type)
+    {
+        final String key = "f|" + type.name();
+        return getStat(key);
+    }
+
+    private AtomicInteger getStat(String key) {
+        AtomicInteger stat = stats.get(key);
+
+        if (stat == null) {
+            stat = new AtomicInteger(0);
+            stats.put(key, stat);
         }
-        catch (RuntimeException e) {
-            log.warn(String.format("Unable to extract event. [%s]\n%s", annotation.toString(), e.toString()));
-            // If one event fails, the entire collection of events is rejected
-            return eventHandler.handleFailure(Response.Status.INTERNAL_SERVER_ERROR, endPointStats, e);
-        }
-        catch (IOException e) {
-            // TODO
-            log.warn(String.format("Unable to extract event. [%s]\n%s", annotation.toString(), e.toString()));
-            // If one event fails, the entire collection of events is rejected
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
-        }
 
-        int successCount = 0;
+        return stat;
+    }
 
-        while (true) {
-            try {
-                final Event event = extractor.extractNextEvent();
-                eventStats.recordExtracted(); // TODO see above TODO (all events share this eventStats object)
+    @Managed(description = "Number of Thrift events the collector successfully deserialized")
+    public long getThriftSuccess()
+    {
+        return getSuccesses(DeserializationType.THRIFT).get();
+    }
 
-                // if has reached EOF
-                if (event == null) {
-                    return Response.status(Response.Status.ACCEPTED).build();
-                }
+    @Managed(description = "Number of Thrift requests the collector couldn't fully deserialize")
+    public long getThriftFailure()
+    {
+        return getFailures(DeserializationType.THRIFT).get();
+    }
 
-                log.debug(String.format("Processing event %s", event));
-                // We ignore the Response here (see below)
-                eventHandler.processEvent(event, annotation, endPointStats, eventStats);
-                successCount++;
-            }
-            // IOExceptions are thrown by extractEvent
-            catch (IOException e) {
-                log.warn(String.format("Exception while extracting or processing an event. [%s]\n%s", annotation.toString(), e.toString()));
-                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", successCount, e.getMessage())));
-            }
-            catch (RuntimeException e) {
-                log.warn(String.format("Exception while extracting or processing an event. [%s]\n%s", annotation.toString(), e.toString()));
-                return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", successCount, e.getMessage())));
-            }
-        }
+    @Managed(description = "Number of Smile events the collector successfully deserialized")
+    public long getSmileSuccess()
+    {
+        return getSuccesses(DeserializationType.JSON).get() +
+            getSuccesses(DeserializationType.SMILE).get();
+    }
+
+    @Managed(description = "Number of Smile requests the collector couldn't fully deserialize")
+    public long getSmileFailure()
+    {
+        return getFailures(DeserializationType.JSON).get() +
+            getFailures(DeserializationType.SMILE).get();
+    }
+
+    @Managed(description = "Number of GET requests the collector couldn't fully deserialize")
+    public long getQueryFailure()
+    {
+        return getFailures(DeserializationType.DECIMAL_QUERY).get() +
+            getFailures(DeserializationType.BASE_64_QUERY).get();
+    }
+
+    @Managed(description = "Number of Thrift events from GET API the collector successfully deserialized")
+    public long getQuerySuccess()
+    {
+        return getFailures(DeserializationType.DECIMAL_QUERY).get() +
+            getFailures(DeserializationType.BASE_64_QUERY).get();
     }
 }

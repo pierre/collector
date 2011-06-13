@@ -71,7 +71,7 @@ public class EventHandlerImpl implements EventHandler
 
     @SuppressWarnings("unchecked")
     @Override
-    //TODO no  need for stats
+    //TODO no need for stats
     public Response processEvent(final Event event, final ExtractedAnnotation annotation, final EventEndPointStats stats, final EventStats eventStats)
     {
         stats.updateTotalEvents();
@@ -83,6 +83,7 @@ public class EventHandlerImpl implements EventHandler
                 return handleFailure(Response.Status.BAD_REQUEST, stats, new EventParsingException(msg));
             }
             else {
+                // TODO we don't actually use filtering. should we still support this?
                 if (requestFilter.passesFilter(event.getName(), annotation)) {
                     stats.updateFilteredEvents();
                     return Response.status(Response.Status.ACCEPTED).cacheControl(cacheControl).build();

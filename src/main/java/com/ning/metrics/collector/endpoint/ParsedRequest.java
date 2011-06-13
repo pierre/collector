@@ -16,6 +16,7 @@
 
 package com.ning.metrics.collector.endpoint;
 
+import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -38,7 +39,7 @@ public class ParsedRequest implements ExtractedAnnotation
     private String userAgent = null;
     private final Granularity granularity;
     private int contentLength = 0;
-    private String contentType = null;
+    private DeserializationType contentType;
     private InputStream inputStream;
 
     /**
@@ -49,38 +50,18 @@ public class ParsedRequest implements ExtractedAnnotation
      * @param eventDateTime     query value parameter (optional)
      * @param granularityString query value parameter (optional)
      * @param peerIpAddress     requestor (peer) IP address (optional)
+     * @param contentType       deserialization type (BASE_64_QUERY or DECIMAL_QUERY)
      */
     public ParsedRequest(
         final String eventName,
         final HttpHeaders httpHeaders,
         final DateTime eventDateTime,
         final String granularityString,
-        final String peerIpAddress
+        final String peerIpAddress,
+        final DeserializationType contentType
     )
     {
-        this(eventName, httpHeaders, null, eventDateTime, granularityString, peerIpAddress, null);
-    }
-
-    /**
-     * Constructor used by the external API (GET only)
-     *
-     * @param eventName         name of the event parsed
-     * @param httpHeaders       HTTP headers of the incoming request
-     * @param inputStream       content of the POST request
-     * @param eventDateTime     query value parameter (optional)
-     * @param granularityString query value parameter (optional)
-     * @param peerIpAddress     requestor (peer) IP address (optional)
-     */
-    public ParsedRequest(
-        final String eventName,
-        final HttpHeaders httpHeaders,
-        final InputStream inputStream,
-        final DateTime eventDateTime,
-        final String granularityString,
-        final String peerIpAddress
-    )
-    {
-        this(eventName, httpHeaders, inputStream, eventDateTime, granularityString, peerIpAddress, null);
+        this(eventName, httpHeaders, null, eventDateTime, granularityString, peerIpAddress, contentType);
     }
 
     /**
@@ -101,7 +82,7 @@ public class ParsedRequest implements ExtractedAnnotation
         final DateTime eventDateTime,
         final String granularityString,
         final String peerIpAddress,
-        final String contentType
+        final DeserializationType contentType
     )
     {
         this.eventName = eventName;
@@ -181,7 +162,7 @@ public class ParsedRequest implements ExtractedAnnotation
     }
 
     @Override
-    public String getContentType()
+    public DeserializationType getContentType()
     {
         return contentType;
     }

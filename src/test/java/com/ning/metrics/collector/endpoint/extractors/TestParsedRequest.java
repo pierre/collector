@@ -92,16 +92,20 @@ public class TestParsedRequest
     public void testParseDateExplicit() throws Exception
     {
         final HttpHeaders httpHeaders = createDummyHeaders();
-        final ExtractedAnnotation parsedRequest = new ParsedRequest("DummyEvent", httpHeaders, new DateTime("2001-02-03"), null, null);
+        final ExtractedAnnotation parsedRequest = new ParsedRequest("DummyEvent", httpHeaders, new DateTime("2001-02-03"), null, null, DeserializationType.DEFAULT);
         Assert.assertEquals(parsedRequest.getDateTime(), new DateTime("2001-02-03"));
     }
 
     @Test(groups = "fast")
     public void testParseDateDefault() throws Exception
     {
+        // TODO weird & hacky! Loading the enum for the first time is costly, so create a single ParsedRequest before testing
+        createParsedRequestWithNoQueryParameter();
+
         final long currentTime = System.currentTimeMillis();
         final ParsedRequest parsedRequest = createParsedRequestWithNoQueryParameter();
-        Assert.assertTrue(Math.abs(parsedRequest.getDateTime().getMillis() - currentTime) < 300);
+        final long timeDiff = Math.abs(parsedRequest.getDateTime().getMillis() - currentTime);
+        Assert.assertTrue(timeDiff < 100, String.format("took %d millis just to create the sample event", timeDiff));
     }
 
     private HttpHeaders createDummyHeaders()
@@ -112,6 +116,6 @@ public class TestParsedRequest
     private ParsedRequest createParsedRequestWithNoQueryParameter()
     {
         final HttpHeaders httpHeaders = createDummyHeaders();
-        return new ParsedRequest("DummyEvent", httpHeaders, null, null, null);
+        return new ParsedRequest("DummyEvent", httpHeaders, null, null, null, DeserializationType.DEFAULT);
     }
 }

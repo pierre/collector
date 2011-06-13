@@ -19,7 +19,6 @@ package com.ning.metrics.collector.endpoint.extractors;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 import com.ning.metrics.collector.binder.annotations.Base64ExternalEventRequestHandler;
 import com.ning.metrics.collector.binder.annotations.ExternalEventEndPointStats;
 import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
@@ -31,10 +30,6 @@ import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
 import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import com.ning.metrics.collector.endpoint.resources.EventHandlerImpl;
 import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
-import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
-import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParserProvider;
-import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
-import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
 import com.ning.metrics.collector.hadoop.processing.WriterHealthCheck;
 import com.ning.metrics.collector.hadoop.writer.HadoopHealthCheck;
 import com.ning.metrics.collector.realtime.RealtimeHealthCheck;
@@ -53,29 +48,17 @@ public class RequestHandlersModule implements Module
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         // Base10 GET Api
-        binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base10"))
-            .toProvider(new ThriftEnvelopeEventParserProvider(DecimalNumberConverter.class)).asEagerSingleton();
-        binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
-            .toProvider(new QueryParameterEventExtractorProvider(Names.named("base10"))).asEagerSingleton();
-        builder.export(QueryParameterEventExtractor.class).annotatedWith(Names.named("base10"))
-            .as("com.ning.metrics.collector:name=HTTP,Type=Base10GETAPIStats");
         binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base10"), ExternalEventEndPointStats.class)).asEagerSingleton();
+            .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
 
         // Base64 GET Api
-        binder.bind(ThriftEnvelopeEventParser.class).annotatedWith(Names.named("base64"))
-            .toProvider(new ThriftEnvelopeEventParserProvider(Base64NumberConverter.class)).asEagerSingleton();
-        binder.bind(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
-            .toProvider(new QueryParameterEventExtractorProvider(Names.named("base64"))).asEagerSingleton();
-        builder.export(QueryParameterEventExtractor.class).annotatedWith(Names.named("base64"))
-            .as("com.ning.metrics.collector:name=HTTP,Type=Base64GETAPIStats");
         binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(QueryParameterEventExtractor.class, Names.named("base64"), ExternalEventEndPointStats.class)).asEagerSingleton();
+            .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
 
         // POST Api
         binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(BodyEventExtractor.class, InternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(BodyEventExtractor.class).as("com.ning.metrics.collector:name=HTTP,Type=POSTAPIStats");
+            .toProvider(new EventRequestHandlerProvider(InternalEventEndPointStats.class)).asEagerSingleton();
+        builder.export(EventRequestHandler.class).as("com.ning.metrics.collector:name=HTTPAPIStats");
 
         binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
             .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
