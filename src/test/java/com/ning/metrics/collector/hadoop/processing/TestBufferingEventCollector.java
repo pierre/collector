@@ -24,7 +24,6 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
-import com.ning.metrics.collector.realtime.EventQueueStats;
 import com.ning.metrics.collector.realtime.GlobalEventQueueStats;
 import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;

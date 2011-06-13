@@ -32,6 +32,7 @@ class LocalQueueAndWorkers
     private static final MBeanExporter exporter = new MBeanExporter(ManagementFactory.getPlatformMBeanServer());
 
     private final BlockingQueue<Object> queue;
+    private final String type;
     private final EventQueueSession processor;
     private final ExecutorService executor;
     private final EventQueueStats stats;
@@ -39,12 +40,13 @@ class LocalQueueAndWorkers
     public LocalQueueAndWorkers(final CollectorConfig config, final String type, final EventQueueSession processor, final GlobalEventQueueStats globalEventQueueStats)
     {
         this.queue = new LinkedBlockingQueue<Object>(config.getActiveMQBufferLength());
+        this.type = type;
         this.processor = processor;
 
         // Gather per-queue stats and expose them via JMX
         stats = globalEventQueueStats.createLocalStats(type, queue);
         // Each type is exported as a child bean of RTQueueStats
-        exporter.export(String.format("com.ning.metrics.collector:name=RTQueueStats,Type=%s", type), stats);
+        exporter.export(getMBeanName(), stats);
 
         this.executor = new FailsafeScheduledExecutor(config.getActiveMQNumSendersPerCategory(), new NamedThreadFactory(type + "-workers"));
         for (int idx = 0; idx < config.getActiveMQNumSendersPerCategory(); idx++) {
@@ -54,6 +56,7 @@ class LocalQueueAndWorkers
 
     public void close()
     {
+        exporter.unexport(getMBeanName());
         executor.shutdown();
         try {
             executor.awaitTermination(1, TimeUnit.SECONDS);
@@ -74,5 +77,10 @@ class LocalQueueAndWorkers
         else {
             stats.registerEventDropped();
         }
+    }
+
+    private String getMBeanName()
+    {
+        return String.format("com.ning.metrics.collector:name=RTQueueStats,Type=%s", type);
     }
 }
