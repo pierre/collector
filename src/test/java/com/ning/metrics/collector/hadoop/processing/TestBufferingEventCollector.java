@@ -21,7 +21,6 @@ import com.google.inject.name.Named;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
 import com.ning.metrics.collector.realtime.GlobalEventQueueStats;
@@ -36,7 +35,7 @@ import java.util.concurrent.locks.Lock;
 
 import static org.testng.Assert.assertEquals;
 
-@Guice(modules = {ConfigTestModule.class, EventCollectorModule.class, HdfsModule.class, RealTimeQueueTestModule.class})
+@Guice(modules = {ConfigTestModule.class, EventCollectorModule.class, MockHdfsModule.class, RealTimeQueueTestModule.class})
 public class TestBufferingEventCollector
 {
     @Inject
@@ -118,15 +117,16 @@ public class TestBufferingEventCollector
         assertEquals(stats.getErroredEvents(), 0);
 
         // Re-open the firehose
+        // The queues are re-created, hence the stats for the bar event are reset
         ((EventQueueProcessorImpl) msgSender).enable();
         collector.collectEvent(event, eventStats);
         collector.collectEvent(event, eventStats);
         Thread.sleep(100);
         assertEquals(sentEvents.size(), 4);
         assertEquals(stats.getIgnoredEvents(), 4);
-        assertEquals(stats.getEnqueuedEvents(), 4);
+        assertEquals(stats.getEnqueuedEvents(), 2); // Went down to 0, now back to 2
         assertEquals(stats.getDroppedEvents(), 0);
-        assertEquals(stats.getSentEvents(), 4);
+        assertEquals(stats.getSentEvents(), 2); // Went down to 0, now back to 2
         assertEquals(stats.getErroredEvents(), 0);
     }
 
