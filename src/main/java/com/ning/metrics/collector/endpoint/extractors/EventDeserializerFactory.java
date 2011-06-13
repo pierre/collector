@@ -32,7 +32,7 @@ public class EventDeserializerFactory
 
     // question: why is this class not static?
     // answer: so we can replace this factory with a mock one during tests
-    public EventDeserializer getEventDeserializer(ExtractedAnnotation annotation) throws IOException
+    public EventDeserializer getEventDeserializer(final ExtractedAnnotation annotation) throws IOException
     {
         switch (annotation.getContentType()) {
             case SMILE:

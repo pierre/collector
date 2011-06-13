@@ -42,7 +42,7 @@ public class EventRequestHandler
     private final EventHandler eventHandler;
 
     private final HashMap<String, AtomicInteger> stats = new HashMap<String, AtomicInteger>(10);
-    private EventDeserializerFactory eventDeserializerFactory;
+    private final EventDeserializerFactory eventDeserializerFactory;
 
     public EventRequestHandler(
         final EventHandler eventHandler,
@@ -57,37 +57,36 @@ public class EventRequestHandler
 
     public Response handleEventRequest(final ExtractedAnnotation annotation, final EventStats eventStats)
     {
-
-        Event event;
-        int successCount = 0;
-        EventDeserializer extractor;
-        DeserializationType type = annotation.getContentType();
+        final EventDeserializer extractor;
+        final DeserializationType type = annotation.getContentType();
 
         try {
             extractor = eventDeserializerFactory.getEventDeserializer(annotation);
         }
-        // can occur if the deserializer fails immediately (if the stream/file doesn't begin correctly)
+        // Can occur if the deserializer fails immediately (if the stream/file doesn't begin correctly)
         // fail fast and notify the sender that their message is improperly formatted
         catch (IOException e) {
             getFailures(type).incrementAndGet();
             return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
         }
 
+        int success = 0;
         try {
             while (extractor.hasNextEvent()) {
-                event = extractor.getNextEvent();
+                final Event event = extractor.getNextEvent();
 
                 log.debug(String.format("Processing event %s", event));
                 // We ignore the Response here (see below)
                 eventHandler.processEvent(event, annotation, endPointStats, eventStats);
                 getSuccesses(type).incrementAndGet();
+                success++;
             }
         }
-        catch (IOException e) {
+        catch (Exception e) {
             log.warn(String.format("Exception while extracting or processing an event. [%s] %s", annotation.toString(), e.toString()));
             getFailures(type).incrementAndGet();
-            // send a 202, but w/ a warning message stating how many succeeded
-            return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", successCount, e.getMessage())));
+            // Send a 202, but w/ a warning message stating how many succeeded
+            return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", success, e.toString())));
         }
 
         return Response.status(Response.Status.ACCEPTED).build();
@@ -105,7 +104,8 @@ public class EventRequestHandler
         return getStat(key);
     }
 
-    private AtomicInteger getStat(String key) {
+    private AtomicInteger getStat(final String key)
+    {
         AtomicInteger stat = stats.get(key);
 
         if (stat == null) {

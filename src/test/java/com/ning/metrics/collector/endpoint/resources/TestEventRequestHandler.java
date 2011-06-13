@@ -27,6 +27,7 @@ import com.ning.metrics.collector.endpoint.extractors.MockEventDeserializer;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.EventDeserializer;
 import com.ning.metrics.serialization.event.StubEvent;
+import org.apache.commons.lang.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -100,7 +101,8 @@ public class TestEventRequestHandler
         Assert.assertEquals(eventHandler.isHandleFailureCalled(), true);
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
 
-        Assert.assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
+        Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
+        Assert.assertTrue(StringUtils.contains((String) response.getMetadata().get("Warning").get(0), "java.io.IOException"));
 
         Assert.assertEquals(stats.getTotalEvents(), 0); // if it can't parse the events, it can't count the total events
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
@@ -117,7 +119,8 @@ public class TestEventRequestHandler
         Assert.assertEquals(eventHandler.isHandleFailureCalled(), true);
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
 
-        Assert.assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
+        Assert.assertTrue(StringUtils.contains((String) response.getMetadata().get("Warning").get(0), "java.lang.RuntimeException"));
 
         Assert.assertEquals(stats.getTotalEvents(), 0);
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
@@ -133,6 +136,7 @@ public class TestEventRequestHandler
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
         Assert.assertEquals(response.getStatus(), Response.Status.ACCEPTED.getStatusCode());
+        Assert.assertTrue(StringUtils.contains((String) response.getMetadata().get("Warning").get(0), "java.lang.RuntimeException"));
 
         Assert.assertEquals(stats.getTotalEvents(), 1);
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
@@ -155,17 +159,17 @@ public class TestEventRequestHandler
     }
 
     @Test(groups = "fast")
-    // TODO fix the assertions. they're just copypasta right now.
     public synchronized void testEventHandlerThrowsOnGetEventDeserializer() throws Exception
     {
-        eventDeserializerFactory.throwsOnGetEventDeserializer = true;
+        // Input stream error?
+        eventDeserializerFactory.setThrowsOnGetEventDeserializer(true);
 
         final Response response = eventRequestHandler.handleEventRequest(createMockRequestAnnotation(), eventStats);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
         Assert.assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
 
-        Assert.assertEquals(stats.getTotalEvents(), 1);
+        Assert.assertEquals(stats.getTotalEvents(), 0);
         Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
         Assert.assertEquals(stats.getFailedToParseEvents(), 1);
     }
@@ -194,18 +198,28 @@ public class TestEventRequestHandler
         return new ParsedRequest("DummyEvent", new MockHttpHeaders(), null, null, null, null, null);
     }
 
-    private class MockEventDeserializerFactory extends EventDeserializerFactory {
-
-        public boolean throwsOnGetEventDeserializer = false;
+    private class MockEventDeserializerFactory extends EventDeserializerFactory
+    {
+        private boolean throwsOnGetEventDeserializer = false;
 
         @Override
-        public EventDeserializer getEventDeserializer(ExtractedAnnotation annotation) throws IOException {
-
+        public EventDeserializer getEventDeserializer(final ExtractedAnnotation annotation) throws IOException
+        {
             if (throwsOnGetEventDeserializer) {
                 throw new IOException("IGNORE. Exception for tests.");
             }
 
             return eventDeserializer;
+        }
+
+        public boolean isThrowsOnGetEventDeserializer()
+        {
+            return throwsOnGetEventDeserializer;
+        }
+
+        public void setThrowsOnGetEventDeserializer(boolean throwsOnGetEventDeserializer)
+        {
+            this.throwsOnGetEventDeserializer = throwsOnGetEventDeserializer;
         }
     }
 }

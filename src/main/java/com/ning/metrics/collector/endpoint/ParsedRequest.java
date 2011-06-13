@@ -108,6 +108,10 @@ public class ParsedRequest implements ExtractedAnnotation
         }
 
         this.contentType = contentType;
+        if (this.contentType == null) {
+            this.contentType = DeserializationType.DEFAULT;
+        }
+
         this.inputStream = inputStream;
 
         userAgent = eventExtractorUtil.getUserAgentFromHeaders(httpHeaders);
@@ -185,7 +189,7 @@ public class ParsedRequest implements ExtractedAnnotation
         builder.append(String.format("ua: %s, ", userAgent == null ? "NULL" : userAgent));
         builder.append(String.format("granularity: %s, ", granularity == null ? "NULL" : granularity));
         builder.append(String.format("contentLength: %d, ", contentLength));
-        builder.append(String.format("contentType: %s", contentType == null ? "NULL" :  contentType));
+        builder.append(String.format("contentType: %s", contentType == null ? "NULL" : contentType));
         return builder.toString();
     }
 }
