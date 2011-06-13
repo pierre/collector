@@ -21,8 +21,6 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.ComponentHealthCheck;
 import com.ning.metrics.collector.util.HealthCheckStatus;
 
-import java.util.Set;
-
 public class RealtimeHealthCheck implements ComponentHealthCheck
 {
     private final EventQueueProcessorImpl processor;
@@ -49,24 +47,7 @@ public class RealtimeHealthCheck implements ComponentHealthCheck
             builder.append(String.format("enabled: %s, ", processor.isEnabled()));
             builder.append(String.format("running: %s, ", processor.isRunning()));
             builder.append(String.format("types: %s, ", processor.getTypesToCollect()));
-
-            builder.append("queue sizes: {");
-            int i = 1;
-            final Set<String> eventTypes = stats.getAllStats().keySet();
-            for (final String eventType : eventTypes) {
-                final long queueSize = stats.getAllStats().get(eventType).getQueueSize();
-                builder.append(String.format("%s: %d", eventType, queueSize));
-                if (queueSize == config.getActiveMQBufferLength()) {
-                    builder.append(" [FULL]");
-                }
-
-                if (i < eventTypes.size()) {
-                    builder.append(", ");
-                }
-                i++;
-            }
-            builder.append("}, ");
-
+            builder.append(String.format("queue sizes: {%s}, ", stats.toString()));
             builder.append(String.format("enqueued: %s, ", stats.getEnqueuedEvents()));
             builder.append(String.format("sent: %s, ", stats.getSentEvents()));
             builder.append(String.format("dropped: %s, ", stats.getDroppedEvents())); // queue full

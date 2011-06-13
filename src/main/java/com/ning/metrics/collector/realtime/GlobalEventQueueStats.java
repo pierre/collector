@@ -20,6 +20,7 @@ import org.weakref.jmx.Managed;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -90,12 +91,24 @@ public class GlobalEventQueueStats
         return erroredEvents;
     }
 
-    /**
-     * @return underlying map of EventQueueStats object by event type, for the healthcheck endpoint
-     */
-    Map<String, EventQueueStats> getAllStats()
+    @Override
+    public String toString()
     {
-        return stats;
+        final StringBuilder builder = new StringBuilder();
+
+        int i = 1;
+        final Set<String> eventTypes = stats.keySet();
+        for (final String eventType : eventTypes) {
+            final long queueSize = stats.get(eventType).getQueueSize();
+            builder.append(String.format("%s: %d", eventType, queueSize));
+
+            if (i < eventTypes.size()) {
+                builder.append(", ");
+            }
+            i++;
+        }
+
+        return builder.toString();
     }
 
     /**
