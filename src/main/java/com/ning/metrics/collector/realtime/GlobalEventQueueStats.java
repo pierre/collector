@@ -114,7 +114,7 @@ public class GlobalEventQueueStats
     /**
      * Unit test hook
      */
-    public synchronized void clear()
+    public void clear()
     {
         ignoredEvents.set(0);
         for (final EventQueueStats localStats : stats.values()) {
