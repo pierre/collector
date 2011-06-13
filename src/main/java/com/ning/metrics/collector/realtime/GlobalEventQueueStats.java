@@ -19,18 +19,19 @@ package com.ning.metrics.collector.realtime;
 import org.weakref.jmx.Managed;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class GlobalEventQueueStats
 {
-    private final Map<String, EventQueueStats> stats = new HashMap<String, EventQueueStats>();
+    private final Map<String, EventQueueStats> stats = new ConcurrentHashMap<String, EventQueueStats>();
     private final AtomicLong ignoredEvents = new AtomicLong(0);
 
     public EventQueueStats createLocalStats(final String eventType, final Collection<Object> queue)
     {
         final EventQueueStats localStats = new EventQueueStats(queue);
+        // We are guaranteed to have at most one stats object per event type (see EventQueueProcessorImpl)
         stats.put(eventType, localStats);
         return localStats;
     }
