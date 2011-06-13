@@ -16,15 +16,23 @@
 
 package com.ning.metrics.collector.endpoint.resources;
 
+import com.google.inject.Inject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.OpsAlert;
+import com.ning.metrics.collector.endpoint.servers.JettyServer;
+import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
+import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -32,9 +40,35 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+
 @Test(groups = "slow", singleThreaded = true)
+@Guice(modules = JettyTestModule.class)
 public class TestBodyResource extends TestPublicAPI
 {
+    @Inject
+    CollectorConfig config;
+
+    @Inject
+    JettyServer server;
+
+    @Inject
+    BufferingEventCollector incomingQueue;
+
+    @Inject
+    MockEventWriter hdfsWriter;
+
+    @BeforeClass
+    public void setup() throws Exception
+    {
+        super.setUp(server);
+    }
+
+    @AfterClass
+    public void tearDown() throws Exception
+    {
+        super.tearDown(server);
+    }
+
     public void testPostThriftEvent() throws Exception
     {
         final long dateTime = System.currentTimeMillis();
@@ -84,7 +118,7 @@ public class TestBodyResource extends TestPublicAPI
 
     private Event sendPostEvent(final ByteArrayOutputStream out, final String name, final String dateTime, final String contentType) throws IOException, ExecutionException, InterruptedException
     {
-        assertCleanQueues();
+        assertCleanQueues(incomingQueue);
 
         final AsyncHttpClient.BoundRequestBuilder requestBuilder = client.preparePost("http://127.0.0.1:" + config.getLocalPort() + "/rest/1.0/event")
             .addHeader("Content-Type", contentType)
@@ -99,6 +133,6 @@ public class TestBodyResource extends TestPublicAPI
         final Response response = requestBuilder.execute().get();
         Assert.assertEquals(response.getStatusCode(), 202);
 
-        return assertEventWasWrittenToHDFS();
+        return assertEventWasWrittenToHDFS(incomingQueue, hdfsWriter);
     }
 }

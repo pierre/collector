@@ -16,38 +16,21 @@
 
 package com.ning.metrics.collector.endpoint.resources;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 import java.io.IOException;
 
 public abstract class TestPublicAPI
 {
-    private static final Logger log = Logger.getLogger(TestPublicAPI.class);
-
-    @Inject
-    CollectorConfig config;
-
-    @Inject
-    JettyServer server;
-
-    @Inject
-    BufferingEventCollector incomingQueue;
-
-    @Inject
-    MockEventWriter hdfsWriter;
+    static final Logger log = Logger.getLogger(TestPublicAPI.class);
 
     static final String MEGATRON_2000_USER_AGENT = "NING_MEGATR0N/2000";
     static final String AWESOME_REFERRER_HOST = "mouraf.ning.com";
@@ -60,11 +43,8 @@ public abstract class TestPublicAPI
         .build();
     final AsyncHttpClient client = new AsyncHttpClient(clientConfig);
 
-    @BeforeClass(alwaysRun = true)
-    public void setUp() throws Exception
+    public void setUp(final JettyServer server) throws Exception
     {
-        Guice.createInjector(new JettyTestModule()).injectMembers(this);
-
         server.start();
 
         while (!server.isInitialized()) {
@@ -74,8 +54,7 @@ public abstract class TestPublicAPI
         log.info("Test collector initialized");
     }
 
-    @AfterClass(alwaysRun = true)
-    public void tearDown() throws Exception
+    public void tearDown(final JettyServer server) throws Exception
     {
         server.stop();
         log.info("Test collector stopped");
@@ -85,12 +64,12 @@ public abstract class TestPublicAPI
         new GuiceFilter().destroy();
     }
 
-    void assertCleanQueues()
+    void assertCleanQueues(final BufferingEventCollector incomingQueue)
     {
         Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
     }
 
-    Event assertEventWasWrittenToHDFS() throws InterruptedException
+    Event assertEventWasWrittenToHDFS(final BufferingEventCollector incomingQueue, final MockEventWriter hdfsWriter) throws InterruptedException
     {
         // Give some time for the flushes
         Thread.sleep(200);
@@ -103,7 +82,7 @@ public abstract class TestPublicAPI
         // only making sure that events were committed
         Assert.assertEquals(hdfsWriter.getCommittedEventList().toArray().length, 1);
 
-        final Event event = getSentEvent();
+        final Event event = getSentEvent(hdfsWriter);
         // Flush the queue to reset stats between tests
         try {
             hdfsWriter.flush();
@@ -114,7 +93,7 @@ public abstract class TestPublicAPI
         return event;
     }
 
-    private Event getSentEvent()
+    private Event getSentEvent(final MockEventWriter hdfsWriter)
     {
         // The threshold for the MockEventWriter is 0, so a forceCommit is triggered
         // for all writes

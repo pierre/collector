@@ -16,13 +16,21 @@
 
 package com.ning.metrics.collector.endpoint.resources;
 
+import com.google.inject.Inject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.endpoint.servers.JettyServer;
+import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
 import com.ning.metrics.collector.util.Ip;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
+import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -30,10 +38,32 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Test(groups = "slow", singleThreaded = true)
+@Guice(modules = JettyTestModule.class)
 public class TestCollectorResource extends TestPublicAPI
 {
-    // TODO: logging in classes
-    // TODO fix /tmp dir tests + cleanup?
+    @Inject
+    CollectorConfig config;
+
+    @Inject
+    JettyServer server;
+
+    @Inject
+    BufferingEventCollector incomingQueue;
+
+    @Inject
+    MockEventWriter hdfsWriter;
+
+    @BeforeClass
+    public void setup() throws Exception
+    {
+        super.setUp(server);
+    }
+
+    @AfterClass
+    public void tearDown() throws Exception
+    {
+        super.tearDown(server);
+    }
 
     public void testGetSimpleEvent() throws Exception
     {
@@ -76,7 +106,7 @@ public class TestCollectorResource extends TestPublicAPI
 
     private Event sendGetEvent(final String path) throws InterruptedException, ExecutionException, IOException
     {
-        assertCleanQueues();
+        assertCleanQueues(incomingQueue);
 
         final AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet("http://127.0.0.1:" + config.getLocalPort() + path)
             .addHeader("Referer", "http://" + AWESOME_REFERRER_HOST + AWESOME_REFERRER_PATH);
@@ -84,6 +114,6 @@ public class TestCollectorResource extends TestPublicAPI
         final Response response = requestBuilder.execute().get();
         Assert.assertEquals(response.getStatusCode(), 202);
 
-        return assertEventWasWrittenToHDFS();
+        return assertEventWasWrittenToHDFS(incomingQueue, hdfsWriter);
     }
 }
