@@ -38,8 +38,10 @@ public abstract class FastCollectorConfig implements CollectorConfig
     /**
      * Maximum number of events per file in the temporary spooling area. Past this threshold,
      * buffered events are promoted to the final spool queue.
+     * This is used in the ThresholdEventWriter (size before commits)
      *
      * @return the maximum number of events per file
+     * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
      */
     @Override
     public long getFlushEventQueueSize()
@@ -48,25 +50,29 @@ public abstract class FastCollectorConfig implements CollectorConfig
     }
 
     /**
-     * Delay between flushes (in seconds)
-     *
-     * @return delay between flushes to HDFS
-     */
-    @Override
-    public long getFlushIntervalInSeconds()
-    {
-        return 1L;
-    }
-
-    /**
      * Maxixum number of seconds before events are promoted from the temporary spooling area to the final spool queue.
+     * This is used in the ThresholdEventWriter (delay between commits).
      *
      * @return maxixmum age of events in seconds in the temporary spool queue
+     * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
      */
     @Override
     public int getRefreshDelayInSeconds()
     {
         return 1;
+    }
+
+    /**
+     * Delay between flushes (in seconds).
+     * This is used in the DiskSpoolEventWriter (delay between flushes).
+     *
+     * @return delay between flushes to HDFS
+     * @see com.ning.metrics.serialization.writer.DiskSpoolEventWriter
+     */
+    @Override
+    public long getFlushIntervalInSeconds()
+    {
+        return 1L;
     }
 
     /**

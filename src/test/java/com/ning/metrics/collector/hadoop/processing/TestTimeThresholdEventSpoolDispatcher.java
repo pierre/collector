@@ -59,19 +59,14 @@ public class TestTimeThresholdEventSpoolDispatcher
         Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 1);
         Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 0);
 
-        // Send another event and wait for the dequeuer to work. The threshold being two in FastCollectorConfig,
-        // we should not have triggered a commit yet, however, since we waited for more than 1 second (time threshold),
-        // it will trigger a flush.
-        Thread.sleep(900);
-        dispatcher.offer(eventA);
-        Thread.sleep(1500);
-        Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 2);
+        // Wait for the dequeuer to work, the threshold being two in FastCollectorConfig
+        Thread.sleep(2200);
         Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 1);
 
-        // We now cross the size threshold, it will flush again
+        // Try again (size threshold is > 2)
         dispatcher.offer(eventA);
-        Thread.sleep(1500);
-        Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 3);
+        Thread.sleep(2000);
+        Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 2);
         Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 2);
     }
 }
