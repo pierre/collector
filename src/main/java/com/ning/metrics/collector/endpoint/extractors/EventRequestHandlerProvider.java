@@ -28,14 +28,12 @@ import java.lang.annotation.Annotation;
 
 class EventRequestHandlerProvider implements Provider<EventRequestHandler>
 {
-    private final Key<EventEndPointStats> eventEndPointStatsKey;
-    private Injector injector;
-    // TODO bind EventDeserializerFactory to eager singleton, rather than using a private field?
     private static final EventDeserializerFactory eventDeserializerFactory = new EventDeserializerFactory();
 
-    public EventRequestHandlerProvider(
-        final Class<? extends Annotation> eventEndPointStatsAnnotation
-    )
+    private final Key<EventEndPointStats> eventEndPointStatsKey;
+    private Injector injector;
+
+    public EventRequestHandlerProvider(final Class<? extends Annotation> eventEndPointStatsAnnotation)
     {
         eventEndPointStatsKey = Key.get(EventEndPointStats.class, eventEndPointStatsAnnotation);
     }

@@ -55,23 +55,22 @@ public class RequestHandlersModule implements Module
         binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
 
-        // POST Api
-        binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(InternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(EventRequestHandler.class).as("com.ning.metrics.collector:name=HTTPAPIStats");
-
         binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
             .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
         builder.export(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
-            .as("com.ning.metrics.collector:name=ExternalEventEndPointStats");
+            .as("com.ning.metrics.collector:name=GETEndPointStats");
+
+        // POST Api
+        binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
+            .toProvider(new EventRequestHandlerProvider(InternalEventEndPointStats.class)).asEagerSingleton();
 
         binder.bind(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
             .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
         builder.export(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
-            .as("com.ning.metrics.collector:name=InternalEventEndPointStats");
+            .as("com.ning.metrics.collector:name=POSTEndPointStats");
 
         binder.bind(EventHandler.class).to(EventHandlerImpl.class).asEagerSingleton();
-        builder.export(EventHandlerImpl.class).as("com.ning.metrics.collector:name=EventHandler");
+        builder.export(EventHandlerImpl.class).as("com.ning.metrics.collector:name=HTTPEventHandler");
 
         // Healthchecks
         binder.bind(new TypeLiteral<List<ComponentHealthCheck>>()

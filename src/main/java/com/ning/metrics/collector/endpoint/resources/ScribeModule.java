@@ -19,8 +19,8 @@ package com.ning.metrics.collector.endpoint.resources;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.ning.metrics.collector.binder.annotations.ScribeStats;
-import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 import scribe.thrift.scribe;
@@ -38,8 +38,9 @@ public class ScribeModule implements Module
         binder.bind(scribe.Iface.class).to(ScribeEventRequestHandler.class);
 
         binder.bind(EventEndPointStats.class).annotatedWith(ScribeStats.class).toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
-        builder.export(EventEndPointStats.class).as("com.ning.metrics.collector:name=ScribeAPIStats");
+        builder.export(EventEndPointStats.class).annotatedWith(ScribeStats.class).as("com.ning.metrics.collector:name=ScribeEndPointStats");
 
-        binder.bind(ScribeEventHandler.class).to(ScribeEventHandlerImpl.class);
+        binder.bind(ScribeEventHandler.class).to(ScribeEventHandlerImpl.class).asEagerSingleton();
+        builder.export(ScribeEventHandler.class).as("com.ning.metrics.collector:name=ScribeEventHandler");
     }
 }

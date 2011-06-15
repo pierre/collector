@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.weakref.jmx.Managed;
 import scribe.thrift.LogEntry;
 
-class ScribeEventHandlerImpl implements ScribeEventHandler
+public class ScribeEventHandlerImpl implements ScribeEventHandler
 {
     private static final Logger logger = Logger.getLogger(ScribeEventHandlerImpl.class);
 
