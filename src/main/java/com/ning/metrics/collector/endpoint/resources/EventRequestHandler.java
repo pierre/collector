@@ -152,7 +152,7 @@ public class EventRequestHandler
     @Managed(description = "Number of Thrift events from GET API the collector successfully deserialized")
     public long getQuerySuccess()
     {
-        return getFailures(DeserializationType.DECIMAL_QUERY).get() +
-            getFailures(DeserializationType.BASE_64_QUERY).get();
+        return getSuccesses(DeserializationType.DECIMAL_QUERY).get() +
+            getSuccesses(DeserializationType.BASE_64_QUERY).get();
     }
 }
