@@ -104,7 +104,7 @@ public class EventRequestHandler
         return getStat(key);
     }
 
-    private AtomicInteger getStat(final String key)
+    private synchronized AtomicInteger getStat(final String key)
     {
         AtomicInteger stat = stats.get(key);
 
