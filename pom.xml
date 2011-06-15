@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -410,6 +411,25 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <!-- For some reason, useIdeaDefaultExcludes doesn't pick up .idea directory -->
+                                <exclude>.idea/**</exclude>
+                                <exclude>.git/**</exclude>
+                                <exclude>.gitignore</exclude>
+                                <exclude>API.txt</exclude>
+                                <exclude>RELEASE.sh</exclude>
+                                <exclude>deploy.sh</exclude>
+                                <exclude>run.sh</exclude>
+                                <exclude>run-local.sh</exclude>
+                                <exclude>src/site/**</exclude>
+                                <exclude>*.log</exclude>
+                                <!-- We have some extra dependencies in there, see license on a per file basis -->
+                                <exclude>src/utils/**</exclude>
+                                <!-- This is a straight import from the upstream libraries -->
+                                <exclude>lib/**</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -449,7 +469,8 @@
                         <phase>package</phase>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.ning.metrics.collector.StandaloneCollectorServer</mainClass>
                                 </transformer>
                             </transformers>
@@ -474,7 +495,8 @@
                         <phase>package</phase>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.sun.faban.driver.engine.MasterImpl</mainClass>
                                 </transformer>
                             </transformers>
@@ -539,25 +561,6 @@
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
                 <version>0.7</version>
-                <configuration>
-                    <excludes>
-                        <!-- For some reason, useIdeaDefaultExcludes doesn't pick up .idea directory -->
-                        <exclude>.idea/**</exclude>
-                        <exclude>.git/**</exclude>
-                        <exclude>.gitignore</exclude>
-                        <exclude>API.txt</exclude>
-                        <exclude>RELEASE.sh</exclude>
-                        <exclude>deploy.sh</exclude>
-                        <exclude>run.sh</exclude>
-                        <exclude>run-local.sh</exclude>
-                        <exclude>src/site/**</exclude>
-                        <exclude>*.log</exclude>
-                        <!-- We have some extra dependencies in there, see license on a per file basis -->
-                        <exclude>src/utils/**</exclude>
-                        <!-- This is a straight import from the upstream libraries -->
-                        <exclude>lib/**</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
