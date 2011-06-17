@@ -23,15 +23,20 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.binder.ProfiledInterceptor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.hadoop.writer.HdfsModule;
-import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
-import com.ning.metrics.collector.endpoint.filters.FiltersModule;
-import com.ning.metrics.collector.realtime.RealTimeQueueModule;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
+import com.ning.metrics.collector.endpoint.filters.FiltersModule;
 import com.ning.metrics.collector.endpoint.resources.ScribeModule;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.endpoint.servers.ScribeServer;
+import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
+import com.ning.metrics.collector.hadoop.writer.HdfsModule;
+import com.ning.metrics.collector.nagios.CollectorServiceCheck;
+import com.ning.metrics.collector.nagios.NagiosMonitor;
+import com.ning.metrics.collector.realtime.RealTimeQueueModule;
 import com.ning.metrics.collector.util.F5PoolMemberControl;
+import com.ning.nagios.FakeNagiosMonitor;
+import com.ning.nagios.ServiceCheck;
+import com.ning.nagios.ServiceMonitor;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -91,6 +96,16 @@ public class StandaloneCollectorServer
                     // F5 slb stuff
                     bind(F5PoolMemberControl.class).asEagerSingleton();
                     builder.export(F5PoolMemberControl.class).as("com.ning.metrics.collector:name=F5poolMemberControl");
+
+                    // Nagios stuff
+                    bind(ServiceCheck.class).to(CollectorServiceCheck.class).asEagerSingleton();
+                    if (config.isNagiosEnabled()) {
+                        bind(ServiceMonitor.class).to(NagiosMonitor.class).asEagerSingleton();
+                    }
+                    else {
+                        final ServiceMonitor monitor = new FakeNagiosMonitor(config.getNagiosCheckRate());
+                        bind(ServiceMonitor.class).toInstance(monitor);
+                    }
                 }
             },
             new RequestHandlersModule(),
@@ -130,6 +145,11 @@ public class StandaloneCollectorServer
         // This is a standalone class, access it via JMX when you need to take a collector in or out of a pool
         injector.getInstance(F5PoolMemberControl.class);
 
+        // Talk to Nagios
+        final ServiceCheck check = injector.getInstance(ServiceCheck.class);
+        final ServiceMonitor serviceMonitor = injector.getInstance(ServiceMonitor.class);
+        serviceMonitor.registerServiceCheck(config.getNagiosServiceName(), check);
+
         final long secondsToStart = (System.currentTimeMillis() - startTime) / 1000;
         log.info(String.format("Collector initialized in %d:%02d", secondsToStart / 60, secondsToStart % 60));
     }
@@ -137,8 +157,8 @@ public class StandaloneCollectorServer
     /**
      * Hack to share the injector with the Jersey GuiceFilter
      *
-     * @see com.ning.metrics.collector.binder.modules.JettyListener
      * @return the main injector
+     * @see com.ning.metrics.collector.binder.modules.JettyListener
      */
     public static Injector getInjector()
     {

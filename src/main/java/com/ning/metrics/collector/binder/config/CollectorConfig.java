@@ -16,9 +16,11 @@
 
 package com.ning.metrics.collector.binder.config;
 
+import com.googlecode.jsendnsca.encryption.Encryption;
 import org.skife.config.Config;
 import org.skife.config.Default;
 import org.skife.config.DefaultNull;
+import org.skife.config.TimeSpan;
 
 public interface CollectorConfig
 {
@@ -301,4 +303,40 @@ public interface CollectorConfig
     @Config("collector.goodwill.enabled")
     @Default("90")
     int getGoodwillCacheTimeout();
+
+    @Config("collector.nagios.enabled")
+    @Default("false")
+    boolean isNagiosEnabled();
+
+    @Config("collector.nagios.host")
+    @DefaultNull
+    String getNagiosHost();
+
+    @Config("collector.nagios.port")
+    @Default("5667")
+    int getNagiosPort();
+
+    @Config("collector.nagios.encryption")
+    @Default("NONE")
+    Encryption getNagiosEncryption();
+
+    @Config("collector.nagios.password")
+    @Default("")
+    String getNagiosPassword();
+
+    @Config("collector.nagios.timeout")
+    @Default("5000ms")
+    TimeSpan getNagiosTimeout();
+
+    @Config("collector.nagios.reportedHostname")
+    @Default("localhost")
+    String getNagiosReportedHostname();
+
+    @Config("collector.nagios.checkRate")
+    @Default("5s")
+    TimeSpan getNagiosCheckRate();
+
+    @Config("collector.nagios.serviceName")
+    @Default("coll")
+    String getNagiosServiceName();
 }
