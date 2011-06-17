@@ -21,11 +21,11 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.serialization.writer.EventWriter;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,7 +40,7 @@ class EventSpoolDispatcher
     private final PersistentWriterFactory factory;
     private final WriterStats stats;
     private final CollectorConfig config;
-    private final Map<String, LocalQueueAndWriter> queuesPerPath = new HashMap<String, LocalQueueAndWriter>();
+    private final Map<String, LocalQueueAndWriter> queuesPerPath = new ConcurrentHashMap<String, LocalQueueAndWriter>();
     private final Object queueMapMonitor = new Object();
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
 
@@ -59,8 +59,8 @@ class EventSpoolDispatcher
                 public void run()
                 {
                     try {
-                        for (String queuePath : queuesPerPath.keySet()) {
-                            LocalQueueAndWriter queueAndWriter = queuesPerPath.get(queuePath);
+                        for (final String queuePath : queuesPerPath.keySet()) {
+                            final LocalQueueAndWriter queueAndWriter = queuesPerPath.get(queuePath);
                             if (queueAndWriter.isEmpty()) {
                                 boolean isRemoved = false;
                                 // synchronized to avoid conflicts when we get a queue to offer an event to
