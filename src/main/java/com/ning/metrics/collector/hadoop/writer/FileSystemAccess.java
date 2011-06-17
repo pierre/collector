@@ -51,6 +51,11 @@ public class FileSystemAccess
 
     public FileSystem get() throws IOException
     {
+        return get(MAX_WAIT_TIME);
+    }
+
+    public FileSystem get(final long maxWaitTimeMillis) throws IOException
+    {
         try {
             if (fs == null) {
                 synchronized (connectionLock) {
@@ -88,16 +93,16 @@ public class FileSystemAccess
                             e2.printStackTrace();
                         }
 
-                        // give up after MAX_WAIT_TIME
-                        if (timeSpentWaiting >= MAX_WAIT_TIME) {
+                        // give up after maxWaitTimeMillis
+                        if (timeSpentWaiting >= maxWaitTimeMillis) {
                             throw new IOException(String.format("Cannot access File System. Gave up after trying for %d:%d", timeSpentWaiting / 60000, timeSpentWaiting / 1000 % 60));
                         }
 
                         waitTime *= 2;
 
-                        if (timeSpentWaiting + waitTime > MAX_WAIT_TIME) {
+                        if (timeSpentWaiting + waitTime > maxWaitTimeMillis) {
                             // check
-                            waitTime = MAX_WAIT_TIME - timeSpentWaiting;
+                            waitTime = maxWaitTimeMillis - timeSpentWaiting;
                         }
                     }
                 }

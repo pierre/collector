@@ -41,7 +41,7 @@ public class HadoopHealthCheck implements ComponentHealthCheck
         String message;
 
         try {
-            final FileSystem fileSystem = fsAccess.get();
+            final FileSystem fileSystem = fsAccess.get(0); // No exponential backoff, fail early
             final Configuration fileSystemConf = fileSystem.getConf();
             final FsStatus fsStatus = fileSystem.getStatus();
             final StringBuilder builder = new StringBuilder();
