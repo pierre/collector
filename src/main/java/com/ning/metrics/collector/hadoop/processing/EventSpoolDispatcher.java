@@ -24,7 +24,9 @@ import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +61,8 @@ class EventSpoolDispatcher
                 public void run()
                 {
                     try {
-                        for (final String queuePath : queuesPerPath.keySet()) {
+                        final Set<String> queuePaths = new HashSet<String>(queuesPerPath.keySet());
+                        for (final String queuePath : queuePaths) {
                             final LocalQueueAndWriter queueAndWriter = queuesPerPath.get(queuePath);
                             if (queueAndWriter.isEmpty()) {
                                 boolean isRemoved = false;
