@@ -20,7 +20,6 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.hadoop.writer.FileSystemAccess;
 import com.ning.metrics.collector.util.NamedThreadFactory;
-import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.Granularity;
 import com.ning.metrics.serialization.event.GranularityPathMapper;
 import com.ning.metrics.serialization.writer.CallbackHandler;
@@ -98,7 +97,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 stats.registerHdfsFlush();
                 flushCount++;
             }
-        }, String.format("%s/%s", config.getSpoolDirectoryName(), localFilename), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("spool to HDFS promoter")),
+        }, String.format("%s/%s", config.getSpoolDirectoryName(), localFilename), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(hdfsDir + "-HDFS-writer")),
             SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(), serializationType.getSerializer());
         return new ThresholdEventWriter(eventWriter, config.getFlushEventQueueSize(), config.getRefreshDelayInSeconds());
     }

@@ -48,7 +48,7 @@ class LocalQueueAndWriter
         this.stats = stats;
 
         // Underlying dequeuer (writer)
-        this.executor = new FailsafeScheduledExecutor(1, new NamedThreadFactory(path + "-writer"));
+        this.executor = new FailsafeScheduledExecutor(1, new NamedThreadFactory(path + "-HDFS-dequeuer"));
         executor.submit(new LocalQueueWorker(queue, eventWriter, stats));
     }
 
@@ -69,6 +69,8 @@ class LocalQueueAndWriter
             eventWriter.forceCommit();
             // Flush to HDFS
             eventWriter.flush();
+            // Shutdown the underlying writer
+            eventWriter.close();
         }
         catch (IOException e) {
             log.warn("Got IOException when trying to promote files to the final spool area", e);
