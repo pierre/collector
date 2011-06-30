@@ -21,8 +21,11 @@ import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.EventWriter;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -69,14 +72,36 @@ class LocalQueueAndWriter
             eventWriter.forceCommit();
             // Flush to HDFS
             eventWriter.flush();
-            // Shutdown the underlying writer
+
+            // The flush is async - give it some time to flush before shutting down the underlying writer.
+            // For the DiskSpoolEventWriter, we don't really need this (as close() simply shuts down the
+            // flusher Thread), but we need it for the main shutdown sequence of the collector
+            // (not to close the Hadoop connection too early).
+            int maxWait = 5;
+            while (localQueueSize() > 0 && maxWait-- >= 0) {
+                Thread.sleep(1000);
+            }
             eventWriter.close();
+
+            // Make sure to delete the directory, if empty
+            if (localQueueSize() == 0) {
+                FileUtils.deleteDirectory(new File(eventWriter.getSpoolPath()));
+            }
         }
         catch (IOException e) {
             log.warn("Got IOException when trying to promote files to the final spool area", e);
         }
+        catch (InterruptedException e) {
+            log.warn("Interrupted while flushing events to HDFS", e);
+        }
 
         queue.clear();
+    }
+
+    private int localQueueSize()
+    {
+        final File spoolPath = new File(eventWriter.getSpoolPath());
+        return FileUtils.listFiles(spoolPath, FileFilterUtils.trueFileFilter(), FileFilterUtils.notFileFilter(FileFilterUtils.directoryFileFilter())).size();
     }
 
     /**

@@ -42,6 +42,7 @@ import org.weakref.jmx.Managed;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -115,34 +116,59 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     @Managed(description = "Process all local files files")
     public void processLeftBelowFiles() throws IOException
     {
+        log.info("Processing files left below");
+
+        // We are going to flush all files that are not being written (not in the _tmp directory) and then delete
+        // empty directories. We can't distinguish older directories vs ones currently in use except by timestamp.
+        // We record candidates first, delete the files, and then delete the empty directories among the candidates.
+        // Candidates are directories last modified more than 2 hours ago
+        final Collection<File> potentialOldDirectories = FileUtils.listFiles(new File(config.getSpoolDirectoryName()), FileFilterUtils.trueFileFilter(),
+            FileFilterUtils.and(FileFilterUtils.directoryFileFilter(), FileFilterUtils.ageFileFilter(System.currentTimeMillis() - 7200000L, true)));
+
         for (final File file : FileUtils.listFiles(new File(config.getSpoolDirectoryName()), FileFilterUtils.trueFileFilter(), FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("_tmp")))) {
-            // Find the spool directory name
+            // Find the spool directory name (depends on collector, date, event name and serialization format)
             String parentDirectory = file.getParent();
-            if (parentDirectory.endsWith("/_lock") || parentDirectory.endsWith("_quarantine")) {
+            if (parentDirectory.endsWith("/_lock") || parentDirectory.endsWith("/_quarantine")) {
                 parentDirectory = file.getParentFile().getParent();
             }
 
             // parentDirectory is like 127.0.0.1-8080-2011-05-27T15.42.03.FrontDoorVisit.smile
             final String[] directoryTokens = StringUtils.split(parentDirectory, '.');
+            if (directoryTokens.length < 3) {
+                log.warn(String.format("Skipping invalid local directory: %s", parentDirectory));
+                continue;
+            }
             final String fileSuffix = directoryTokens[directoryTokens.length - 1];
             final String eventName = directoryTokens[directoryTokens.length - 2];
 
+            // Build the final output directory in HDFS
             // TODO Use default granularity of HOURLY, we could have different granularity in the file though :(
             // This may be already broken in EventSpoolDispatcher
             final GranularityPathMapper pathMapper = new GranularityPathMapper(String.format("%s/%s", config.getEventOutputDirectory(), eventName), Granularity.HOURLY);
             final String hdfsDir = pathMapper.getPathForDateTime(new DateTime(file.lastModified()));
 
-            // We need the flush count if we have multiple quarantined files for a specific event and hour for instance
-            int flushCount = 1;
-            final String outputPath = String.format("%s/left_below-%s-%d-%s-f%d.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(new DateTime()), flushCount, fileSuffix);
+            final String outputPath = String.format("%s/left_below-%s-%d-%s.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(new DateTime()), fileSuffix);
 
             log.info(String.format("Flushing events to HDFS: [%s] -> [%s]", file.getAbsolutePath(), outputPath));
             hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(outputPath));
             if (!file.delete()) {
                 log.warn(String.format("Exception cleaning up left below file: %s. We might have DUPS in HDFS!", file.toString()));
             }
+        }
 
-            flushCount++;
+        // Cleanup old and empty directories -- we need to go twice, as File.list doesn't guarantee order
+        cleanupDirectories(potentialOldDirectories);
+        cleanupDirectories(potentialOldDirectories);
+    }
+
+    private void cleanupDirectories(final Collection<File> potentialOldDirectories)
+    {
+        // Cleanup empty directories
+        for (final File dir : FileUtils.listFiles(new File(config.getSpoolDirectoryName()), FileFilterUtils.trueFileFilter(), FileFilterUtils.directoryFileFilter())) {
+            if (potentialOldDirectories.contains(dir) && dir.listFiles().length == 0) {
+                log.info(String.format("Deleting empty directory: %s", dir.toString()));
+                dir.delete();
+            }
         }
     }
 
