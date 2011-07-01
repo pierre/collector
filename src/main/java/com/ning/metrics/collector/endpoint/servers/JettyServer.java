@@ -23,6 +23,7 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.modules.JettyListener;
 import com.ning.metrics.collector.endpoint.setup.SetupJULBridge;
 import org.apache.log4j.Logger;
+import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -78,6 +79,10 @@ public class JettyServer
         // Jersey insists on using java.util.logging (JUL)
         final EventListener listener = new SetupJULBridge();
         context.addEventListener(listener);
+
+        // Protect the resources using Shiro
+        final FilterHolder authFilterHolder = new FilterHolder(IniShiroFilter.class);
+        context.addFilter(authFilterHolder, "/*", ServletContextHandler.NO_SESSIONS);
 
         // Make sure Guice filter all requests
         final FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);

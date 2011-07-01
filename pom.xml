@@ -273,6 +273,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.thrift</groupId>
             <artifactId>libfb303</artifactId>
             <version>0.6.1</version>
@@ -374,6 +379,7 @@
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>log4j.xml</exclude>
+                    <exclude>shiro.ini</exclude>
                 </excludes>
             </resource>
         </resources>
