@@ -23,6 +23,7 @@ import java.net.ServerSocket;
 
 public abstract class FastCollectorConfig implements CollectorConfig
 {
+    private static final long START_TIME = System.currentTimeMillis();
     private int cachedPort = -1;
 
     /**
@@ -83,7 +84,7 @@ public abstract class FastCollectorConfig implements CollectorConfig
     @Override
     public String getSpoolDirectoryName()
     {
-        return System.getProperty("java.io.tmpdir") + "/collector-local-spool-" + System.currentTimeMillis();
+        return System.getProperty("java.io.tmpdir") + "/collector-local-spool-" + START_TIME;
     }
 
 

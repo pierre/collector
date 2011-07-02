@@ -15,7 +15,10 @@
  */
 package com.ning.metrics.collector.hadoop.processing;
 
-import com.ning.metrics.serialization.event.*;
+import com.ning.metrics.serialization.event.Event;
+import com.ning.metrics.serialization.event.EventSerializer;
+import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
+import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.smile.SmileEnvelopeEventSerializer;
 import com.ning.metrics.serialization.thrift.ThriftEnvelopeEventSerializer;
 import com.ning.metrics.serialization.writer.ObjectOutputEventSerializer;
@@ -86,5 +89,24 @@ enum SerializationType
     public String getFileSuffix()
     {
         return suffix;
+    }
+
+    public static SerializationType fromSuffix(String suffix)
+    {
+        if (suffix.equals("smile")) {
+            return SMILE;
+        }
+        else if (suffix.equals("json")) {
+            return JSON;
+        }
+        else if (suffix.equals("thrift")) {
+            return THRIFT;
+        }
+        else if (suffix.equals("bin")) {
+            return DEFAULT;
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
     }
 }

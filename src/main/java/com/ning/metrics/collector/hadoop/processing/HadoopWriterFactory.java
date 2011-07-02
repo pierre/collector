@@ -20,40 +20,31 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.hadoop.writer.FileSystemAccess;
 import com.ning.metrics.collector.util.NamedThreadFactory;
-import com.ning.metrics.serialization.event.Granularity;
-import com.ning.metrics.serialization.event.GranularityPathMapper;
 import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventHandler;
 import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.SyncType;
 import com.ning.metrics.serialization.writer.ThresholdEventWriter;
-import org.apache.axis.utils.StringUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.weakref.jmx.Managed;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HadoopWriterFactory implements PersistentWriterFactory
 {
     private static final Logger log = Logger.getLogger(HadoopWriterFactory.class);
-    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss").withZone(DateTimeZone.UTC);
 
     private final CollectorConfig config;
     private final FileSystemAccess hdfsAccess;
     private final AtomicBoolean flushEnabled = new AtomicBoolean(true);
+    private long cutoffTime = 7200000L;
 
     @Inject
     public HadoopWriterFactory(final FileSystemAccess hdfsAccess, final CollectorConfig config)
@@ -65,8 +56,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     @Override
     public EventWriter createPersistentWriter(final WriterStats stats, final SerializationType serializationType, final String eventName, final String hdfsDir)
     {
-        final ReadableInstant timeStamp = new DateTime();
-        final String localFilename = String.format("%s-%d-%s.%s.%s", config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), eventName, serializationType.getFileSuffix());
+        final LocalSpoolManager spoolManager = new LocalSpoolManager(config, eventName, serializationType, hdfsDir);
 
         final EventWriter eventWriter = new DiskSpoolEventWriter(new EventHandler()
         {
@@ -80,15 +70,8 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 }
 
                 try {
-                    /* fileName includes a number of things to avoid collisions:
-                       ip  to avoid conflicts between machines
-                       fileExtension  (serialization-type-specific) so multiple file extensions can be written to same directory
-                       flushCount  so the same queue can write multiple times
-                       queueCreationTimestamp  so if, for instance, we shut down and restart the collector within an hour, their writes won't conflict
-                    */
-                    final String outputPath = String.format("%s/%s-%d-%s-f%d.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), flushCount, serializationType.getFileSuffix());
-                    log.info(String.format("Flushing events to HDFS: [%s] -> [%s]", file.getAbsolutePath(), outputPath));
-                    hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(outputPath));
+                    final String outputPath = spoolManager.toHadoopPath(flushCount);
+                    pushFileToHadoop(file, outputPath);
                 }
                 catch (IOException e) {
                     handler.onError(e, file);
@@ -98,7 +81,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 stats.registerHdfsFlush();
                 flushCount++;
             }
-        }, String.format("%s/%s", config.getSpoolDirectoryName(), localFilename), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(hdfsDir + "-HDFS-writer")),
+        }, spoolManager.getSpoolDirectoryPath(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(hdfsDir + "-HDFS-writer")),
             SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(), serializationType.getSerializer());
         return new ThresholdEventWriter(eventWriter, config.getFlushEventQueueSize(), config.getRefreshDelayInSeconds());
     }
@@ -117,59 +100,74 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     public void processLeftBelowFiles() throws IOException
     {
         log.info("Processing files left below");
-
         // We are going to flush all files that are not being written (not in the _tmp directory) and then delete
         // empty directories. We can't distinguish older directories vs ones currently in use except by timestamp.
         // We record candidates first, delete the files, and then delete the empty directories among the candidates.
-        // Candidates are directories last modified more than 2 hours ago
-        final Collection<File> potentialOldDirectories = FileUtils.listFiles(new File(config.getSpoolDirectoryName()), FileFilterUtils.trueFileFilter(),
-            FileFilterUtils.and(FileFilterUtils.directoryFileFilter(), FileFilterUtils.ageFileFilter(System.currentTimeMillis() - 7200000L, true)));
+        final Collection<File> potentialOldDirectories = LocalSpoolManager.findOldSpoolDirectories(config.getSpoolDirectoryName(), getCutoffTime());
 
-        for (final File file : FileUtils.listFiles(new File(config.getSpoolDirectoryName()), FileFilterUtils.trueFileFilter(), FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("_tmp")))) {
-            // Find the spool directory name (depends on collector, date, event name and serialization format)
-            String parentDirectory = file.getParent();
-            if (parentDirectory.endsWith("/_lock") || parentDirectory.endsWith("/_quarantine")) {
-                parentDirectory = file.getParentFile().getParent();
-            }
+        final HashMap<String, Integer> flushesPerEvent = new HashMap<String, Integer>();
+        for (final File oldDirectory : potentialOldDirectories) {
+            // Ignore _tmp, files may be corrupted (not closed properly)
+            for (final File file : LocalSpoolManager.findFilesInSpoolDirectory(oldDirectory)) {
+                final LocalSpoolManager spoolManager;
+                try {
+                    spoolManager = new LocalSpoolManager(config, oldDirectory);
+                }
+                catch (IllegalArgumentException e) {
+                    log.warn(String.format("Skipping invalid local directory: %s", file.getAbsolutePath()));
+                    continue;
+                }
 
-            // parentDirectory is like 127.0.0.1-8080-2011-05-27T15.42.03.FrontDoorVisit.smile
-            final String[] directoryTokens = StringUtils.split(parentDirectory, '.');
-            if (directoryTokens.length < 3) {
-                log.warn(String.format("Skipping invalid local directory: %s", parentDirectory));
-                continue;
-            }
-            final String fileSuffix = directoryTokens[directoryTokens.length - 1];
-            final String eventName = directoryTokens[directoryTokens.length - 2];
+                incrementFlushCount(flushesPerEvent, spoolManager.getEventName());
+                final String outputPath = spoolManager.toHadoopPath(flushesPerEvent.get(spoolManager.getEventName()));
+                pushFileToHadoop(file, outputPath);
 
-            // Build the final output directory in HDFS
-            // TODO Use default granularity of HOURLY, we could have different granularity in the file though :(
-            // This may be already broken in EventSpoolDispatcher
-            final GranularityPathMapper pathMapper = new GranularityPathMapper(String.format("%s/%s", config.getEventOutputDirectory(), eventName), Granularity.HOURLY);
-            final String hdfsDir = pathMapper.getPathForDateTime(new DateTime(file.lastModified()));
-
-            final String outputPath = String.format("%s/left_below-%s-%d-%s.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(new DateTime()), fileSuffix);
-
-            log.info(String.format("Flushing events to HDFS: [%s] -> [%s]", file.getAbsolutePath(), outputPath));
-            hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(outputPath));
-            if (!file.delete()) {
-                log.warn(String.format("Exception cleaning up left below file: %s. We might have DUPS in HDFS!", file.toString()));
+                if (!file.delete()) {
+                    log.warn(String.format("Exception cleaning up left below file: %s. We might have DUPS in HDFS!", file.toString()));
+                }
             }
         }
 
-        // Cleanup old and empty directories -- we need to go twice, as File.list doesn't guarantee order
-        cleanupDirectories(potentialOldDirectories);
-        cleanupDirectories(potentialOldDirectories);
+        LocalSpoolManager.cleanupOldSpoolDirectories(potentialOldDirectories);
     }
 
-    private void cleanupDirectories(final Collection<File> potentialOldDirectories)
+    protected void pushFileToHadoop(final File file, final String outputPath) throws IOException
     {
-        // Cleanup empty directories
-        for (final File dir : FileUtils.listFiles(new File(config.getSpoolDirectoryName()), FileFilterUtils.trueFileFilter(), FileFilterUtils.directoryFileFilter())) {
-            if (potentialOldDirectories.contains(dir) && dir.listFiles().length == 0) {
-                log.info(String.format("Deleting empty directory: %s", dir.toString()));
-                dir.delete();
-            }
+        log.info(String.format("Flushing events to HDFS: [%s] -> [%s]", file.getAbsolutePath(), outputPath));
+        hdfsAccess.get().copyFromLocalFile(new Path(file.getAbsolutePath()), new Path(outputPath));
+    }
+
+    /**
+     * Increment flushes count for this event
+     *
+     * @param flushesPerEvent global HashMap keeping state
+     * @param eventName       name of the event
+     */
+    private void incrementFlushCount(final HashMap<String, Integer> flushesPerEvent, final String eventName)
+    {
+        final Integer flushes = flushesPerEvent.get(eventName);
+        if (flushes == null) {
+            flushesPerEvent.put(eventName, 0);
         }
+        flushesPerEvent.put(eventName, flushesPerEvent.get(eventName) + 1);
+    }
+
+    /**
+     * When processing asynchronously files in the diskspool, how old the files should be?
+     * Candidates are directories last modified more than 2 hours ago
+     *
+     * @return cutoff time in milliseconds
+     */
+    @Managed(description = "Cutoff time for files to be sent to HDFS")
+    public long getCutoffTime()
+    {
+        return cutoffTime;
+    }
+
+    @Managed(description = "Set the cutoff time")
+    public void setCutoffTime(final long cutoffTime)
+    {
+        this.cutoffTime = cutoffTime;
     }
 
     @Managed(description = "Whether files should be flushed to HDFS")
