@@ -38,6 +38,7 @@ import com.ning.nagios.ServiceCheck;
 import com.ning.nagios.ServiceMonitor;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
 import org.weakref.jmx.guice.ExportBuilder;
@@ -98,6 +99,7 @@ public class StandaloneCollectorServer
                     }
                 }
             },
+            new InstrumentationModule(),     /* Provide metrics */
             new RequestHandlersModule(),
             new HdfsModule(),                /* Wiring for Hadoop */
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */
