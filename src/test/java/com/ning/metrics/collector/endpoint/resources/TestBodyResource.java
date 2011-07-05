@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
-@Test(groups = "slow", singleThreaded = true)
+@Test(groups = "slow", singleThreaded = true, enabled = false)
 @Guice(modules = JettyTestModule.class)
 public class TestBodyResource extends TestPublicAPI
 {
