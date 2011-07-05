@@ -21,6 +21,7 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
+import com.yammer.metrics.guice.Metered;
 import org.apache.log4j.Logger;
 import org.weakref.jmx.Managed;
 
@@ -75,6 +76,7 @@ public class BufferingEventCollector implements EventCollector
         dispatcher.shutdown();
     }
 
+    @Metered
     @Override
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {

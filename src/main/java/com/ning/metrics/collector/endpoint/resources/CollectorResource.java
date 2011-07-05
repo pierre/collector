@@ -23,6 +23,7 @@ import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
+import com.yammer.metrics.guice.Timed;
 import org.joda.time.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +49,7 @@ public class CollectorResource
     }
 
     @GET
+    @Timed(name = "GET_API")
     public Response get(
         @QueryParam("v") final String eventName,
         @QueryParam("date") final String eventDateTimeString,

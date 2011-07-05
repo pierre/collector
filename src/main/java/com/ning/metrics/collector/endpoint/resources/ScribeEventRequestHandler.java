@@ -23,6 +23,7 @@ import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftToThriftEnvelopeEvent;
+import com.yammer.metrics.guice.Timed;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -37,7 +38,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class ScribeEventRequestHandler implements Iface
 {
@@ -69,6 +74,7 @@ class ScribeEventRequestHandler implements Iface
      * @return resultCode  OK if everything went well, TRY_LATER otherwise
      */
     @Override
+    @Timed(name = "SCRIBE_API")
     public ResultCode Log(final List<LogEntry> logEntries)
     {
         boolean success = false;

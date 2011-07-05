@@ -23,6 +23,7 @@ import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
+import com.yammer.metrics.guice.Timed;
 import org.joda.time.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,6 +59,7 @@ public class BodyResource
     // legacy endpoint to fall back on, for recieving single ThriftEnvelopeEvents
     @POST
     @Produces(MediaType.TEXT_PLAIN)
+    @Timed(name = "POST_ThriftLegacy_API")
     public Response postThriftLegacy(
         @QueryParam("name") final String eventName,
         @QueryParam("date") final String eventDateTimeString,
@@ -76,6 +78,7 @@ public class BodyResource
     @POST
     @Consumes(THRIFT)
     @Produces(MediaType.TEXT_PLAIN)
+    @Timed(name = "POST_Thrift_API")
     public Response postThrift(
         final InputStream body,
         @Context final HttpHeaders httpHeaders,
@@ -90,6 +93,7 @@ public class BodyResource
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
+    @Timed(name = "POST_Json_API")
     public Response postJson(
         final InputStream body,
         @Context final HttpHeaders httpHeaders,
@@ -104,6 +108,7 @@ public class BodyResource
     @POST
     @Consumes(APPLICATION_JSON_SMILE)
     @Produces(MediaType.TEXT_PLAIN)
+    @Timed(name = "POST_Smile_API")
     public Response postSmile(
         final InputStream body,
         @Context final HttpHeaders httpHeaders,
