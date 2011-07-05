@@ -50,14 +50,10 @@ public class RequestHandlersModule implements Module
         // Base10 GET Api
         binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
-            .as("com.ning.metrics.collector:name=GETEventHandler");
 
         // Base64 GET Api
         binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
-            .as("com.ning.metrics.collector:name=GETBase64EventHandler");
 
         binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
             .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
@@ -67,8 +63,6 @@ public class RequestHandlersModule implements Module
         // POST Api
         binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(InternalEventEndPointStats.class)).asEagerSingleton();
-        builder.export(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
-            .as("com.ning.metrics.collector:name=POSTEventHandler");
 
         binder.bind(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
             .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();

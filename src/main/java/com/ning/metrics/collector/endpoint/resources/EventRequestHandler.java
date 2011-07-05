@@ -23,13 +23,15 @@ import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.EventDeserializer;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MeterMetric;
 import org.apache.log4j.Logger;
-import org.weakref.jmx.Managed;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Event handler for the HTTP API (GET and POST).
@@ -41,8 +43,8 @@ public class EventRequestHandler
     private final EventEndPointStats endPointStats;
     private final EventHandler eventHandler;
 
-    private final HashMap<String, AtomicInteger> stats = new HashMap<String, AtomicInteger>(10);
     private final EventDeserializerFactory eventDeserializerFactory;
+    private final Map<String, MeterMetric> metrics = new HashMap<String, MeterMetric>();
 
     public EventRequestHandler(
         final EventHandler eventHandler,
@@ -53,6 +55,14 @@ public class EventRequestHandler
         this.endPointStats = stats;
         this.eventHandler = eventHandler;
         this.eventDeserializerFactory = eventDeserializerFactory;
+
+        // Exposes stats per Event type
+        for (final DeserializationType deserializationType : DeserializationType.values()) {
+            metrics.put(getSuccessMetricsKey(deserializationType),
+                Metrics.newMeter(EventRequestHandler.class, getSuccessMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
+            metrics.put(getFailureMetricsKey(deserializationType),
+                Metrics.newMeter(EventRequestHandler.class, getFailureMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
+        }
     }
 
     public Response handleEventRequest(final ExtractedAnnotation annotation, final EventStats eventStats)
@@ -66,7 +76,7 @@ public class EventRequestHandler
         // Can occur if the deserializer fails immediately (if the stream/file doesn't begin correctly)
         // fail fast and notify the sender that their message is improperly formatted
         catch (IOException e) {
-            getFailures(type).incrementAndGet();
+            metrics.get(getFailureMetricsKey(type)).mark();
             return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
         }
 
@@ -78,13 +88,13 @@ public class EventRequestHandler
                 log.debug(String.format("Processing event %s", event));
                 // We ignore the Response here (see below)
                 eventHandler.processEvent(event, annotation, endPointStats, eventStats);
-                getSuccesses(type).incrementAndGet();
+                metrics.get(getSuccessMetricsKey(type)).mark();
                 success++;
             }
         }
         catch (Exception e) {
             log.warn(String.format("Exception while extracting or processing an event. [%s] %s", annotation.toString(), e.toString()));
-            getFailures(type).incrementAndGet();
+            metrics.get(getFailureMetricsKey(type)).mark();
             // Send a 202, but w/ a warning message stating how many succeeded
             return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", success, e.toString())));
         }
@@ -92,67 +102,13 @@ public class EventRequestHandler
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    private AtomicInteger getSuccesses(final DeserializationType type)
+    private String getSuccessMetricsKey(final DeserializationType type)
     {
-        final String key = "s|" + type.name();
-        return getStat(key);
+        return type.toString() + "_SUCCES";
     }
 
-    private AtomicInteger getFailures(final DeserializationType type)
+    private String getFailureMetricsKey(final DeserializationType type)
     {
-        final String key = "f|" + type.name();
-        return getStat(key);
-    }
-
-    private synchronized AtomicInteger getStat(final String key)
-    {
-        AtomicInteger stat = stats.get(key);
-
-        if (stat == null) {
-            stat = new AtomicInteger(0);
-            stats.put(key, stat);
-        }
-
-        return stat;
-    }
-
-    @Managed(description = "Number of Thrift events the collector successfully deserialized")
-    public long getThriftSuccess()
-    {
-        return getSuccesses(DeserializationType.THRIFT).get();
-    }
-
-    @Managed(description = "Number of Thrift requests the collector couldn't fully deserialize")
-    public long getThriftFailure()
-    {
-        return getFailures(DeserializationType.THRIFT).get();
-    }
-
-    @Managed(description = "Number of Smile events the collector successfully deserialized")
-    public long getSmileSuccess()
-    {
-        return getSuccesses(DeserializationType.JSON).get() +
-            getSuccesses(DeserializationType.SMILE).get();
-    }
-
-    @Managed(description = "Number of Smile requests the collector couldn't fully deserialize")
-    public long getSmileFailure()
-    {
-        return getFailures(DeserializationType.JSON).get() +
-            getFailures(DeserializationType.SMILE).get();
-    }
-
-    @Managed(description = "Number of GET requests the collector couldn't fully deserialize")
-    public long getQueryFailure()
-    {
-        return getFailures(DeserializationType.DECIMAL_QUERY).get() +
-            getFailures(DeserializationType.BASE_64_QUERY).get();
-    }
-
-    @Managed(description = "Number of Thrift events from GET API the collector successfully deserialized")
-    public long getQuerySuccess()
-    {
-        return getSuccesses(DeserializationType.DECIMAL_QUERY).get() +
-            getSuccesses(DeserializationType.BASE_64_QUERY).get();
+        return type.toString() + "_FAILURE";
     }
 }
