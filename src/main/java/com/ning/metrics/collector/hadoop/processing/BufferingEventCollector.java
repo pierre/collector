@@ -22,7 +22,6 @@ import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
-import org.perf4j.aop.Profiled;
 import org.weakref.jmx.Managed;
 
 import java.util.concurrent.TimeUnit;
@@ -77,7 +76,6 @@ public class BufferingEventCollector implements EventCollector
     }
 
     @Override
-    @Profiled(tag = "acceptance", message = "Time to collect an event")
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {
         if (activeMQController != null && event != null) {

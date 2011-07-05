@@ -309,11 +309,6 @@
             <version>7.4.0.v20110414</version>
         </dependency>
         <dependency>
-            <groupId>org.perf4j</groupId>
-            <artifactId>perf4j</artifactId>
-            <version>0.9.14</version>
-        </dependency>
-        <dependency>
             <groupId>org.skife.config</groupId>
             <artifactId>config-magic</artifactId>
             <version>0.8</version>
