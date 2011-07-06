@@ -339,4 +339,8 @@ public interface CollectorConfig
     @Config("collector.nagios.serviceName")
     @Default("coll")
     String getNagiosServiceName();
+
+    @Config("collector.shiro.configPath")
+    @DefaultNull
+    String getShiroConfigPath();
 }

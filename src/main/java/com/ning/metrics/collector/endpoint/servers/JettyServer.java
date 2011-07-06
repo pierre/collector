@@ -81,8 +81,15 @@ public class JettyServer
         context.addEventListener(listener);
 
         // Protect the resources using Shiro
-        final FilterHolder authFilterHolder = new FilterHolder(IniShiroFilter.class);
-        context.addFilter(authFilterHolder, "/*", ServletContextHandler.NO_SESSIONS);
+        if (config.getShiroConfigPath() != null) {
+            log.info(String.format("Using [%s] for Shiro configPath", config.getShiroConfigPath()));
+            final FilterHolder authFilterHolder = new FilterHolder(IniShiroFilter.class);
+            authFilterHolder.setInitParameter("configPath", config.getShiroConfigPath());
+            context.addFilter(authFilterHolder, "/*", ServletContextHandler.NO_SESSIONS);
+        }
+        else {
+            log.info("Skipping Shiro configuration as no config path was specified");
+        }
 
         // Make sure Guice filter all requests
         final FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
