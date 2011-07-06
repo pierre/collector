@@ -16,26 +16,35 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
-//@Guice(modules = ConfigTestModule.class)
+import java.io.File;
+
+@Guice(modules = ConfigTestModule.class)
 public class TestEventSpoolDispatcherWithMockWriter
 {
     @Inject
     private CollectorConfig collectorConfig;
 
-    @BeforeClass
-    public void setup() {
-        Guice.createInjector(new ConfigTestModule()).injectMembers(this);
+    @BeforeTest(alwaysRun = true)
+    public void setUp() throws Exception
+    {
+        new File(collectorConfig.getSpoolDirectoryName()).mkdir();
+    }
+
+    @AfterTest(alwaysRun = true)
+    public void tearDown() throws Exception
+    {
+        new File(collectorConfig.getSpoolDirectoryName()).delete();
     }
 
     @Test(groups = "slow")
