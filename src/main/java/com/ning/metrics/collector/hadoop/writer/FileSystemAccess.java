@@ -22,6 +22,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -47,6 +48,9 @@ public class FileSystemAccess
     {
         this.hdfsConfig = hdfsConfig;
         this.fsClass = fsClass;
+
+        // Stupid Hadoop: https://issues.apache.org/jira/browse/HADOOP-4829
+        suppressHdfsShutdownHook();
     }
 
     public FileSystem get() throws IOException
@@ -86,6 +90,7 @@ public class FileSystemAccess
                     catch (IOException e1) {
                         // exp backoff
                         try {
+                            log.warn(String.format("Sleeping %dms before reconnecting to HDFS", waitTime));
                             Thread.sleep(waitTime);
                             timeSpentWaiting += waitTime;
                         }
@@ -140,6 +145,26 @@ public class FileSystemAccess
         }
         catch (RuntimeException e) {
             throw new IOException(String.format("Got exception while accessing get method for class %s ", fsClass), e);
+        }
+    }
+
+    private void suppressHdfsShutdownHook()
+    {
+        // See http://blog.rapleaf.com/dev/2008/12/12/graceful-shutdown-hadoop-and-black-magic/
+        try {
+            final Field field = FileSystem.class.getDeclaredField("clientFinalizer");
+            field.setAccessible(true);
+            final Thread hdfsClientFinalizer = (Thread) field.get(null);
+            if (hdfsClientFinalizer == null) {
+                Runtime.getRuntime().removeShutdownHook(hdfsClientFinalizer);
+                log.info("Removed HDFS shutdown hook");
+            }
+        }
+        catch (NoSuchFieldException nsfe) {
+            log.error("Couldn't find field 'clientFinalizer' in FileSystem! Failed to suppress HDFS shutdown hook", nsfe);
+        }
+        catch (IllegalAccessException iae) {
+            log.error("Couldn't access field 'clientFinalizer' in FileSystem! Failed to suppress HDFS shutdown hook", iae);
         }
     }
 }
