@@ -52,9 +52,10 @@ public class BufferingEventCollector implements EventCollector
             {
                 log.info("Starting main shutdown sequence");
 
-                log.info("Stop accepting new events");
                 // Stop accepting events and flush all events in memory to disk
                 shutdown();
+
+                log.info("Main shutdown sequence terminated");
             }
         });
     }
@@ -69,6 +70,8 @@ public class BufferingEventCollector implements EventCollector
      */
     public void shutdown()
     {
+        log.info("Stop accepting new events");
+
         // Disable AMQ hook
         activeMQController.stop();
 
