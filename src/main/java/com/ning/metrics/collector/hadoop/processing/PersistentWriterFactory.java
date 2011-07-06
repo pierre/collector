@@ -46,4 +46,6 @@ public interface PersistentWriterFactory
      * @see <a href="http://en.wikipedia.org/wiki/Thank_God,_It's_Doomsday">Left Below</a>
      */
     void processLeftBelowFiles() throws IOException;
+
+    void close();
 }

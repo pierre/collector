@@ -44,6 +44,7 @@ class FileSystemAccessProvider implements Provider<FileSystemAccess>
             hadoopConfig.set("fs.default.name", hfsHost);
         }
 
+        hadoopConfig.setBoolean("fs.automatic.close", false);
         hadoopConfig.setLong("dfs.block.size", collectorConfig.getHadoopBlockSize());
         hadoopConfig.set("hadoop.job.ugi", collectorConfig.getHadoopUgi());
         hadoopConfig.setStrings("io.serializations", HadoopThriftWritableSerialization.class.getName(),

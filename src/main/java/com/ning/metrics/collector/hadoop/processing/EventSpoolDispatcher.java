@@ -23,8 +23,6 @@ import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -107,37 +105,7 @@ class EventSpoolDispatcher
         }
         queuesPerPath.clear();
 
-        log.info("Processing old files and quarantine directories");
-        try {
-            factory.processLeftBelowFiles();
-        }
-        catch (IOException e) {
-            log.warn("Got IOException trying to process left below files: " + e.getLocalizedMessage());
-        }
-
-        // Give some time for the flush to happen
-        final File spoolDirectory = new File(config.getSpoolDirectoryName());
-        int nbOfSleeps = 0;
-        int numberOfLocalFiles = LocalSpoolManager.findFilesInSpoolDirectory(spoolDirectory).size();
-        while (numberOfLocalFiles > 0 && nbOfSleeps < 10) {
-            log.info(String.format("%d more files are left to be flushed, sleeping to give them a chance", numberOfLocalFiles));
-            try {
-                Thread.sleep(5000L);
-                numberOfLocalFiles = LocalSpoolManager.findFilesInSpoolDirectory(spoolDirectory).size();
-                nbOfSleeps++;
-            }
-            catch (InterruptedException e) {
-                log.warn(String.format("Interrupted while waiting for files to be flushed to HDFS. This means that [%s] still contains data!", config.getSpoolDirectoryName()));
-                break;
-            }
-        }
-
-        if (numberOfLocalFiles > 0) {
-            log.warn(String.format("Giving up while waiting for files to be flushed to HDFS.  This means that [%s] still contains data!", config.getSpoolDirectoryName()));
-        }
-        else {
-            log.info("All local files have been flushed");
-        }
+        factory.close();
     }
 
     public boolean isRunning()

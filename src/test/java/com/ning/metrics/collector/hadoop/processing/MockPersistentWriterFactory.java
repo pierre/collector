@@ -64,4 +64,9 @@ public class MockPersistentWriterFactory implements PersistentWriterFactory
     public void processLeftBelowFiles() throws IOException
     {
     }
+
+    @Override
+    public void close()
+    {
+    }
 }
