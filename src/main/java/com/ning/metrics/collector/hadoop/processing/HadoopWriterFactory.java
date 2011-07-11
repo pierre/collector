@@ -160,7 +160,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
         }
 
         if (numberOfLocalFiles > 0) {
-            log.warn(String.format("Giving up while waiting for files to be flushed to HDFS.  This means that [%s] still contains data!", config.getSpoolDirectoryName()));
+            log.warn(String.format("Giving up while waiting for files to be flushed to HDFS. Files not flushed: %s", LocalSpoolManager.findFilesInSpoolDirectory(spoolDirectory)));
         }
         else {
             log.info("All local files have been flushed");
