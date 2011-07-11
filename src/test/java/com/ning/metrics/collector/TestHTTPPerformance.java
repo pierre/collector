@@ -18,8 +18,7 @@ package com.ning.metrics.collector;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
-import com.ning.metrics.collector.util.NamedThreadFactory;
+import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.eventtracker.CollectorController;
 import com.ning.metrics.eventtracker.CollectorControllerModule;
 import com.ning.metrics.serialization.event.Event;
@@ -79,7 +78,7 @@ public class TestHTTPPerformance
         final Injector injector = Guice.createInjector(new CollectorControllerModule());
         controller = injector.getInstance(CollectorController.class);
 
-        executor = new FailsafeScheduledExecutor(1, new NamedThreadFactory("sender"));
+        executor = new FailsafeScheduledExecutor(1, "sender");
         executor.submit(new SenderWorker(controller));
 
         payload.put("message", "World");

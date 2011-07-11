@@ -16,9 +16,8 @@
 
 package com.ning.metrics.collector.realtime;
 
+import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 import org.weakref.jmx.MBeanExporter;
 
 import java.lang.management.ManagementFactory;
@@ -48,7 +47,7 @@ class LocalQueueAndWorkers
         // Each type is exported as a child bean of RTQueueStats
         exporter.export(getMBeanName(), stats);
 
-        this.executor = new FailsafeScheduledExecutor(config.getActiveMQNumSendersPerCategory(), new NamedThreadFactory(type + "-workers"));
+        this.executor = new FailsafeScheduledExecutor(config.getActiveMQNumSendersPerCategory(), type + "-workers");
         for (int idx = 0; idx < config.getActiveMQNumSendersPerCategory(); idx++) {
             executor.submit(new LocalQueueWorker(queue, processor, stats));
         }

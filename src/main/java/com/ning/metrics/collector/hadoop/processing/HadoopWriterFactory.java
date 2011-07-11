@@ -17,9 +17,9 @@
 package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
+import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.hadoop.writer.FileSystemAccess;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventHandler;
@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HadoopWriterFactory implements PersistentWriterFactory
@@ -81,7 +80,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 stats.registerHdfsFlush();
                 flushCount++;
             }
-        }, spoolManager.getSpoolDirectoryPath(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(hdfsDir + "-HDFS-writer")),
+        }, spoolManager.getSpoolDirectoryPath(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new FailsafeScheduledExecutor(1, hdfsDir + "-HDFS-writer"),
             SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(), serializationType.getSerializer());
         return new ThresholdEventWriter(eventWriter, config.getFlushEventQueueSize(), config.getRefreshDelayInSeconds());
     }

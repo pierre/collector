@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector;
 
-import com.ning.metrics.collector.util.NamedThreadFactory;
+import com.mogwee.executors.Executors;
 import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftField;
 import com.ning.metrics.serialization.thrift.ThriftFieldListSerializer;
@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class TestPerformance
@@ -145,7 +144,7 @@ public class TestPerformance
 
     private static long scheduleScribeAgents() throws InterruptedException
     {
-        final ExecutorService e = Executors.newFixedThreadPool(THREADPOOL_SIZE, new NamedThreadFactory("Performance tests (Scribe client)"));
+        final ExecutorService e = Executors.newFixedThreadPool(THREADPOOL_SIZE, "Performance tests (Scribe client)");
 
         final long startTime = System.currentTimeMillis();
         for (int i = 0; i < NUMBER_OF_SCRIBE_CLIENTS; i++) {

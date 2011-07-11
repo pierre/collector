@@ -17,8 +17,8 @@
 package com.ning.metrics.collector.realtime;
 
 import com.google.inject.Inject;
+import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.goodwill.access.CachingGoodwillAccessor;
 import com.ning.metrics.goodwill.access.GoodwillSchema;
 import com.ning.metrics.goodwill.access.GoodwillSchemaField;
@@ -41,7 +41,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -76,7 +75,7 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
 
         this.connection = factory.createConnection();
-        final Executor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("EventQueueProcessorImpl"));
+        final Executor executor = new FailsafeScheduledExecutor(1, "EventQueueProcessorImpl");
         executor.execute(new Runnable()
         {
             @Override

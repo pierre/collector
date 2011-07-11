@@ -17,9 +17,8 @@
 package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
+import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.FailsafeScheduledExecutor;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
 
@@ -55,7 +54,7 @@ class EventSpoolDispatcher
         this.config = config;
 
         // Background committer (close the current open file and promote it to the final spool area for flush)
-        final ScheduledExecutorService scheduledExecutor = new FailsafeScheduledExecutor(1, new NamedThreadFactory("WriterQueuesReaper"));
+        final ScheduledExecutorService scheduledExecutor = new FailsafeScheduledExecutor(1, "WriterQueuesReaper");
         scheduledExecutor.schedule(new Runnable()
         {
             @Override

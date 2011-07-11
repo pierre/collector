@@ -17,8 +17,8 @@
 package com.ning.metrics.collector.endpoint.servers;
 
 import com.google.inject.Inject;
+import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.NamedThreadFactory;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -30,8 +30,6 @@ import scribe.thrift.scribe.Iface;
 import scribe.thrift.scribe.Processor;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Thrift service. Contacted usually by Scribe client.
@@ -51,7 +49,7 @@ public class ScribeServer
         this.eventRequestHandler = eventRequestHandler;
         this.config = config;
 
-        final Executor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("ScribeServer"));
+        final Executor executor = new FailsafeScheduledExecutor(1, "ScribeServer");
         executor.execute(new Runnable()
         {
             @Override
