@@ -22,6 +22,7 @@ import com.ning.metrics.serialization.event.GranularityPathMapper;
 import org.apache.axis.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -45,7 +46,7 @@ class LocalSpoolManager
 
     private static final Pattern filenamePattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}-\\d{1,5}-(\\d{4}-\\d{2}-\\d{2}T\\d{2}.\\d{2}.\\d{2})\\.[a-zA-Z]*\\.[a-zA-Z]*");
 
-    protected static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss").withZone(DateTimeZone.UTC);
+    protected static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS").withZone(DateTimeZone.UTC);
 
     private final CollectorConfig config;
     private String eventName;
@@ -157,7 +158,7 @@ class LocalSpoolManager
      */
     public String getSpoolDirectoryName()
     {
-        return String.format("%s-%d-%s.%s.%s", config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), eventName, serializationType.getFileSuffix());
+        return String.format("%s-%d-%s.%s.%s.%s", config.getLocalIp(), config.getLocalPort(), RandomStringUtils.randomAlphanumeric(4), dateFormatter.print(timeStamp), eventName, serializationType.getFileSuffix());
     }
 
     /**
@@ -182,7 +183,7 @@ class LocalSpoolManager
      */
     public String toHadoopPath(final int flushCount)
     {
-        return String.format("%s/%s-%d-%s-f%d.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), dateFormatter.print(timeStamp), flushCount, serializationType.getFileSuffix());
+        return String.format("%s/%s-%d-%s-%s-f%d.%s", hdfsDir, config.getLocalIp(), config.getLocalPort(), RandomStringUtils.randomAlphanumeric(4), dateFormatter.print(timeStamp), flushCount, serializationType.getFileSuffix());
     }
 
     public String getEventName()
