@@ -43,19 +43,19 @@ public class TestLocalSpoolManager
             Assert.assertTrue(true);
         }
 
-        spoolManager = new LocalSpoolManager(config, new File("127.0.0.1-8080-2011-05-27T15.42.03.FrontDoorVisit.smile"));
+        spoolManager = new LocalSpoolManager(config, new File("127.0.0.1-8080-pYb2-2011-05-27T15.42.03.124.FrontDoorVisit.smile"));
         Assert.assertEquals(spoolManager.getEventName(), "FrontDoorVisit");
         Assert.assertEquals(spoolManager.getSerializationType(), SerializationType.SMILE);
-        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2011-05-27T15.42.03"));
+        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2011-05-27T15.42.03.124"));
 
-        spoolManager = new LocalSpoolManager(config, new File("10.18.81.236-8080-2011-06-24T17.29.18.FrontDoorVisit.thrift"));
+        spoolManager = new LocalSpoolManager(config, new File("10.18.81.236-8080-pYb2-2011-06-24T17.29.18.143.FrontDoorVisit.thrift"));
         Assert.assertEquals(spoolManager.getEventName(), "FrontDoorVisit");
         Assert.assertEquals(spoolManager.getSerializationType(), SerializationType.THRIFT);
-        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2011-06-24T17.29.18"));
+        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2011-06-24T17.29.18.143"));
 
-        spoolManager = new LocalSpoolManager(config, new File("10.18.81.236-8080-2011-06-23T19.57.36.Homepage.thrift"));
+        spoolManager = new LocalSpoolManager(config, new File("10.18.81.236-8080-pYb2-2011-06-23T19.57.36.124.Homepage.thrift"));
         Assert.assertEquals(spoolManager.getEventName(), "Homepage");
         Assert.assertEquals(spoolManager.getSerializationType(), SerializationType.THRIFT);
-        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2011-06-23T19.57.36"));
+        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2011-06-23T19.57.36.124"));
     }
 }

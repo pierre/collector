@@ -44,9 +44,10 @@ class LocalSpoolManager
 {
     private static final Logger log = Logger.getLogger(LocalSpoolManager.class);
 
-    private static final Pattern filenamePattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}-\\d{1,5}-(\\d{4}-\\d{2}-\\d{2}T\\d{2}.\\d{2}.\\d{2})\\.[a-zA-Z]*\\.[a-zA-Z]*");
+    private static final Pattern filenamePattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}-\\d{1,5}-[a-zA-Z0-9]{4}-(\\d{4}-\\d{2}-\\d{2}T\\d{2}.\\d{2}.\\d{2}.\\d{3})\\.[a-zA-Z]*\\.[a-zA-Z]*");
 
-    protected static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS").withZone(DateTimeZone.UTC);
+    // Can't use : in the pattern - Hadoop chokes on it when building the .crc Path
+    protected static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss.SSS").withZone(DateTimeZone.UTC);
 
     private final CollectorConfig config;
     private String eventName;
@@ -135,7 +136,7 @@ class LocalSpoolManager
      */
     private void reverseEngineerFilename(final String directoryName) throws IllegalArgumentException
     {
-        // directoryName is like 127.0.0.1-8080-2011-05-27T15.42.03.FrontDoorVisit.smile
+        // directoryName is like 127.0.0.1-8080-pYb2-2011-05-27T15.42.03.586.FrontDoorVisit.smile
         final String[] directoryTokens = StringUtils.split(directoryName, '.');
         if (directoryTokens.length < 3) {
             throw new IllegalArgumentException();
@@ -158,7 +159,7 @@ class LocalSpoolManager
      */
     public String getSpoolDirectoryName()
     {
-        return String.format("%s-%d-%s.%s.%s.%s", config.getLocalIp(), config.getLocalPort(), RandomStringUtils.randomAlphanumeric(4), dateFormatter.print(timeStamp), eventName, serializationType.getFileSuffix());
+        return String.format("%s-%d-%s-%s.%s.%s", config.getLocalIp(), config.getLocalPort(), RandomStringUtils.randomAlphanumeric(4), dateFormatter.print(timeStamp), eventName, serializationType.getFileSuffix());
     }
 
     /**
