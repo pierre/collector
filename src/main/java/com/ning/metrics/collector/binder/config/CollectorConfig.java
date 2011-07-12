@@ -333,7 +333,7 @@ public interface CollectorConfig
     String getNagiosReportedHostname();
 
     @Config("collector.nagios.checkRate")
-    @Default("5s")
+    @Default("5m")
     TimeSpan getNagiosCheckRate();
 
     @Config("collector.nagios.serviceName")
