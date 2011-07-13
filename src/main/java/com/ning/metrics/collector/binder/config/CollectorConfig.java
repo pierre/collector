@@ -304,7 +304,7 @@ public interface CollectorConfig
      *
      * @return true if Goodwill integration is enabled, false otherwise
      */
-    @Config("collector.goodwill.enabled")
+    @Config("collector.goodwill.cacheTimeout")
     @Default("90")
     int getGoodwillCacheTimeout();
 
