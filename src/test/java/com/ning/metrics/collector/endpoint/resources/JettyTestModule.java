@@ -32,6 +32,8 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.skife.config.ConfigurationObjectFactory;
 
+import javax.management.MBeanServer;
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +58,7 @@ public class JettyTestModule extends AbstractModule
     protected void configure()
     {
         final CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(AutoFlushConfig.class);
+        bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
 
         // Install all production (real) modules...
         install(new AbstractModule()

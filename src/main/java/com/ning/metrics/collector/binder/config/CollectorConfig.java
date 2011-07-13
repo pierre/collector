@@ -180,6 +180,10 @@ public interface CollectorConfig
     @Default("443")
     int getLocalSSLPort();
 
+    @Config("collector.jetty.stats")
+    @Default("true")
+    boolean isJettyStatsOn();
+
     @Config("collector.jetty.ssl.keystore")
     @DefaultNull
     String getSSLkeystoreLocation();

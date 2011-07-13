@@ -24,6 +24,7 @@ import com.ning.metrics.collector.binder.modules.JettyListener;
 import com.ning.metrics.collector.endpoint.setup.SetupJULBridge;
 import org.apache.log4j.Logger;
 import org.apache.shiro.web.servlet.IniShiroFilter;
+import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -33,7 +34,9 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.log.Log;
 
+import javax.management.MBeanServer;
 import java.util.EventListener;
 
 @Singleton
@@ -42,13 +45,15 @@ public class JettyServer
     private static final Logger log = Logger.getLogger(JettyServer.class);
 
     private final CollectorConfig config;
+    private final MBeanServer mbeanServer;
     private boolean initialized = false;
     private Server server;
 
     @Inject
-    public JettyServer(final CollectorConfig config)
+    public JettyServer(final CollectorConfig config, final MBeanServer mbeanServer)
     {
         this.config = config;
+        this.mbeanServer = mbeanServer;
     }
 
     public void start() throws Exception
@@ -57,13 +62,21 @@ public class JettyServer
 
         server = new Server();
 
+        // Setup JMX
+        final MBeanContainer mbContainer = new MBeanContainer(mbeanServer);
+        server.getContainer().addEventListener(mbContainer);
+        server.addBean(mbContainer);
+        mbContainer.addBean(Log.getLog());
+
         final Connector connector = new SelectChannelConnector();
+        connector.setStatsOn(config.isJettyStatsOn());
         connector.setHost(config.getLocalIp());
         connector.setPort(config.getLocalPort());
         server.addConnector(connector);
 
         if (config.isSSLEnabled()) {
             final SslConnector sslConnector = new SslSelectChannelConnector();
+            sslConnector.setStatsOn(config.isJettyStatsOn());
             sslConnector.setPort(config.getLocalSSLPort());
             sslConnector.setKeystore(config.getSSLkeystoreLocation());
             sslConnector.setKeyPassword(config.getSSLkeystorePassword());
