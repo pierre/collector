@@ -20,6 +20,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.ning.metrics.collector.hadoop.processing.HadoopWriterFactory;
 import com.ning.metrics.collector.hadoop.processing.PersistentWriterFactory;
+import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 

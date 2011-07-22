@@ -18,7 +18,7 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.hadoop.writer.FileSystemAccess;
+import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.testng.Assert;

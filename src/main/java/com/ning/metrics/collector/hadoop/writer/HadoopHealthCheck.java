@@ -19,6 +19,7 @@ package com.ning.metrics.collector.hadoop.writer;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.util.ComponentHealthCheck;
 import com.ning.metrics.collector.util.HealthCheckStatus;
+import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsStatus;

@@ -88,30 +88,11 @@ public interface CollectorConfig
     @Default("true")
     boolean isHdfsWriterEnabled();
 
+    @Config("collector.event-end-point.rate-window-size-minutes")
+    @Default("5")
+    int getRateWindowSizeMinutes();
+
     //------------------- Spooling -------------------//
-
-    /**
-     * Maximum number of events per file in the temporary spooling area. Past this threshold,
-     * buffered events are promoted to the final spool queue.
-     * This is used in the ThresholdEventWriter (size before commits)
-     *
-     * @return the maximum number of events per file
-     * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
-     */
-    @Config("collector.diskspool.flush-event-queue-size")
-    @Default("10000")
-    long getFlushEventQueueSize();
-
-    /**
-     * Maxixum number of seconds before events are promoted from the temporary spooling area to the final spool queue.
-     * This is used in the ThresholdEventWriter (delay between commits).
-     *
-     * @return maxixmum age of events in seconds in the temporary spool queue
-     * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
-     */
-    @Config("collector.diskspool.refresh-delay-seconds")
-    @Default("60")
-    int getRefreshDelayInSeconds();
 
     /**
      * Directory for the collector to buffer events before writing them to HDFS
@@ -119,11 +100,11 @@ public interface CollectorConfig
      * @return the directory path
      */
     @Config("collector.diskspool.path")
-    @Default("/tmp/collector/diskspool")
+    @Default(".diskspool")
     String getSpoolDirectoryName();
 
     /**
-     * If false, events will not be periodically sent to HDFS
+     * If false, events will not be periodically written to HDFS
      *
      * @return whether to send events buffered locally
      */
@@ -138,9 +119,9 @@ public interface CollectorConfig
      * @return delay between flushes to HDFS
      * @see com.ning.metrics.serialization.writer.DiskSpoolEventWriter
      */
-    @Config("collector.diskspool.refresh-delay-seconds")
+    @Config("collector.diskspool.flush-interval-seconds")
     @Default("30")
-    long getFlushIntervalInSeconds();
+    int getFlushIntervalInSeconds();
 
     /**
      * Type of outputter to use when spooling: NONE, FLUSH, or SYNC
@@ -156,13 +137,36 @@ public interface CollectorConfig
      *
      * @return the number of events to buffer before calling flush or sync
      */
-    @Config("collector.diskspool.sync-batch-size")
+    @Config("collector.diskspool.batch-size")
     @Default("50")
     int getSyncBatchSize();
 
-    @Config("collector.event-end-point.rate-window-size-minutes")
-    @Default("5")
-    int getRateWindowSizeMinutes();
+    /**
+     * Maximum number of events in the file being written (_tmp directory).
+     * <p/>
+     * Maximum number of events per file in the temporary spooling area. Past this threshold,
+     * buffered events are promoted to the final spool queue.
+     * This is used in the ThresholdEventWriter (size before commits)
+     *
+     * @return the maximum number of events per file
+     * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
+     */
+    @Config("collector.diskspool.max-uncommitted-write-count")
+    @Default("10000")
+    long getMaxUncommittedWriteCount();
+
+    /**
+     * Maximum age of events in the file being written (_tmp directory).
+     * <p/>
+     * Maximum number of seconds before events are promoted from the temporary spooling area to the final spool queue.
+     * This is used in the ThresholdEventWriter (delay between commits).
+     *
+     * @return maxixmum age of events in seconds in the temporary spool queue
+     * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
+     */
+    @Config("collector.diskspool.max-uncommitted-period-seconds")
+    @Default("60")
+    int getMaxUncommittedPeriodInSeconds();
 
     @Config("collector.server.ip")
     @Default("127.0.0.1")

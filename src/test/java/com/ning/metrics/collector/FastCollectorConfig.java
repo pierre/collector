@@ -45,7 +45,7 @@ public abstract class FastCollectorConfig implements CollectorConfig
      * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
      */
     @Override
-    public long getFlushEventQueueSize()
+    public long getMaxUncommittedWriteCount()
     {
         return 2;
     }
@@ -58,7 +58,7 @@ public abstract class FastCollectorConfig implements CollectorConfig
      * @see com.ning.metrics.serialization.writer.ThresholdEventWriter
      */
     @Override
-    public int getRefreshDelayInSeconds()
+    public int getMaxUncommittedPeriodInSeconds()
     {
         return 1;
     }
@@ -71,9 +71,9 @@ public abstract class FastCollectorConfig implements CollectorConfig
      * @see com.ning.metrics.serialization.writer.DiskSpoolEventWriter
      */
     @Override
-    public long getFlushIntervalInSeconds()
+    public int getFlushIntervalInSeconds()
     {
-        return 1L;
+        return 1;
     }
 
     /**

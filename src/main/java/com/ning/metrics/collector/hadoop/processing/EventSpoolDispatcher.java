@@ -85,7 +85,7 @@ class EventSpoolDispatcher
                     LocalSpoolManager.cleanupOldSpoolDirectories(LocalSpoolManager.findOldSpoolDirectories(config.getSpoolDirectoryName(), CUTOFF_TIME_OLD_DIRS));
                 }
                 finally {
-                    scheduledExecutor.schedule(this, config.getRefreshDelayInSeconds(), TimeUnit.SECONDS);
+                    scheduledExecutor.schedule(this, config.getMaxUncommittedPeriodInSeconds(), TimeUnit.SECONDS);
                 }
             }
         }, 1, TimeUnit.HOURS);

@@ -48,7 +48,7 @@ public class JettyTestModule extends AbstractModule
          * @return the maximum number of events per file
          */
         @Override
-        public long getFlushEventQueueSize()
+        public long getMaxUncommittedWriteCount()
         {
             return 0L;
         }

@@ -19,6 +19,7 @@ package com.ning.metrics.collector.hadoop.writer;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import com.ning.metrics.serialization.hadoop.HadoopSmileOutputStreamSerialization;
 import com.ning.metrics.serialization.hadoop.HadoopThriftEnvelopeSerialization;
 import com.ning.metrics.serialization.hadoop.HadoopThriftWritableSerialization;

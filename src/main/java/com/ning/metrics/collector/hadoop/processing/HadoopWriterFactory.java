@@ -19,7 +19,7 @@ package com.ning.metrics.collector.hadoop.processing;
 import com.google.inject.Inject;
 import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.hadoop.writer.FileSystemAccess;
+import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import com.ning.metrics.serialization.writer.CallbackHandler;
 import com.ning.metrics.serialization.writer.DiskSpoolEventWriter;
 import com.ning.metrics.serialization.writer.EventHandler;
@@ -81,8 +81,8 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 flushCount++;
             }
         }, spoolManager.getSpoolDirectoryPath(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new FailsafeScheduledExecutor(1, hdfsDir + "-HDFS-writer"),
-            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getRateWindowSizeMinutes(), serializationType.getSerializer());
-        return new ThresholdEventWriter(eventWriter, config.getFlushEventQueueSize(), config.getRefreshDelayInSeconds());
+            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), serializationType.getSerializer());
+        return new ThresholdEventWriter(eventWriter, config.getMaxUncommittedWriteCount(), config.getMaxUncommittedPeriodInSeconds());
     }
 
     /**
