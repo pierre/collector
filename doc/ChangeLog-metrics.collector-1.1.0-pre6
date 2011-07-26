@@ -1,0 +1,70 @@
+commit 0b4ddf67071d22f22bf21ac8e27c899d5dab9d8c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 6 16:36:04 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre6
+
+commit 9ea5aac56d50567928b6d0a33a442e74d96a5a9f
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 6 16:33:41 2011 -0700
+
+    hdfs: cleanup shutdown sequence
+    
+    HADOOP-4829 has been fixed in 0.21.0.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit da3033b6cf98fcbefd74a18b594d135f099d6c5c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 6 13:55:03 2011 -0700
+
+    hdfs: remove FileSystem shutdown hook
+    
+    This should fix the race conditions we've been seeing on shutdown.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 2eb04213f2f9b3c5fca0a46429e1e3d79fe6cbc8
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 6 12:43:06 2011 -0700
+
+    test: fix shutdown test
+    
+    The shutdown hook assumes the spool directory already exists. Make sure
+    it does in the tests.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 9b07caccc947e6ac76794af00192be64a38c4de7
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 6 11:43:58 2011 -0700
+
+    config: allows one to specify shiro.ini config path
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit b95a451cdee86c713b404460233b5e004eaeeaa9
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 17:47:05 2011 -0700
+
+    performance: update metrics to 2.0.0-BETA14
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 4341161417ce91062a9b35807d27869286371699
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 17:45:57 2011 -0700
+
+    shutdown: give some time for the flush to happen
+    
+    Make the main shutdown hook sleep for at most 50s (galaxy limit
+    before kill -9 is 2 minutes). This should give enough time to flush
+    remaining local files.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 43f33bb14b0639b5055cd4f20d304079d0f98439
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 16:35:02 2011 -0700
+
+    [maven-release-plugin] prepare for next development iteration

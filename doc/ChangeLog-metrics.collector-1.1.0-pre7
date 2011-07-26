@@ -1,0 +1,132 @@
+commit 0b84312b67be9384c267bbb9bdda35d2da9bb726
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 20:46:38 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre7
+
+commit bd74297bb3305e37d453357a6f3dd59ce513b9d8
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 20:42:28 2011 -0700
+
+    Revert "[maven-release-plugin] prepare release metrics.collector-1.1.0-pre7"
+    
+    This reverts commit ddc8a3c1d0c2f503f4f95ddd0baea27b2f1913dd.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit ddc8a3c1d0c2f503f4f95ddd0baea27b2f1913dd
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 20:39:34 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre7
+
+commit abbcf50f2d01b54dfcaa753ef8f46d7617bbe0d4
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 20:35:10 2011 -0700
+
+    pom.xml: bump serialization to -pre8
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit ff0eafb73298e3ddd87f1d5f2d59adbad55a61b1
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 20:33:08 2011 -0700
+
+    jetty: add Jetty JMX MBeans
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 80f61c8e1d835623b02aa54781046ed229149327
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 11:02:19 2011 -0700
+
+    spool: fix LocalSpoolManager tests
+    
+    Adapt the pattern matcher to take into account the extra randomness.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit af76cdb7e283f687331cb95db3c86c649082e935
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 09:17:55 2011 -0700
+
+    spool: add randomness in the file names
+    
+    We had issues where two HDFS-writer had conflicting spool paths.
+    Add some randomness in the string.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit e3ba14bb7aee66afb5b2bb408f714a3f2fe1f897
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 09:16:27 2011 -0700
+
+    config: use 5m for default Nagios ping rate
+    
+    5s was too aggressive.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 84f7838d97a46038ac46498d3cb87d8093e8df91
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 09:16:14 2011 -0700
+
+    pom.xml: bump jetty to 7.4.4.v20110707
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 41b5a8974b583576e2d88b0ae44e34b67527935c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 09:16:00 2011 -0700
+
+    pom.xml: bump jackson to 1.8.3
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 51c76cbcc0daf4432020fb1e4b5da2a2c95f3f7a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jul 11 13:51:47 2011 -0700
+
+    pom.xml: bump serialization to -pre8-SNAPSHOT
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 936122118ec4afc7630578554c59348f42f9c158
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jul 11 13:50:44 2011 -0700
+
+    util: use mogwee-executors instead of our own
+    
+    TimW just released mogwee-executors 1.0.0! Less code to maintain, yay!
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit ccbec6660a456423a86dba0edd4099a6f75437a8
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jul 11 13:19:25 2011 -0700
+
+    hadoop: better log message on shutdown
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit da638bfb7f3413b69d005a1b2b98ccb776de242f
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jul 11 10:05:20 2011 -0700
+
+    utils: add summary option to the coll_jmx_summary script
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 28843263a13fdf1332ea3a470c5155730e45968e
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jul 11 09:16:43 2011 -0700
+
+    utils: add jruby script to print JMX coll stats
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit b0deb016168916dfd1a928893efc5dd1241709e6
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 6 16:36:09 2011 -0700
+
+    [maven-release-plugin] prepare for next development iteration

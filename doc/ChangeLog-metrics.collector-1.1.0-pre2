@@ -1,0 +1,85 @@
+commit 8e7cec672a310e565a07fa0ed52691378200687a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 19 18:26:11 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre2
+
+commit 852f0a51cdaa90ae9f4b37c51ae9f71dc50a10ea
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 19 17:48:27 2011 -0700
+
+    pom.xml: bump jackson to 1.8.1
+    
+    1.8.1 features some Smile bug fixes.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 86711dd04e19e8419272d16dd7bfc76d11003a88
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 19 17:48:01 2011 -0700
+
+    pom.xml: bump serialization to 2.0.0-pre3
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit bfbdc8dd23a4a267fbb4e7791af4e587b115f896
+Author: Cole Ott <cole@ning.com>
+Date:   Thu May 19 17:42:32 2011 -0700
+
+    EventRequestHandler: added handleJsonRequest()
+    
+    * BodyResource now uses handleJsonRequest to handle Json and Smile
+    * handleJsonRequest() is a stop-gap until I write a more general solution
+
+commit 7c8b04532765b0d959ebcd7df613a7b6580533a4
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 18 15:25:38 2011 -0700
+
+    BodyEventExtractor: replaced vector w/ singletonList
+
+commit 496c9d83fab426d0dcae6da18149e64dcbcc61bb
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 18 15:20:49 2011 -0700
+
+    QueryParameterEventExtractor: no more static LinkedList
+
+commit f7b5e97e86462c482ea059dd977d46bfea892116
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 17 15:13:36 2011 -0700
+
+    tesT: make TestDiskSpoolEventWriterProvider really work
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit bf428b1be16068b86bef28877f71bbdbd4b8b1f9
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 17 15:13:21 2011 -0700
+
+    writer: add some logging
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit afdb017e090753a6a6bba9a985f8dd2e46216e78
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 17 14:05:56 2011 -0700
+
+    test: fix multiple injectors bug in integration tests
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 3160f9617925127c3c3161d97e3c5e2822faebbc
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 17 14:03:55 2011 -0700
+
+    test: fix while loop in TestDiskSpoolEventWriterProvider
+    
+    Tests didn't always finish in TestDiskSpoolEventWriterProvider. Refactor
+    for stability.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit e303f217905f098b1e2808ea498b189fb4b429f7
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon May 16 12:50:45 2011 -0700
+
+    [maven-release-plugin] prepare for next development iteration

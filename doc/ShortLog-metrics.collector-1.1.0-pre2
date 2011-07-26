@@ -1,0 +1,15 @@
+Cole Ott (3):
+      QueryParameterEventExtractor: no more static LinkedList
+      BodyEventExtractor: replaced vector w/ singletonList
+      EventRequestHandler: added handleJsonRequest()
+
+Pierre-Alexandre Meyer (8):
+      [maven-release-plugin] prepare for next development iteration
+      test: fix while loop in TestDiskSpoolEventWriterProvider
+      test: fix multiple injectors bug in integration tests
+      writer: add some logging
+      tesT: make TestDiskSpoolEventWriterProvider really work
+      pom.xml: bump serialization to 2.0.0-pre3
+      pom.xml: bump jackson to 1.8.1
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre2
+

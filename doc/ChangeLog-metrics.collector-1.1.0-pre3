@@ -1,0 +1,760 @@
+commit 3e9c8ee2fa1f61c2a4402d13765d65e7c78aa19c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 15:57:29 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre3
+
+commit 82273bc79e52a9eb9eb32432e9429f52bc959160
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 15:53:28 2011 -0700
+
+    pom.xml: fix rat plugin configuration for maven 3
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 357bb927dfcf9f0771b6c8223aad307111d5fae4
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 15:39:43 2011 -0700
+
+    pom.xml: bump to released versions
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 5c8484b81fc624cec7c3248010863c8fba35f079
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 14:27:40 2011 -0700
+
+    jmx: fix typo in EventRequestHandler stats
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 7f32ba819d8729626f6461b34f2cd59ce9e4042b
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 14:27:30 2011 -0700
+
+    jmx: add missing exports
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit ab236917775f9404a19956af627c4de03f165073
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 14:21:15 2011 -0700
+
+    endpoint: synchronize stats access
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 29984de7fc9c90f610fb34b54605441dd95e422c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 14:20:57 2011 -0700
+
+    jmx: fix MBean export issues
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 61e61be4fdfb01895df1a22db87644c4df1a07f1
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 14:20:09 2011 -0700
+
+    pom.xml: bump config-magic to 0.8
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 3183a389b0213095a6ac9490568dac99a97eb54c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 16:48:25 2011 -0700
+
+    test: disable TestCollectorResource
+    
+    It never worked reliably with IDEA/surefire. Works great ran in
+    standalone though.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 605fab0219130da93c7c3b44ce366265bfd354d6
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 16:45:28 2011 -0700
+
+    test: fix TestBufferingEventCollector tests
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 12e647ceb7eaba89deb3a0a40330c5d9676800b6
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 16:27:49 2011 -0700
+
+    test: fix EventRequestHandler tests
+    
+    Fixing cole's TODO... ;)
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 11553dc6431496627e4eda546c2e9806367b9eec
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 15:43:38 2011 -0700
+
+    stats: remove unnecessary synchronized
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 8a8e53431ddcd701ce1ef0738d6c254dc25027bf
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 15:42:31 2011 -0700
+
+    healthcheck: address tomdz's comments
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 131a7d5b54ad3611ae5f0e42a8360b4f92d7621a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 15:37:01 2011 -0700
+
+    realtime: make sure to unexport bean on stop
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit a02cb728f176d204e583a56726ead99a467986fc
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 15:23:30 2011 -0700
+
+    amq: make global stats threadsafe
+    
+    We are guaranteed to have at most one stats object per event type, we
+    still need to make sure the put call is thread safe though.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 42dc7cf61088f43627fc9627aee324953b1e7e5e
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 15:07:25 2011 -0700
+
+    test: fix TestTimeThresholdEventSpoolDispatcher
+    
+    We changed the semantics of the time threshold writer. Now, even though
+    no events are offered, we still trigger a commit past the threshold.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit bf6e71df694c3c1de1b25cf249b568d8a7a99f88
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon Jun 13 14:44:31 2011 -0700
+
+    test: move Guice stuff out off base abstract test
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 711f1eb8f1346dbab5b9395d2cc1b4d6de5a3aab
+Author: Cole Ott <cole@ning.com>
+Date:   Fri Jun 3 22:26:41 2011 -0700
+
+    TestParsedRequest: hacky fix to a test (w/ TODO note)
+
+commit 80e2975d9deb2490471cd5360d899ac326a9b222
+Author: Cole Ott <cole@ning.com>
+Date:   Fri Jun 3 22:26:09 2011 -0700
+
+    LocalQueueAndWriter: squashed warning
+
+commit 5430d493ce0bb67ae7dc537bc4249f196061c295
+Author: Cole Ott <cole@ning.com>
+Date:   Fri Jun 3 11:09:17 2011 -0700
+
+    JettyTestModule: changed delay to 1 second (from 0 seconds)
+    
+    * less than optimal to wait a whole second, but '0 seconds' was
+      causing an IllegalArgumentException
+
+commit 587e5477654435d72c6f297c6e6deb9448eab5c2
+Author: Cole Ott <cole@ning.com>
+Date:   Fri Jun 3 11:08:40 2011 -0700
+
+    pom: bumped serialization dependency to pre6-SNAPSHOT
+
+commit 65593eb7f02ff2571818c2fca5af5913eb338223
+Author: Cole Ott <cole@ning.com>
+Date:   Fri Jun 3 11:08:11 2011 -0700
+
+    SerializationType: cleaned up.
+
+commit 0c0b5bdddfea053d189b0f248a4a87a1870ecbc7
+Author: Cole Ott <cole@ning.com>
+Date:   Fri Jun 3 11:04:23 2011 -0700
+
+    added comment & fixed a javadoc
+
+commit 8a940418ae8313686e380a39e64de41f305c43c7
+Author: Cole Ott <cole@ning.com>
+Date:   Fri Jun 3 11:01:34 2011 -0700
+
+    De-generified collector/hadoop/processing/*
+
+commit e8f413ac9d0e53376abd426cd5da5e424f1f4381
+Author: Cole Ott <cole@ning.com>
+Date:   Thu Jun 2 17:14:09 2011 -0700
+
+    (BIG) replaced EventExtractor w/ EventDeserializer
+    
+    Got rid of some generics
+    Updated some tests to reflect these changes
+
+commit 7e3bb78cc7aab79a141c9724d24452fca94131e2
+Author: Cole Ott <cole@ning.com>
+Date:   Thu Jun 2 17:12:42 2011 -0700
+
+    added DeserializationType & EventDeserializerFactory (not used yet)
+
+commit 8c9a905328ff8f43338d4a49d54d6150c64d4c18
+Author: Cole Ott <cole@ning.com>
+Date:   Thu Jun 2 17:09:28 2011 -0700
+
+    QueryParameterEventDeserializer: fixed infinite loop
+
+commit f86f01acf9c2b0ac5e38d4138e50d39006aceea1
+Author: Cole Ott <cole@ning.com>
+Date:   Thu Jun 2 15:14:23 2011 -0700
+
+    Removed EventParser interface. Didn't make sense.
+
+commit 7037f509b5ddad40cab48e994da66f5d69020ff3
+Author: Cole Ott <cole@ning.com>
+Date:   Thu Jun 2 15:09:29 2011 -0700
+
+    ScribeEventRequestHandler: remove SmileBucketEvent stuff.
+    
+    * Only deal w/ single thrift events sent over scribe
+
+commit 22043e9066ba91e3c004c6d8ccc7bb6179d6e6c6
+Author: Cole Ott <cole@ning.com>
+Date:   Wed Jun 1 12:48:19 2011 -0700
+
+    Added EventDeserializers: QueryParameter, ThriftLegacy, Mock
+
+commit 1d40b59fe5aa50f1cf92c9c757ba43792b458d45
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 22:56:54 2011 -0700
+
+    amq: disable async send
+    
+    Async send is supposed to "add a massive performance boost"
+    (http://activemq.apache.org/async-sends.html).
+    However, our current throughput is terrible - turn it off for now.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit b5bf26042d88c97c0bd8c28c8f12ba7ed66ed11f
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 22:54:47 2011 -0700
+
+    pom.xml: bump goodwill-access to 0.1.1-SNAPSHOT
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit ac94ad19b1c11a21cb55a8af03647f2b6285e27f
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 22:53:40 2011 -0700
+
+    test: add final timeout in TestHTTPPerformance
+    
+    This makes the eventtracker wait long enough for requests in flight.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit f2c54957b4737313a37988611358879802d6749b
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 22:53:22 2011 -0700
+
+    test: fix MockPersistentWriterFactory
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 2fc087d085b6e217cb947573004b25b43943621f
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 22:51:52 2011 -0700
+
+    realtime: add stats per event type
+    
+    Create local stats on a per queue basis to have a better understanding
+    of what's going on under load.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 4166aa8f2b815ba277a32a9f5e9ef5276437d9d2
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 22:47:44 2011 -0700
+
+    jmx: group HTTP API stats together
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit dc667094525e0a2894576736c0139ac3bf82d391
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 16:34:30 2011 -0700
+
+    jmx: rename Scribe bean
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 8231138c567d7c7f8de9e34de49c065cde56f3cf
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 16:32:20 2011 -0700
+
+    hdfs: add runtime switch to disable flush
+    
+    It is useful to be able to disable flushes (if Hadoop is down for
+    instance). The tricky part is that it may be possible that we disable
+    for so long, that the writers are not around anymore (reaped). In this
+    case, we need to manually flush the files.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 5aa5a77ee2044e76974a2532912fda3a9008f378
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 14:23:06 2011 -0700
+
+    jmx: rename queue beans
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit cf5d75e832df8a37e48d6e7c35c8ee3d0e87611a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 27 10:26:54 2011 -0700
+
+    jmx: cleanup JMX attributes for HTTP APIs
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 587106a2a8cd1c336320e7e4fbd4fd9698207206
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 26 16:34:56 2011 -0700
+
+    perf4j: rename tag to something more meaningful
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 5ed7acbcf21bac0e0f02592f12132c79a22832d9
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 26 16:06:42 2011 -0700
+
+    processing: make each queue have its own local spool directory
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit c77c4d04c21fef3773f6413644e9fab6a24344dd
+Author: Cole Ott <cole@ning.com>
+Date:   Thu May 26 15:03:48 2011 -0700
+
+    EventRequestHandler: fixed bug in error handling. made less verbose.
+
+commit ffb88bc4295cb78e35855395e4bafebc2c2cfd57
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 26 14:50:22 2011 -0700
+
+    collector: fix TestHTTPPerformance to spawn a single eventtracker
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit ad40fc94c50f375dea57519583dd087e9bed4746
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 26 13:37:28 2011 -0700
+
+    endpoint: fix missing paren
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 93db9f819a9eca1c9b84886ab92e6f75ecb14aad
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 26 13:36:40 2011 -0700
+
+    endpoint: remove stacktraces for bad requests
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 682f81973c19a4abd80860b823f74350b85344b8
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed May 25 17:13:08 2011 -0700
+
+    test: add performance test using latest eventtracker
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit becf6eb398eb2bc5c0b9af90b2e4d4d48e3dec73
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 25 16:29:23 2011 -0700
+
+    Tests: create Guice injector manually.
+    
+    * annotations wasn't working for me, for some reason...
+    * now we can run tests in parallel again!
+
+commit de01a48721d97f60d794a51835bf07e2498c5877
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 25 16:27:53 2011 -0700
+
+    TestEventSpoolDispatcherWithMockWriter: updated to be consistent w/ last commit
+
+commit 37ffb882e0e377be96eb1964f5d4c8a6e9ec0c24
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 25 15:26:42 2011 -0700
+
+    PersistentWriterFactory: improve file names to avoid collisions
+    
+    * a worse version of this functionality used to live in EventSpoolDispatcher
+
+commit fdb8d1f79e2306b8c42e5e08d565f122c60979d5
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 25 14:38:52 2011 -0700
+
+    SerializationType: cleaned up getFileSuffix()
+
+commit 9598ff88fcff88e1b964161ae5f874841a84afcc
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed May 25 11:54:26 2011 -0700
+
+    hadoop: tweak file name in HDFS
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit a4707a82d3b2154b6ed95e44cf31dd31ce102f9f
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 25 11:25:21 2011 -0700
+
+    EventSpoolDispatcher: include IP address in pathname
+    
+    to avoid hdfs write conflicts between machines
+
+commit e94d7e16bf384256e4869d81645e5816ccfc9cc7
+Author: Cole Ott <cole@ning.com>
+Date:   Wed May 25 11:24:54 2011 -0700
+
+    removed HadoopFileEventWriter & HadoopOutputChunk
+
+commit ea8fe665fa9433feb87a5ebee2d389a7b19481f1
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 21:54:17 2011 -0700
+
+    test: fix TestPublicAPI tests
+    
+    They now pass.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit b7d1f1062377e6b18b28f5b39269a0a263d0397a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 21:40:00 2011 -0700
+
+    test: fix TestBufferingEventCollector test
+    
+    Now we are fully exercising the HDFS code, the test run longer.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 6396039a38ae5d7975aa73b77ef89882f898e560
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 21:37:14 2011 -0700
+
+    test: fix TestEventSpoolDispatcherWithMockWriter test
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit b31a271a0dd203d93f30acd87ce3a50e2d3f65e5
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 21:31:31 2011 -0700
+
+    test: fix TestPublicAPI tests
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 7dad49ddcedb3c694b0719aa985b3d0fdd1ce446
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 19:48:02 2011 -0700
+
+    endpoint: allow ParsedRequest without event name
+    
+    The eventtracker library can now do bulk sends, with multiple event
+    types in one request.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 613989f440651af6d7957daf013a88e88aa3aa1d
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 19:43:40 2011 -0700
+
+    pom.xml: bump serialization to -pre5-SNAPSHOT
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 3b1e66f2abda1768fc2a8568f54bef76bca1af1a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 19:43:15 2011 -0700
+
+    guice: remove old bindings in HdfsModule
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit b3cf0004bbbd21e621409e711d6c2cf77024cfa4
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 19:42:58 2011 -0700
+
+    test: fix TestEventSpoolDispatcher
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit f70f4e49a0e76976455c71da654da18815570493
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 18:26:56 2011 -0700
+
+    hadoop: add log message on connection exceptions
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 1bc6504e985db33a71fdbd84da5f0bc40a28ca87
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 18:21:54 2011 -0700
+
+    hadoop: remove old Hadoop code
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 4ab022e5557836ee64a814478323527954bb72bc
+Author: Cole Ott <cole@ning.com>
+Date:   Tue May 24 16:49:16 2011 -0700
+
+    FileSystemAccess: get() throws IOException after waiting for too long
+
+commit 35980eda8565f229ea16a488e6533ba9bb97334b
+Author: Cole Ott <cole@ning.com>
+Date:   Tue May 24 16:16:03 2011 -0700
+
+    oops! this was supposed to be in the last commit.
+
+commit efae1fa915f9b36f32253fa980b7fbcde1082f82
+Author: Cole Ott <cole@ning.com>
+Date:   Tue May 24 16:14:39 2011 -0700
+
+    SerializationType: created (code extracted from EventSpoolDispatcher)
+
+commit 1e9a71679b59b9d13774716c5b827da96b9651de
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 15:46:27 2011 -0700
+
+    dispatcher: supports plain JSON as well as smile
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 5629331de4a90cbc24fd773bc8814b29206cb219
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 15:36:19 2011 -0700
+
+    pom.xml: update dwarf dependencies to latest versions
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 58202e1d210d033fcff6ef1105e8b7e27c07d596
+Author: Cole Ott <cole@ning.com>
+Date:   Tue May 24 14:58:57 2011 -0700
+
+    LocalQueueAndWriter & LocalQueueWorker: introduced generics
+
+commit 0a2d7863444b62eaa024d0372addf5ba023b641d
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 10:11:31 2011 -0700
+
+    healthcheck: add hdfs flushes count
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 55e479f9730654541c2c0aefd68ba05f5f593f51
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue May 24 10:10:41 2011 -0700
+
+    perf4j: tweak integration
+    
+    * Add endpoint /perf to display graphs
+    * Remove file appender
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 1e64ae7325dbfd158e88f535a65051c31c43ab61
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon May 23 20:47:06 2011 -0700
+
+    healthcheck: initial implementation
+    
+    Add an endpoint to gather the health of the collector. Sample output:
+    
+    curl  http://127.0.0.1:8080/1.0/healthcheck?pretty=true
+    {
+      "location" : "http://127.0.0.1:8080/1.0/healthcheck",
+      "size" : 3,
+      "formatVersion" : "1",
+      "generated" : "2011-05-24T03:41:16.602Z",  "items" : [ {
+        "type" : "WriterHealthCheck",    "code" : "OK",
+        "message" : "running: true, local files:
+    {/tmp/pierre-is-testing-smile/Rest/2011/05/23/20: 0,
+    /tmp/pierre-is-testing-smile/Hello/2011/05/23/20: 0},
+    enqueued: 4, written: 4, dropped: 0, errored: 0, ignored: 0"
+      }, {
+        "type" : "RealtimeHealthCheck",
+        "code" : "OK",
+        "message" : "enabled: false, running: false, types: [], queue sizes:
+    {}, enqueued: 0, sent: 0, dropped: 0, errored: 0, ignored: 4"
+      }, {
+        "type" : "HadoopHealthCheck",    "code" : "OK",    "message" :
+    "fs.default.name: file://127.0.0.1/tmp, io.serializations:
+    com.ning.metrics.serialization.hadoop.HadoopThriftWritableSerialization,com.ning.metrics.serialization.hadoop.HadoopThriftEnvelopeSerialization,com.ning.metrics.serialization.hadoop.HadoopSmileOutputStreamSerialization,org.apache.hadoop.
+    io.serializer.WritableSerialization, io.compression.codecs:
+    org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.GzipCodec,org.apache.ha
+    doop.io.compress.BZip2Codec, capacity: 199705673728, used: 170128846848,
+    remaining: 29576826880"
+      } ]
+    }
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit e6ec80e3c036cf03a7f54c5e4697905cba67bcac
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon May 23 20:41:02 2011 -0700
+
+    guice: add missing Singleton bindings
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 4f119af68be99c44389dcc1578f40753d6a37bba
+Author: Cole Ott <cole@ning.com>
+Date:   Mon May 23 16:56:14 2011 -0700
+
+    EventRequestHandler: fixed typo. does not return on IOException.
+
+commit ecb397b9926d0392bd9f125351660db17d4dd6ac
+Author: Cole Ott <cole@ning.com>
+Date:   Mon May 23 16:54:08 2011 -0700
+
+    EventSpoolDispatcher: reaper, serializer
+    
+    * reaps dead queues
+    * uses appropriate EventSerializer for Smile/JSON
+
+commit cb81e14ecbbd7c72a041e60ddaa70dfce1c52c1e
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Mon May 23 09:45:10 2011 -0700
+
+    test: cleanups
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit f931e58fd9e4a976bf9260f05dba36307049b778
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Sun May 22 14:06:32 2011 -0700
+
+    refactoring: code style fixes
+    
+    * Add final where possible
+    * Narrow scope of classes and variables
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 1855c2d9c0d3f430d73c8b0f7f95afc04623f010
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Sun May 22 13:41:22 2011 -0700
+
+    refactoring: remove unnecessary code
+    
+    * The EventCollectorProvider is not necessary anymore
+    * Remove unused test code
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit dea08edc52399e0236fa29c1b8c8d15e1c80381e
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Sun May 22 13:26:53 2011 -0700
+
+    hadoop: simplify writers flow
+    
+    * Get rid of HdfsEventWriter annotation - we only have one EventWriter,
+      the HDFS one, to inject
+    * Add PersistentWriterFactory which takes care of creating the
+      local event writer (ThresholdEventWriter)
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit e7c315590fda9c4934ed0ca5d28f59bee5a2f5e8
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Sat May 21 18:41:46 2011 -0700
+
+    collector: trivial cleanups
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 53768c9c750e14ec347cf356351f98f67faf7f0b
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Sat May 21 18:39:38 2011 -0700
+
+    dispatcher: simplify API
+    
+    Make the dispatcher check for its running state.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 143fcdcce6dc528588eb5063da6172c271df2884
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Sat May 21 17:17:57 2011 -0700
+
+    refactoring: move events.hadoop to hadoop
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit be904de574cd8e904724f244e54568285f062a14
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Sat May 21 17:12:32 2011 -0700
+
+    writer: cleanup dispatcher patch
+    
+    * Remove dead code
+    * Add stats for all writers
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit dc3d9f03ea943b7e27c89b183b707a985d633b1c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 20 18:28:34 2011 -0700
+
+    processing: add Javadocs
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 5ba1cb6c2424cae3759747cc887745d25b87d003
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 20 17:14:16 2011 -0700
+
+    build: fix compilation errors
+    
+    Tests run: 82, Failures: 11, Errors: 0, Skipped: 0
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit cdca356a2c43ca7f6da5738f50ae79e9e95b097f
+Author: Cole Ott <cole@ning.com>
+Date:   Fri May 20 16:15:28 2011 -0700
+
+    Hadoop stuff: Changed some log.info's to log.debug's
+    
+    * output's still overly verbose
+
+commit dc4588311b9706a2ce962a85c35bd06747426357
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri May 20 15:58:12 2011 -0700
+
+    refactoring: proposal at mutlthreaded disk writer
+    
+    We now create one writer per output path (the local spooled file
+    will map to one final file in HDFS).
+    
+    Tests won't compile.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit ef8cd0b3cbebd1bb086810bfb460a53d5311bbb8
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu May 19 18:26:28 2011 -0700
+
+    [maven-release-plugin] prepare for next development iteration

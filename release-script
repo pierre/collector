@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# After release:perform, do
+#
+#  ./release-script metrics.collector-1.1.0-pre1 metrics.collector-1.1.0-pre2
+
+last="$1"
+new="$2"
+git log --no-merges $new ^$last > doc/ChangeLog-$new
+git shortlog --no-merges $new ^$last > doc/ShortLog-$new

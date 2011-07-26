@@ -1,0 +1,63 @@
+commit 48bc3a332413a1c0a7606f9fe595a6b0c173534a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri Jun 17 12:56:38 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre4
+
+commit 9c9cd067364ff28823d3f4c4125319351f11ec94
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri Jun 17 12:52:23 2011 -0700
+
+    pom.xml: bump com.ning:nagios dependency to 0.0.1
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 053aa671c2bb06b1e5b2a1866b57257220cd2a70
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri Jun 17 11:22:09 2011 -0700
+
+    hadoop: optimize writers watchdog
+    
+    ConcurrentHashMap#keySet() returns a view of the original keys. We don't
+    really need this reference - use our own copy instead.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 698ad734b931fedce1d6fb36bbd0707c368fc933
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri Jun 17 09:17:23 2011 -0700
+
+    healthcheck: fail early when testing connectivity to HDFS
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 22c5b9b022b30da501cfa76a6ddbf5a098edf8cd
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu Jun 16 17:24:49 2011 -0700
+
+    hadoop: queuesPerPath needs to be Thread safe
+    
+    2 Threads are accessing the Map: the main dispatcher and the reaper.
+    
+    This should fix ConcurrentModificationException we've been seeing.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 362f08ffd17892f2849abbf0b7d216f836b5bf4d
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Thu Jun 16 17:16:02 2011 -0700
+
+    nagios: add introspective monitoring
+    
+    The collector can now send passive checks to Nagios, to report its
+    health.
+    
+    See also https://github.com/pierre/introspective-monitoring.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 9ddcf6cdd22f181f32423941d89eb52618182016
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 15 15:57:35 2011 -0700
+
+    [maven-release-plugin] prepare for next development iteration

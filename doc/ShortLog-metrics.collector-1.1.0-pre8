@@ -1,0 +1,5 @@
+Pierre-Alexandre Meyer (3):
+      [maven-release-plugin] prepare for next development iteration
+      realtime feed: fix goodwill integration
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre8
+

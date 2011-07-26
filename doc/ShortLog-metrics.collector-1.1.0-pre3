@@ -1,0 +1,93 @@
+Cole Ott (27):
+      Hadoop stuff: Changed some log.info's to log.debug's
+      EventSpoolDispatcher: reaper, serializer
+      EventRequestHandler: fixed typo. does not return on IOException.
+      LocalQueueAndWriter & LocalQueueWorker: introduced generics
+      SerializationType: created (code extracted from EventSpoolDispatcher)
+      oops! this was supposed to be in the last commit.
+      FileSystemAccess: get() throws IOException after waiting for too long
+      removed HadoopFileEventWriter & HadoopOutputChunk
+      EventSpoolDispatcher: include IP address in pathname
+      SerializationType: cleaned up getFileSuffix()
+      PersistentWriterFactory: improve file names to avoid collisions
+      TestEventSpoolDispatcherWithMockWriter: updated to be consistent w/ last commit
+      Tests: create Guice injector manually.
+      EventRequestHandler: fixed bug in error handling. made less verbose.
+      Added EventDeserializers: QueryParameter, ThriftLegacy, Mock
+      ScribeEventRequestHandler: remove SmileBucketEvent stuff.
+      Removed EventParser interface. Didn't make sense.
+      QueryParameterEventDeserializer: fixed infinite loop
+      added DeserializationType & EventDeserializerFactory (not used yet)
+      (BIG) replaced EventExtractor w/ EventDeserializer
+      De-generified collector/hadoop/processing/*
+      added comment & fixed a javadoc
+      SerializationType: cleaned up.
+      pom: bumped serialization dependency to pre6-SNAPSHOT
+      JettyTestModule: changed delay to 1 second (from 0 seconds)
+      LocalQueueAndWriter: squashed warning
+      TestParsedRequest: hacky fix to a test (w/ TODO note)
+
+Pierre-Alexandre Meyer (62):
+      [maven-release-plugin] prepare for next development iteration
+      refactoring: proposal at mutlthreaded disk writer
+      build: fix compilation errors
+      processing: add Javadocs
+      writer: cleanup dispatcher patch
+      refactoring: move events.hadoop to hadoop
+      dispatcher: simplify API
+      collector: trivial cleanups
+      hadoop: simplify writers flow
+      refactoring: remove unnecessary code
+      refactoring: code style fixes
+      test: cleanups
+      guice: add missing Singleton bindings
+      healthcheck: initial implementation
+      perf4j: tweak integration
+      healthcheck: add hdfs flushes count
+      pom.xml: update dwarf dependencies to latest versions
+      dispatcher: supports plain JSON as well as smile
+      hadoop: remove old Hadoop code
+      hadoop: add log message on connection exceptions
+      test: fix TestEventSpoolDispatcher
+      guice: remove old bindings in HdfsModule
+      pom.xml: bump serialization to -pre5-SNAPSHOT
+      endpoint: allow ParsedRequest without event name
+      test: fix TestPublicAPI tests
+      test: fix TestEventSpoolDispatcherWithMockWriter test
+      test: fix TestBufferingEventCollector test
+      test: fix TestPublicAPI tests
+      hadoop: tweak file name in HDFS
+      test: add performance test using latest eventtracker
+      endpoint: remove stacktraces for bad requests
+      endpoint: fix missing paren
+      collector: fix TestHTTPPerformance to spawn a single eventtracker
+      processing: make each queue have its own local spool directory
+      perf4j: rename tag to something more meaningful
+      jmx: cleanup JMX attributes for HTTP APIs
+      jmx: rename queue beans
+      hdfs: add runtime switch to disable flush
+      jmx: rename Scribe bean
+      jmx: group HTTP API stats together
+      realtime: add stats per event type
+      test: fix MockPersistentWriterFactory
+      test: add final timeout in TestHTTPPerformance
+      pom.xml: bump goodwill-access to 0.1.1-SNAPSHOT
+      amq: disable async send
+      test: move Guice stuff out off base abstract test
+      test: fix TestTimeThresholdEventSpoolDispatcher
+      amq: make global stats threadsafe
+      realtime: make sure to unexport bean on stop
+      healthcheck: address tomdz's comments
+      stats: remove unnecessary synchronized
+      test: fix EventRequestHandler tests
+      test: fix TestBufferingEventCollector tests
+      test: disable TestCollectorResource
+      pom.xml: bump config-magic to 0.8
+      jmx: fix MBean export issues
+      endpoint: synchronize stats access
+      jmx: add missing exports
+      jmx: fix typo in EventRequestHandler stats
+      pom.xml: bump to released versions
+      pom.xml: fix rat plugin configuration for maven 3
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre3
+

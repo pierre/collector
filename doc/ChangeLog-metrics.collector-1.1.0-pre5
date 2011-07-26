@@ -1,0 +1,135 @@
+commit 72b76b99900122769db2454c043513434412f96f
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 16:34:56 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre5
+
+commit a1a6bfea89b996d753f65f3b361601e33111febf
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 16:28:51 2011 -0700
+
+    pom.xml: update Dwarf libraries to released versions
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 7c55aee3139f179917191dd17234002bcc81460d
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 16:03:14 2011 -0700
+
+    performance: cleanup RequestHandlers metrics
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 41510ec9b95cafea16a9a3fdbe45c34ec7e82b95
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 15:29:16 2011 -0700
+
+    performance: add stats
+    
+    * Measure time spent in all APIs
+    * Measure rate of events collected
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit f2443d70fe889492f8bbd61439612acc68687847
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 14:36:42 2011 -0700
+
+    dispatcher: update to latest serialization-writer library
+    
+    Low-level cleanup (commit/flush) is now handled by the
+    serialization-writer library.
+    
+    This should fix two bugs:
+    
+    * # Threads created grow unbounded
+    * Concurrency issue when cleaning up local queues (multiple threads
+      trying to commit the same files)
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 27dc0e17a6b2f5e6544d8d0f4b1984bd2e0bd29d
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 13:38:26 2011 -0700
+
+    metrics: add codahale / metrics module
+    
+    This gives us @Timed and @Metered annotations to instrument the code.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 7a9b91f7db460d2bee5841f2b9f7b662887c5ead
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 10:56:05 2011 -0700
+
+    performance: remove perf4j
+    
+    I'm seeing all sorts of weirdness in our QA environments, the biggest of
+    which is the following error on shutdown:
+    
+    log4j:ERROR Attempted to append to closed appender named [CoalescingStatistics].
+    
+    tomdz is using another library (metrics) which seems to be stable and
+    provide more functionality. I'll investigate it.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 1dae7f72d82fa53b0134c4d5323b57348c96d00a
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 5 10:33:23 2011 -0700
+
+    test: disable TestBodyResource
+    
+    Same issue as TestCollectorResource. Works fine run in standalone mode,
+    but not part of the suite (race condition issue?).
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 1ea46c6fe7db5a523313f285ed0d7d460195ac39
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri Jul 1 21:26:39 2011 -0700
+
+    spool: refactor cleanup code
+    
+    * Share Left Below code with regular code path
+    * Add unit tests
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit eb561db5050b2297333b729e31332261ebc0bd19
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri Jul 1 14:32:45 2011 -0700
+
+    jetty: add Shiro support
+    
+    We want to be able to protect certain resources (the healthcheck
+    endpoint for instance). We use Shiro for this.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 3ad85f5e1c7396f6198200efd0507875141c3909
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jun 29 20:25:11 2011 -0700
+
+    writer: improve cleanup of local queues
+    
+    * processLeftBelowFiles also deletes old, empty directories
+    * LocalQueueAndWriter cleans after itself on close
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit 3425669eec96d90881a0772ad832c8e71217e92d
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jun 28 13:41:18 2011 -0700
+
+    writer: close underlying EventWriter
+    
+    This fixes a Thread leak.
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit a971adba1a9c0d57d9eac210360884c4b476bfa9
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Fri Jun 17 12:56:43 2011 -0700
+
+    [maven-release-plugin] prepare for next development iteration

@@ -1,0 +1,18 @@
+Pierre-Alexandre Meyer (16):
+      [maven-release-plugin] prepare for next development iteration
+      utils: add jruby script to print JMX coll stats
+      utils: add summary option to the coll_jmx_summary script
+      hadoop: better log message on shutdown
+      util: use mogwee-executors instead of our own
+      pom.xml: bump serialization to -pre8-SNAPSHOT
+      pom.xml: bump jackson to 1.8.3
+      pom.xml: bump jetty to 7.4.4.v20110707
+      config: use 5m for default Nagios ping rate
+      spool: add randomness in the file names
+      spool: fix LocalSpoolManager tests
+      jetty: add Jetty JMX MBeans
+      pom.xml: bump serialization to -pre8
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre7
+      Revert "[maven-release-plugin] prepare release metrics.collector-1.1.0-pre7"
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre7
+

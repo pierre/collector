@@ -1,0 +1,9 @@
+Pierre-Alexandre Meyer (7):
+      [maven-release-plugin] prepare for next development iteration
+      nagios: add introspective monitoring
+      hadoop: queuesPerPath needs to be Thread safe
+      healthcheck: fail early when testing connectivity to HDFS
+      hadoop: optimize writers watchdog
+      pom.xml: bump com.ning:nagios dependency to 0.0.1
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre4
+

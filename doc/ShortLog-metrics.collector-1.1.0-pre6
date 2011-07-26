@@ -1,0 +1,10 @@
+Pierre-Alexandre Meyer (8):
+      [maven-release-plugin] prepare for next development iteration
+      shutdown: give some time for the flush to happen
+      performance: update metrics to 2.0.0-BETA14
+      config: allows one to specify shiro.ini config path
+      test: fix shutdown test
+      hdfs: remove FileSystem shutdown hook
+      hdfs: cleanup shutdown sequence
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre6
+

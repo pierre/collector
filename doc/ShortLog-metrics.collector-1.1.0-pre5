@@ -1,0 +1,15 @@
+Pierre-Alexandre Meyer (13):
+      [maven-release-plugin] prepare for next development iteration
+      writer: close underlying EventWriter
+      writer: improve cleanup of local queues
+      jetty: add Shiro support
+      spool: refactor cleanup code
+      test: disable TestBodyResource
+      performance: remove perf4j
+      metrics: add codahale / metrics module
+      dispatcher: update to latest serialization-writer library
+      performance: add stats
+      performance: cleanup RequestHandlers metrics
+      pom.xml: update Dwarf libraries to released versions
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre5
+

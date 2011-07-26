@@ -1,0 +1,22 @@
+commit eaf2752915207d95afdd9afea11843997e613ef7
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 13 15:53:05 2011 -0700
+
+    [maven-release-plugin] prepare release metrics.collector-1.1.0-pre8
+
+commit cc4480549b498ea9a4c36c0581e278325fefb2a3
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Wed Jul 13 15:49:39 2011 -0700
+
+    realtime feed: fix goodwill integration
+    
+    * Typo in configuration class
+    * Runtime issue (async-http-client wasn't pulled)
+    
+    Signed-off-by: Pierre-Alexandre Meyer <pierre@ning.com>
+
+commit b2833f7d458bc1b19feaaf8821f513b7898b492c
+Author: Pierre-Alexandre Meyer <pierre@ning.com>
+Date:   Tue Jul 12 20:46:44 2011 -0700
+
+    [maven-release-plugin] prepare for next development iteration
