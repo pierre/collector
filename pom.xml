@@ -81,9 +81,9 @@
             <version>2.6</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math</artifactId>
-            <version>2.2</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>r09</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -223,6 +223,11 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math</artifactId>
+            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
