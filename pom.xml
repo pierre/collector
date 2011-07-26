@@ -515,6 +515,7 @@
                                 <exclude>deploy.sh</exclude>
                                 <exclude>run.sh</exclude>
                                 <exclude>run-local.sh</exclude>
+                                <exclude>doc/**</exclude>
                                 <exclude>src/site/**</exclude>
                                 <exclude>*.log</exclude>
                                 <!-- We have some extra dependencies in there, see license on a per file basis -->
