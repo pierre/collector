@@ -225,4 +225,10 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     {
         flushEnabled.set(false);
     }
+
+    @Managed(description = "Number of local files not yet pushed to HDFS")
+    public int nbLocalFiles()
+    {
+        return LocalSpoolManager.findFilesInSpoolDirectory(new File(config.getSpoolDirectoryName())).size();
+    }
 }
