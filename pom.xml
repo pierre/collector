@@ -81,9 +81,11 @@
             <version>2.6</version>
         </dependency>
         <dependency>
+            <!-- Marked as provided by goodwill-access -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>r09</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
