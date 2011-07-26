@@ -515,6 +515,7 @@
                                 <exclude>deploy.sh</exclude>
                                 <exclude>run.sh</exclude>
                                 <exclude>run-local.sh</exclude>
+                                <exclude>release-script</exclude>
                                 <exclude>doc/**</exclude>
                                 <exclude>src/site/**</exclude>
                                 <exclude>*.log</exclude>

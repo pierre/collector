@@ -27,12 +27,14 @@ public class WriterHealthCheck implements ComponentHealthCheck
 {
     private final EventSpoolDispatcher processor;
     private final WriterStats stats;
+    private final PersistentWriterFactory factory;
     private final CollectorConfig config;
 
     @Inject
-    public WriterHealthCheck(final EventSpoolDispatcher processor, final WriterStats stats, final CollectorConfig config)
+    public WriterHealthCheck(final EventSpoolDispatcher processor, final PersistentWriterFactory factory, final WriterStats stats, final CollectorConfig config)
     {
         this.processor = processor;
+        this.factory = factory;
         this.stats = stats;
         this.config = config;
     }
@@ -70,6 +72,9 @@ public class WriterHealthCheck implements ComponentHealthCheck
             builder.append(String.format("dropped: %s, ", stats.getDroppedEvents())); // queue full
             builder.append(String.format("errored: %s, ", stats.getErroredEvents())); // I/O error
             builder.append(String.format("ignored: %s, ", stats.getIgnoredEvents())); // system disabled
+            if (factory instanceof HadoopWriterFactory) {
+                builder.append(String.format("pendingFiles: %s, ", ((HadoopWriterFactory) factory).nbLocalFiles())); // files waiting to be flushed
+            }
             builder.append(String.format("flushes: %s", stats.getHdfsFlushes())); // HDFS flushes
 
             message = builder.toString();
