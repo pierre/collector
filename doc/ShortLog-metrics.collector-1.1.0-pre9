@@ -1,0 +1,14 @@
+Pierre-Alexandre Meyer (12):
+      [maven-release-plugin] prepare for next development iteration
+      pom.xml: bump serialization to 2.0.0-pre9
+      hadoop: use FileSystemAccess from metrics.serialization-hadoop
+      test: remove performance tests
+      pom.xml: cleanups
+      pom.xml: exclude ChangeLogs for Rat
+      hadoop: expose the number of local files to JMX
+      hadoop: fix error on shutdown with illegal local files
+      healthcheck: expose number of files waiting to be flushed
+      pom.xml: bump serialization to 2.0.0-pre11
+      doc: add release-script and ChangeLogs
+      [maven-release-plugin] prepare release metrics.collector-1.1.0-pre9
+
