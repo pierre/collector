@@ -142,7 +142,9 @@ class LocalSpoolManager
             throw new IllegalArgumentException();
         }
         final Matcher m = filenamePattern.matcher(directoryName);
-        m.matches();
+        if (!m.matches()) {
+            throw new IllegalArgumentException();
+        }
 
         this.timeStamp = dateFormatter.parseDateTime(m.group(1));
         this.eventName = directoryTokens[directoryTokens.length - 2];
