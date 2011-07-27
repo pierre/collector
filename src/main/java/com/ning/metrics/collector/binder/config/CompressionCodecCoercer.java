@@ -29,13 +29,13 @@ public class CompressionCodecCoercer implements Coercer<CompressionCodec>
             return (CompressionCodec) someCodeClass.newInstance();
         }
         catch (ClassNotFoundException e) {
-            return null;
+            throw new IllegalStateException(e);
         }
         catch (InstantiationException e) {
-            return null;
+            throw new IllegalStateException(e);
         }
         catch (IllegalAccessException e) {
-            return null;
+            throw new IllegalStateException(e);
         }
     }
 }
