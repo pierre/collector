@@ -17,6 +17,7 @@
 package com.ning.metrics.collector.binder.config;
 
 import com.googlecode.jsendnsca.encryption.Encryption;
+import com.ning.metrics.serialization.writer.CompressionCodec;
 import org.skife.config.Config;
 import org.skife.config.Default;
 import org.skife.config.DefaultNull;
@@ -167,6 +168,16 @@ public interface CollectorConfig
     @Config("collector.diskspool.max-uncommitted-period-seconds")
     @Default("60")
     int getMaxUncommittedPeriodInSeconds();
+
+    /**
+     * Compression codec to use. Specify com.ning.metrics.collector.hadoop.processing.LzfCompressionCodec
+     * for lzf. Default is no compression.
+     *
+     * @return class to use for compressing files
+     */
+    @Config("collector.diskspool.compression")
+    @Default("com.ning.metrics.serialization.writer.NoCompressionCodec")
+    CompressionCodec getCompressionCodec();
 
     @Config("collector.server.ip")
     @Default("127.0.0.1")

@@ -19,14 +19,17 @@ package com.ning.metrics.collector.hadoop.processing;
 import com.google.inject.AbstractModule;
 import com.ning.metrics.collector.FastCollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import org.skife.config.ConfigurationObjectFactory;
+import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 
 public class ConfigTestModule extends AbstractModule
 {
     @Override
     protected void configure()
     {
-        final CollectorConfig collectorConfig = new ConfigurationObjectFactory(System.getProperties()).build(FastCollectorConfig.class);
+        final String spoolPath = System.getProperty("java.io.tmpdir") + "/collector-tests-" + System.currentTimeMillis();
+        System.setProperty("collector.diskspool.path", spoolPath);
+
+        final CollectorConfig collectorConfig = new CollectorConfigurationObjectFactory(System.getProperties()).build(FastCollectorConfig.class);
         bind(CollectorConfig.class).toInstance(collectorConfig);
     }
 }

@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.FastCollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
 import com.ning.metrics.collector.endpoint.filters.FiltersModule;
 import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
@@ -30,7 +31,6 @@ import com.ning.metrics.serialization.writer.MockEventWriter;
 import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-import org.skife.config.ConfigurationObjectFactory;
 
 import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
@@ -57,7 +57,7 @@ public class JettyTestModule extends AbstractModule
     @Override
     protected void configure()
     {
-        final CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(AutoFlushConfig.class);
+        final CollectorConfig config = new CollectorConfigurationObjectFactory(System.getProperties()).build(AutoFlushConfig.class);
         bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
 
         // Install all production (real) modules...

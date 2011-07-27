@@ -81,7 +81,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 flushCount++;
             }
         }, spoolManager.getSpoolDirectoryPath(), config.isFlushEnabled(), config.getFlushIntervalInSeconds(), new FailsafeScheduledExecutor(1, hdfsDir + "-HDFS-writer"),
-            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), serializationType.getSerializer());
+            SyncType.valueOf(config.getSyncType()), config.getSyncBatchSize(), config.getCompressionCodec(), serializationType.getSerializer());
         return new ThresholdEventWriter(eventWriter, config.getMaxUncommittedWriteCount(), config.getMaxUncommittedPeriodInSeconds());
     }
 

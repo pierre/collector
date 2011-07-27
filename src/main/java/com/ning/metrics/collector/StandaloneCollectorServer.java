@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
 import com.ning.metrics.collector.endpoint.filters.FiltersModule;
 import com.ning.metrics.collector.endpoint.resources.ScribeModule;
@@ -40,7 +41,6 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.log4j.Logger;
-import org.skife.config.ConfigurationObjectFactory;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
@@ -68,7 +68,7 @@ public class StandaloneCollectorServer
         final Map<String, String> params = new HashMap<String, String>();
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
-        final CollectorConfig config = new ConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
+        final CollectorConfig config = new CollectorConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
 
         // Stage.PRODUCTION is mandatory for jmxutils
         injector = Guice.createInjector(Stage.PRODUCTION,
