@@ -74,6 +74,9 @@ public class HadoopWriterFactory implements PersistentWriterFactory
                 }
                 catch (IOException e) {
                     handler.onError(e, file);
+                    // Increment flush count in case the file was created on HDFS
+                    flushCount++;
+                    return;
                 }
 
                 handler.onSuccess(file);
