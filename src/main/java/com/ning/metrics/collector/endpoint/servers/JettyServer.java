@@ -35,7 +35,6 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.resource.Resource;
 
 import javax.management.MBeanServer;
 import java.util.EventListener;
@@ -88,7 +87,10 @@ public class JettyServer
         server.setStopAtShutdown(true);
 
         final ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
-        context.setBaseResource(Resource.newResource("src/main/webapp"));
+        context.setContextPath("/");
+        // Required! See ContextHandler#getResource and http://docs.codehaus.org/display/JETTY/Embedding+Jetty
+        final String webapp = this.getClass().getClassLoader().getResource("webapp").toExternalForm();
+        context.setResourceBase(webapp);
         context.addEventListener(new JettyListener());
 
         // Jersey insists on using java.util.logging (JUL)
