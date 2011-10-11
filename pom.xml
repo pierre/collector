@@ -173,6 +173,11 @@
             <version>1.6</version>
         </dependency>
         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
             <!-- Required at compile time for PackagesResourceConf -->
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
@@ -334,6 +339,28 @@
                     <!-- We user jcl-over-slf4j -->
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-guice</artifactId>
+            <version>0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-jersey</artifactId>
+            <version>0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -535,6 +562,8 @@
                                 <exclude>src/utils/**</exclude>
                                 <!-- This is a straight import from the upstream libraries -->
                                 <exclude>lib/**</exclude>
+                                <!-- rat doesn't parse MIT -->
+                                <exclude>**/*.js</exclude>
                             </excludes>
                         </configuration>
                     </execution>

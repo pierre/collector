@@ -38,16 +38,16 @@ import com.ning.nagios.FakeNagiosMonitor;
 import com.ning.nagios.ServiceCheck;
 import com.ning.nagios.ServiceMonitor;
 import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.log4j.Logger;
+import org.atmosphere.guice.GuiceManagedAtmosphereServlet;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
 import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * If you are writing your own Main class, make sure to match the name since
@@ -63,10 +63,6 @@ public class StandaloneCollectorServer
     public static void main(final String... args) throws Exception
     {
         final long startTime = System.currentTimeMillis();
-
-        /* Scan for Jersey endpoints */
-        final Map<String, String> params = new HashMap<String, String>();
-        params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
 
         final CollectorConfig config = new CollectorConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
 
@@ -110,8 +106,16 @@ public class StandaloneCollectorServer
                 @Override
                 protected void configureServlets()
                 {
-                    // Note! It's "*", NOT "/*"
-                    serve("*").with(GuiceContainer.class, params);
+                    // Static files
+                    bind(DefaultServlet.class).asEagerSingleton();
+                    serve("/media/*").with(DefaultServlet.class);
+
+                    serve("*").with(GuiceManagedAtmosphereServlet.class, new HashMap<String, String>()
+                    {
+                        {
+                            put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
+                        }
+                    });
                 }
             },
             new ScribeModule()              /* Optional, provide the Scribe endpoint */

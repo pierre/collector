@@ -35,6 +35,7 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.resource.Resource;
 
 import javax.management.MBeanServer;
 import java.util.EventListener;
@@ -87,6 +88,7 @@ public class JettyServer
         server.setStopAtShutdown(true);
 
         final ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
+        context.setBaseResource(Resource.newResource("src/main/webapp"));
         context.addEventListener(new JettyListener());
 
         // Jersey insists on using java.util.logging (JUL)
@@ -108,9 +110,8 @@ public class JettyServer
         final FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
         context.addFilter(filterHolder, "/*", ServletContextHandler.NO_SESSIONS);
 
+        // Backend servlet for Guice - never used
         final ServletHolder sh = new ServletHolder(DefaultServlet.class);
-        sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
-        sh.setInitParameter("com.sun.jersey.config.property.packages", "com.ning.metrics.collector.endpoint");
         context.addServlet(sh, "/*");
 
         server.start();

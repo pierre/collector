@@ -18,7 +18,7 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.realtime.EventQueueProcessor;
+import com.ning.metrics.collector.realtime.EventListenerDispatcher;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
 import com.yammer.metrics.guice.Metered;
@@ -32,7 +32,7 @@ public class BufferingEventCollector implements EventCollector
 {
     private static final Logger log = Logger.getLogger(BufferingEventCollector.class);
 
-    private final EventQueueProcessor activeMQController;
+    private final EventListenerDispatcher listenerDispatcher;
     private final EventSpoolDispatcher dispatcher;
 
     private final AtomicLong lostEvents = new AtomicLong(0);
@@ -41,9 +41,9 @@ public class BufferingEventCollector implements EventCollector
     private final Stats extractionStats = Stats.timeWindow(30, TimeUnit.MINUTES);
 
     @Inject
-    public BufferingEventCollector(final EventQueueProcessor activeMQController, final EventSpoolDispatcher dispatcher)
+    public BufferingEventCollector(final EventListenerDispatcher listenerDispatcher, final EventSpoolDispatcher dispatcher)
     {
-        this.activeMQController = activeMQController;
+        this.listenerDispatcher = listenerDispatcher;
         this.dispatcher = dispatcher;
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -72,8 +72,8 @@ public class BufferingEventCollector implements EventCollector
     {
         log.info("Stop accepting new events");
 
-        // Disable AMQ hook
-        activeMQController.stop();
+        // Disable realtime hook
+        listenerDispatcher.stop();
 
         // Disable writer to disk
         dispatcher.shutdown();
@@ -83,9 +83,7 @@ public class BufferingEventCollector implements EventCollector
     @Override
     public boolean collectEvent(final Event event, final EventStats eventStats)
     {
-        if (activeMQController != null && event != null) {
-            activeMQController.send(event);
-        }
+        listenerDispatcher.offer(event);
 
         // Update the endpoint statistics
         eventStats.recordAccepted();
