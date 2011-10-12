@@ -31,6 +31,7 @@ public class RealTimeQueueModule implements Module
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         binder.bind(EventListenerDispatcher.class).asEagerSingleton();
+        builder.export(EventListenerDispatcher.class).as("com.ning.metrics.collector:name=Listeners");
 
         // The following is for AMQ
         binder.bind(GlobalEventQueueStats.class).asEagerSingleton();

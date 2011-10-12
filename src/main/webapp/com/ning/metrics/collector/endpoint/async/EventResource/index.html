@@ -35,13 +35,13 @@
             else {
                 url = '/async/event?type=' + eventType;
             }
-            return $.atmosphere.subscribe(url, callback,
+            $.atmosphere.subscribe(url, callback,
                     $.atmosphere.request = {
                         transport: 'long-polling',
-                        timeout: 250000,
                         maxRequest: 5000000
                     }
             );
+            $.atmosphere.log('info', ['Created new subscription for ' + eventType]);
         }
 
         $(document).ready(function()
@@ -79,7 +79,7 @@
             Collector Live Activity Stream:
             <span id="status">No events received...</span>
             <span id="lastupdate"> (__s ago)</span>
-            <input id="filter" type="text" size="25" value="Event name"/>
+            <input id="filter" type="text" size="55" value="Event name"/>
         </h1>
     </div>
 </div>

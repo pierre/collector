@@ -16,10 +16,8 @@
 
 package com.ning.metrics.collector.realtime;
 
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.cpr.AtmosphereResourceEventListener;
-import org.atmosphere.cpr.Broadcaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,47 +28,37 @@ public class EventsLogger implements AtmosphereResourceEventListener
 {
     private static final Logger log = LoggerFactory.getLogger(EventsLogger.class);
 
-    private final EventListenerDispatcher dispatcher;
-    private final String eventType;
-    private final NewEventListener listener;
-
-    public EventsLogger(final CollectorConfig config, final EventListenerDispatcher dispatcher, final Broadcaster broadcaster, final String callback, final String eventType)
+    @Override
+    public void onSuspend(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> event)
     {
-        this.dispatcher = dispatcher;
-        this.eventType = eventType;
-        listener = new NewEventListener(config, broadcaster, callback, eventType);
+        log.debug("onSuspend(): {}:{}", event.getResource().getRequest().getRemoteAddr(), event.getResource().getRequest().getRemotePort());
     }
 
     @Override
-    public void onSuspend(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> httpServletRequestHttpServletResponseAtmosphereResourceEvent)
+    public void onResume(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> event)
     {
-        dispatcher.addListener(listener);
-        log.info("Added listener for " + eventType);
+        log.debug("onResume(): {}:{}", event.getResource().getRequest().getRemoteAddr(),
+            event.getResource().getRequest().getRemotePort());
     }
 
     @Override
-    public void onResume(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> httpServletRequestHttpServletResponseAtmosphereResourceEvent)
+    public void onDisconnect(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> event)
     {
-        dispatcher.removeListener(listener);
-        log.info("Removed listener for " + eventType);
+        log.debug("onDisconnect(): {}:{}", event.getResource().getRequest().getRemoteAddr(),
+            event.getResource().getRequest().getRemotePort());
     }
 
     @Override
-    public void onDisconnect(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> httpServletRequestHttpServletResponseAtmosphereResourceEvent)
+    public void onBroadcast(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> event)
     {
-        dispatcher.removeListener(listener);
-        log.info("Removed listener for " + eventType);
+        log.debug("onBroadcast(): {}:{}", event.getResource().getRequest().getRemoteAddr(),
+            event.getResource().getRequest().getRemotePort());
     }
 
     @Override
-    public void onBroadcast(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> httpServletRequestHttpServletResponseAtmosphereResourceEvent)
+    public void onThrowable(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> event)
     {
-    }
-
-    @Override
-    public void onThrowable(final AtmosphereResourceEvent<HttpServletRequest, HttpServletResponse> httpServletRequestHttpServletResponseAtmosphereResourceEvent)
-    {
-        dispatcher.removeListener(listener);
-        log.info("Removed listener for " + eventType);
+        log.debug("onThrowable(): {}:{}", event.getResource().getRequest().getRemoteAddr(),
+            event.getResource().getRequest().getRemotePort());
     }
 }

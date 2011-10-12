@@ -20,18 +20,20 @@ import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventListenerDispatcher;
 import com.ning.metrics.collector.realtime.EventsLogger;
+import com.ning.metrics.collector.realtime.NewEventListener;
 import com.sun.jersey.api.view.Viewable;
 import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.jersey.SuspendResponse;
 import org.atmosphere.jersey.util.JerseySimpleBroadcaster;
+import org.slf4j.Logger;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
@@ -61,17 +63,26 @@ public class EventResource
     @Path("/async/event")
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_JSONP})
-    public SuspendResponse<String> subscribe(@QueryParam("type") final String eventType,
-                                             @DefaultValue("void") @QueryParam("jsonp") final String callback,
-                                             @Context final Request request)
+    public SuspendResponse subscribe(@PathParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final Broadcaster feed,
+                                     @QueryParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final String eventType,
+                                     @DefaultValue("void") @QueryParam("jsonp") final String callback)
     {
-        // Create a Broadcaster per suspended request
-        final Broadcaster broadcaster = new JerseySimpleBroadcaster(request.toString());
+        // Use the original one, if it exists
+        Broadcaster broadcaster = feed;
+        if (feed == null || feed.getAtmosphereResources().size() == 0) {
+            broadcaster = BroadcasterFactory.getDefault().lookup(JerseySimpleBroadcaster.class, eventType);
+            if (broadcaster == null) {
+                broadcaster = BroadcasterFactory.getDefault().lookup(JerseySimpleBroadcaster.class, eventType, true);
+                final NewEventListener listener = new NewEventListener(config, broadcaster, callback);
+                dispatcher.addListener(eventType, listener);
+            }
+       }
 
         return new SuspendResponse.SuspendResponseBuilder<String>()
             .broadcaster(broadcaster)
+            .resumeOnBroadcast(false)
             .outputComments(true)
-            .addListener(new EventsLogger(config, dispatcher, broadcaster, callback, eventType))
+            .addListener(new EventsLogger())
             .build();
     }
 }

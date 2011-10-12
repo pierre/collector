@@ -18,12 +18,20 @@ package com.ning.metrics.collector.realtime;
 
 import com.google.inject.Inject;
 import com.ning.metrics.serialization.event.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.weakref.jmx.Managed;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventListenerDispatcher
 {
-    private final ConcurrentLinkedQueue<NewEventListener> listeners = new ConcurrentLinkedQueue<NewEventListener>();
+    public static final String NO_FILTER_KEY = "__ALL__";
+
+    private static final Logger log = LoggerFactory.getLogger(EventListenerDispatcher.class);
+
+    private final Map<String, NewEventListener> listeners = new ConcurrentHashMap<String, NewEventListener>();
     private final EventQueueProcessor activeMQController;
 
     @Inject
@@ -32,14 +40,10 @@ public class EventListenerDispatcher
         this.activeMQController = activeMQController;
     }
 
-    public void addListener(final NewEventListener listener)
+    public void addListener(final String eventKey, final NewEventListener listener)
     {
-        listeners.add(listener);
-    }
-
-    public void removeListener(final NewEventListener listener)
-    {
-        listeners.remove(listener);
+        log.info("Adding listener for " + eventKey);
+        listeners.put(eventKey, listener);
     }
 
     public void stop()
@@ -47,18 +51,32 @@ public class EventListenerDispatcher
         activeMQController.stop();
     }
 
-    public void offer(final Event event)
+    public synchronized void offer(final Event event)
     {
         if (event == null) {
             return;
         }
 
+        // We are still in the request thread, make sure to stay async here!
+
         if (activeMQController != null) {
             activeMQController.send(event);
         }
 
-        for (final NewEventListener listener : listeners) {
+        final NewEventListener listener = listeners.get(event.getName());
+        if (listener != null) {
             listener.onNewEvent(event);
         }
+
+        final NewEventListener allListener = listeners.get(NO_FILTER_KEY);
+        if (allListener != null) {
+            allListener.onNewEvent(event);
+        }
+    }
+
+    @Managed
+    public int getNbOfListeners()
+    {
+        return listeners.size();
     }
 }

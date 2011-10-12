@@ -20,45 +20,50 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.sun.jersey.api.json.JSONWithPadding;
 import org.atmosphere.cpr.Broadcaster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class NewEventListener
 {
+    private static final Logger log = LoggerFactory.getLogger(NewEventListener.class);
+
     private final Broadcaster broadcaster;
     private final String callback;
-    private final String eventType;
     private final EventFormatter eventFormatter;
 
-    public NewEventListener(final CollectorConfig config, final Broadcaster broadcaster, final String callback, final String eventType)
+    public NewEventListener(final CollectorConfig config, final Broadcaster broadcaster, final String callback)
     {
         this.broadcaster = broadcaster;
         this.callback = callback;
-        this.eventType = eventType;
         eventFormatter = new EventFormatter(config);
     }
 
     public void onNewEvent(final Event event)
     {
-        if (eventType != null && !event.getName().equalsIgnoreCase(eventType)) {
-            return;
+        String eventString = (String) eventFormatter.getFormattedEvent(event);
+        // Prepend the event name for json (it's already there for Thrift without a schema)
+        if (!eventString.startsWith(event.getName())) {
+            eventString = String.format("%s: %s", event.getName(), eventString);
         }
 
-        final Response response = prepareResponse((String) eventFormatter.getFormattedEvent(event));
+        final Response response = prepareResponse(eventString);
+        log.debug("Broadcasting event: " + eventString);
+        // This is asynchronous
         broadcaster.broadcast(response);
     }
 
-    Response prepareResponse(final String formattedEvent)
+    private Response prepareResponse(final String formattedEvent)
     {
         // See issue https://jersey.dev.java.net/issues/show_bug.cgi?id=461 that explain
         // why we need to manually set the content-type.
         return Response.ok(new JSONWithPadding(new GenericEntity<String>(formattedEvent)
         {
         }, callback))
-            .header("Content-Type", APPLICATION_JSON)
+            .header("Content-Type", MediaType.APPLICATION_JSON_TYPE)
             .build();
     }
 }
