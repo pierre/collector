@@ -23,7 +23,6 @@ import org.codehaus.jackson.map.util.JSONPObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public class NewEventListener
@@ -57,10 +56,7 @@ public class NewEventListener
 
     private Response prepareResponse(final String formattedEvent)
     {
-        // See issue https://jersey.dev.java.net/issues/show_bug.cgi?id=461 that explain
-        // why we need to manually set the content-type.
-        return Response.ok(new JSONPObject(callback, formattedEvent))
-            .header("Content-Type", MediaType.APPLICATION_JSON_TYPE)
-            .build();
+        final JSONPObject jsonpObject = new JSONPObject(callback, formattedEvent);
+        return Response.ok(jsonpObject).build();
     }
 }

@@ -26,7 +26,6 @@ import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.jersey.SuspendResponse;
 import org.atmosphere.jersey.util.JerseySimpleBroadcaster;
-import org.slf4j.Logger;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -65,7 +64,7 @@ public class EventResource
     @Produces({APPLICATION_JSON, APPLICATION_JSONP})
     public SuspendResponse subscribe(@PathParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final Broadcaster feed,
                                      @QueryParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final String eventType,
-                                     @DefaultValue("void") @QueryParam("jsonp") final String callback)
+                                     @DefaultValue("callback") @QueryParam("jsonp") final String callback)
     {
         // Use the original one, if it exists
         Broadcaster broadcaster = feed;
@@ -76,7 +75,7 @@ public class EventResource
                 final NewEventListener listener = new NewEventListener(config, broadcaster, callback);
                 dispatcher.addListener(eventType, listener);
             }
-       }
+        }
 
         return new SuspendResponse.SuspendResponseBuilder<String>()
             .broadcaster(broadcaster)

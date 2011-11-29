@@ -41,6 +41,7 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.log4j.Logger;
 import org.atmosphere.guice.GuiceManagedAtmosphereServlet;
+import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
@@ -93,6 +94,8 @@ public class StandaloneCollectorServer
                         final ServiceMonitor monitor = new FakeNagiosMonitor(config.getNagiosCheckRate());
                         bind(ServiceMonitor.class).toInstance(monitor);
                     }
+
+                    bind(JacksonJsonProvider.class).asEagerSingleton();
                 }
             },
             new InstrumentationModule(),     /* Provide metrics */
