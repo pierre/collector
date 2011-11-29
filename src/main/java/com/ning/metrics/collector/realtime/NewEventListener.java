@@ -18,12 +18,11 @@ package com.ning.metrics.collector.realtime;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
-import com.sun.jersey.api.json.JSONWithPadding;
 import org.atmosphere.cpr.Broadcaster;
+import org.codehaus.jackson.map.util.JSONPObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -60,9 +59,7 @@ public class NewEventListener
     {
         // See issue https://jersey.dev.java.net/issues/show_bug.cgi?id=461 that explain
         // why we need to manually set the content-type.
-        return Response.ok(new JSONWithPadding(new GenericEntity<String>(formattedEvent)
-        {
-        }, callback))
+        return Response.ok(new JSONPObject(callback, formattedEvent))
             .header("Content-Type", MediaType.APPLICATION_JSON_TYPE)
             .build();
     }

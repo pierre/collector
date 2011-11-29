@@ -37,6 +37,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 
 import javax.management.MBeanServer;
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
 import java.util.EventListener;
 
 @Singleton
@@ -102,7 +104,7 @@ public class JettyServer
             log.info(String.format("Using [%s] for Shiro configPath", config.getShiroConfigPath()));
             final FilterHolder authFilterHolder = new FilterHolder(IniShiroFilter.class);
             authFilterHolder.setInitParameter("configPath", config.getShiroConfigPath());
-            context.addFilter(authFilterHolder, "/*", ServletContextHandler.NO_SESSIONS);
+            context.addFilter(authFilterHolder, "/*", EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC));
         }
         else {
             log.info("Skipping Shiro configuration as no config path was specified");
@@ -110,7 +112,7 @@ public class JettyServer
 
         // Make sure Guice filter all requests
         final FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
-        context.addFilter(filterHolder, "/*", ServletContextHandler.NO_SESSIONS);
+        context.addFilter(filterHolder, "/*", EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC));
 
         // Backend servlet for Guice - never used
         final ServletHolder sh = new ServletHolder(DefaultServlet.class);

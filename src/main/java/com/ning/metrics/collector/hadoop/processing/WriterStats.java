@@ -115,4 +115,17 @@ public class WriterStats
     {
         return hdfsFlushes.get();
     }
+
+    /**
+     * Unit testing hook
+     */
+    public void clear()
+    {
+        ignoredEvents.set(0);
+        enqueuedEvents.set(0);
+        droppedEvents.set(0);
+        writtenEvents.set(0);
+        erroredEvents.set(0);
+        hdfsFlushes.set(0);
+    }
 }

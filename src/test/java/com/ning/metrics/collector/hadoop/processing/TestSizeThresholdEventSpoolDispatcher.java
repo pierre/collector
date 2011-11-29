@@ -27,6 +27,7 @@ import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
 import org.joda.time.DateTime;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
@@ -44,6 +45,12 @@ public class TestSizeThresholdEventSpoolDispatcher
 
     @Inject
     FileSystemAccess hdfsAccess;
+
+    @BeforeMethod(alwaysRun = true)
+    public void setUp() throws Exception
+    {
+        dispatcher.getStats().clear();
+    }
 
     @Test(groups = "slow")
     public void testFlushSizeThreshold() throws Exception
@@ -70,7 +77,7 @@ public class TestSizeThresholdEventSpoolDispatcher
         // time threshold (around 400ms elapsed since the first offer, and the threshold is 1 second).
         // The flush is slow - we need to wait a little bit
         dispatcher.offer(eventA);
-        Thread.sleep(1500);
+        Thread.sleep(2000);
         Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 3);
         Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 1);
     }

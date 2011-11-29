@@ -27,6 +27,7 @@ import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
 import org.joda.time.DateTime;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
@@ -44,6 +45,12 @@ public class TestTimeThresholdEventSpoolDispatcher
 
     @Inject
     FileSystemAccess hdfsAccess;
+
+    @BeforeMethod(alwaysRun = true)
+    public void setUp() throws Exception
+    {
+        dispatcher.getStats().clear();
+    }
 
     @Test(groups = "slow")
     public void testFlushTimeThreshold() throws Exception

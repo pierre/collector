@@ -75,6 +75,10 @@ class LocalSpoolManager
 
     public static Collection<File> findFilesInSpoolDirectory(final File spoolDirectory)
     {
+        if (!spoolDirectory.isDirectory()) {
+            log.warn("Asked to find files in spool directory but [" + spoolDirectory + "] is not a directory!");
+            return null;
+        }
         return FileUtils.listFiles(spoolDirectory, FileFilterUtils.trueFileFilter(), FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("_tmp")));
     }
 

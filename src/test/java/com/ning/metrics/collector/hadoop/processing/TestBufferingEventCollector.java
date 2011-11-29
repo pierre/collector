@@ -45,6 +45,9 @@ public class TestBufferingEventCollector
     private BufferingEventCollector collector;
 
     @Inject
+    private EventSpoolDispatcher dispatcher;
+
+    @Inject
     private EventQueueProcessor msgSender;
 
     @Inject
@@ -71,6 +74,7 @@ public class TestBufferingEventCollector
     @BeforeMethod(alwaysRun = true)
     void setup()
     {
+        dispatcher.getStats().clear();
         sentEvents.clear();
         stats.clear();
 
