@@ -35,7 +35,7 @@ import java.io.OutputStream;
 
 public class EventFormatter
 {
-    private final Logger log = Logger.getLogger(EventFormatter.class);
+    private final static Logger log = Logger.getLogger(EventFormatter.class);
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final CachingGoodwillAccessor goodwillAccessor;
@@ -59,20 +59,13 @@ public class EventFormatter
      */
     public Object getFormattedEvent(final Event event)
     {
-        String message = null;
-
         if (goodwillAccessor != null) {
             final GoodwillSchema schema = goodwillAccessor.getSchema(event.getName());
             if (schema != null) {
-                message = eventToJson(event, schema);
+                return eventToJson(event, schema);
             }
         }
-
-        if (message == null) {
-            message = event.getData().toString();
-        }
-
-        return message;
+        return event.getData().toString();
     }
 
     /**
@@ -110,7 +103,7 @@ public class EventFormatter
             try {
                 final ThriftEnvelope envelope = (ThriftEnvelope) event.getData();
                 short i = 1;
-                final ObjectNode root = JsonNodeFactory.instance.objectNode();
+                final ObjectNode root = jsonMapper.createObjectNode();
 
                 for (final ThriftField field : envelope.getPayload()) {
                     final GoodwillSchemaField goodwillSchemaField = schema.getFieldByPosition(i);
