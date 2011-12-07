@@ -48,6 +48,8 @@ class ActiveMQConnection implements EventQueueConnection
     @Override
     public void reconnect()
     {
+        final long startTime = System.currentTimeMillis();
+
         if (connectionFactory == null) {
             logger.warn("Asked to reconnect to AMQ but no connectionFactory was configured!");
             return;
@@ -80,6 +82,9 @@ class ActiveMQConnection implements EventQueueConnection
                 }
             }
         }
+
+        final long secondsToReconnect = (System.currentTimeMillis() - startTime) / 1000;
+        logger.info(String.format("Reconnected to AMQ in %d seconds", secondsToReconnect));
     }
 
     @Override

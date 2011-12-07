@@ -18,6 +18,8 @@ package com.ning.metrics.collector.realtime.amq;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueSession;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.TimerMetric;
 import org.apache.activemq.AlreadyClosedException;
 import org.apache.activemq.ConnectionFailedException;
 import org.apache.log4j.Logger;
@@ -27,11 +29,14 @@ import javax.jms.JMSException;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class ActiveMQSession implements EventQueueSession
+public class ActiveMQSession implements EventQueueSession
 {
     private static final Logger logger = Logger.getLogger(ActiveMQSession.class);
+
+    private final TimerMetric timer;
 
     private final CollectorConfig config;
     private final ActiveMQConnection connection;
@@ -46,6 +51,9 @@ class ActiveMQSession implements EventQueueSession
         this.config = config;
         this.connection = connection;
         this.topic = topic;
+
+        timer = Metrics.newTimer(ActiveMQSession.class, topic, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+
         reinit();
     }
 
@@ -79,6 +87,8 @@ class ActiveMQSession implements EventQueueSession
 
     private void reinit()
     {
+        final long startTime = System.currentTimeMillis();
+
         synchronized (sessionMonitor) {
             close();
             while (!isRunning.get()) {
@@ -94,6 +104,9 @@ class ActiveMQSession implements EventQueueSession
                 }
             }
         }
+
+        final long secondsToRecreate = (System.currentTimeMillis() - startTime) / 1000;
+        logger.info(String.format("Recreated topic [%s] in %d seconds", topic, secondsToRecreate));
     }
 
     private boolean shouldReinit(final JMSException ex)
@@ -109,7 +122,9 @@ class ActiveMQSession implements EventQueueSession
     {
         if (isRunning.get()) {
             try {
+                final long startTime = System.nanoTime();
                 publisher.send(session.createTextMessage(event.toString()));
+                timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
             }
             catch (JMSException ex) {
                 if (shouldReinit(ex)) {
