@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.realtime.amq;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueConnection;
 import com.ning.metrics.collector.realtime.EventQueueSession;
@@ -35,9 +37,11 @@ class ActiveMQConnection implements EventQueueConnection
     private ActiveMQConnectionFactory connectionFactory = null;
     private final Object connectionMonitor = new Object();
     private TopicConnection connection = null;
+    private final AtomicBoolean useBytesMessage;
 
     public ActiveMQConnection(final CollectorConfig config)
     {
+        useBytesMessage = new AtomicBoolean(config.getActiveMQUseBytesMessage());
         this.config = config;
         if (config.getActiveMQUri() != null) {
             this.connectionFactory = new ActiveMQConnectionFactory(config.getActiveMQUri());
@@ -45,6 +49,11 @@ class ActiveMQConnection implements EventQueueConnection
         }
     }
 
+    @Override
+    public void setUseBytesMessage(boolean state) {
+        useBytesMessage.set(state);
+    }
+    
     @Override
     public void reconnect()
     {
@@ -90,7 +99,7 @@ class ActiveMQConnection implements EventQueueConnection
     @Override
     public EventQueueSession getSessionFor(final String type)
     {
-        return new ActiveMQSession(config, this, type);
+        return new ActiveMQSession(config, this, type, useBytesMessage);
     }
 
     TopicSession createTopicSession()

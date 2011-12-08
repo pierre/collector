@@ -23,4 +23,6 @@ public interface EventQueueConnection
     void reconnect();
 
     void close();
+
+    void setUseBytesMessage(boolean state);
 }

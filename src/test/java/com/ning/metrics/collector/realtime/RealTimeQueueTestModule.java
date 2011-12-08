@@ -54,9 +54,7 @@ public class RealTimeQueueTestModule extends AbstractModule
     private class TestEventQueueConnection implements EventQueueConnection
     {
         @Override
-        public void reconnect()
-        {
-        }
+        public void reconnect() { }
 
         @Override
         public EventQueueSession getSessionFor(final String type)
@@ -65,9 +63,7 @@ public class RealTimeQueueTestModule extends AbstractModule
         }
 
         @Override
-        public void close()
-        {
-        }
+        public void close() { }
 
         private class TestEventQueueSession implements EventQueueSession
         {
@@ -84,9 +80,10 @@ public class RealTimeQueueTestModule extends AbstractModule
             }
 
             @Override
-            public void close()
-            {
-            }
+            public void close() { }
         }
+
+        @Override
+        public void setUseBytesMessage(boolean state) { }
     }
 }

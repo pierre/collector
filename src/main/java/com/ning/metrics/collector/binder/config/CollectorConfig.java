@@ -69,6 +69,13 @@ public interface CollectorConfig
     @Default("1")
     int getActiveMQNumSendersPerCategory();
 
+    /* Whether we use BytesMessage (true), or TextMessage (false)
+     * when sending ActiveMQ notifications
+     */
+    @Config("collector.activemq.useBytesMessage")
+    @Default("false")
+    boolean getActiveMQUseBytesMessage();
+    
     // Whether to collect scribe events
 
     @Config("collector.scribe.enabled")

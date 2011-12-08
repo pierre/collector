@@ -141,6 +141,18 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
+    @Managed(description = "Enables sending of events as ByteMessage (instead of TextMessage)")
+    public void sendUsingBytesMessage()
+    {
+        connection.setUseBytesMessage(true);
+    }
+
+    @Managed(description = "Enables sending of events as TextMessage (instead of ByteMessage)")
+    public void sendUsingTextMessage()
+    {
+        connection.setUseBytesMessage(false);
+    }
+    
     @Managed(description = "add event type to collect")
     public void addTypeToCollect(final String event)
     {
