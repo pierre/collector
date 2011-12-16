@@ -38,10 +38,10 @@ public class TestThriftFieldListParser
         input.add(ThriftField.createThriftField("string", (short) 0));
         input.add(ThriftField.createThriftField(true, (short) 1));
         input.add(ThriftField.createThriftField((byte) 1, (short) 2));
-        input.add(ThriftField.createThriftField((short) 2, (short) 2));
-        input.add(ThriftField.createThriftField(4, (short) 3));
-        input.add(ThriftField.createThriftField(8L, (short) 4));
-        input.add(ThriftField.createThriftField(3.14, (short) 5));
+        input.add(ThriftField.createThriftField((short) 2, (short) 3));
+        input.add(ThriftField.createThriftField(4, (short) 4));
+        input.add(ThriftField.createThriftField(8L, (short) 5));
+        input.add(ThriftField.createThriftField(3.14, (short) 6));
 
         final ThriftFieldListSerializer serializer = new ThriftFieldListSerializer();
         final byte[] payload = serializer.createPayload(input);
