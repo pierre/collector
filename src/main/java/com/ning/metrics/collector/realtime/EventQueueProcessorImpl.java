@@ -21,6 +21,7 @@ import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import org.apache.log4j.Logger;
+import org.skife.config.ConfigurationObjectFactory;
 import org.weakref.jmx.Managed;
 
 import java.util.Arrays;
@@ -34,8 +35,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class EventQueueProcessorImpl implements EventQueueProcessor
 {
-    private final Logger log = Logger.getLogger(EventQueueProcessorImpl.class);
-    private final CollectorConfig config;
+    private final static Logger log = Logger.getLogger(EventQueueProcessorImpl.class);
+
+    private final ConfigurationObjectFactory configFactory;
     private final EventQueueConnection connection;
     private final AtomicBoolean enabled = new AtomicBoolean(false);
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
@@ -46,17 +48,19 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     private final EventFormatter eventFormatter;
 
     @Inject
-    public EventQueueProcessorImpl(final CollectorConfig config, final EventQueueConnectionFactory factory, final GlobalEventQueueStats stats)
+    public EventQueueProcessorImpl(final ConfigurationObjectFactory configFactory,
+            final CollectorConfig baseConfig,
+            final EventQueueConnectionFactory factory, final GlobalEventQueueStats stats)
     {
-        this.config = config;
+        this.configFactory = configFactory;
         this.stats = stats;
-        this.enabled.set(config.isActiveMQEnabled());
+        this.enabled.set(baseConfig.isActiveMQEnabled());
 
-        final String typesStr = config.getActiveMQEventsToCollect();
-        final Set<String> types = typesStr == null ? new HashSet<String>() : new HashSet<String>(Arrays.asList(typesStr.split("\\s*,\\s*")));
+        final String typesStr = baseConfig.getActiveMQEventsToCollect();
+        final Set<String> types = (typesStr == null) ? new HashSet<String>() : new HashSet<String>(Arrays.asList(typesStr.split("\\s*,\\s*")));
 
         this.typesToCollect.set(types);
-        eventFormatter = new EventFormatter(config);
+        eventFormatter = new EventFormatter(baseConfig);
 
         this.connection = factory.createConnection();
         final Executor executor = new FailsafeScheduledExecutor(1, "EventQueueProcessorImpl");
@@ -104,10 +108,16 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
             LocalQueueAndWorkers queue = queuesPerCategory.get(type);
 
             if (queue == null) {
+                // should these be reused? For now, assume there is no need (not often re-created)
+                Map<String,String> replacements = new HashMap<String,String>();
+                replacements.put("category", type);
+                CollectorConfig config = configFactory.buildWithReplacements(CollectorConfig.class, replacements);
+                
                 synchronized (queueMapMonitor) {
                     queue = queuesPerCategory.get(type);
                     if (queue == null) {
-                        queue = new LocalQueueAndWorkers(config, type, connection.getSessionFor(type), stats);
+                        EventQueueSession session = connection.getSessionFor(type, config);
+                        queue = new LocalQueueAndWorkers(type, session, stats);
                         queuesPerCategory.put(type, queue);
                     }
                 }
@@ -141,13 +151,13 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
         }
     }
 
-    @Managed(description = "Enables sending of events as ByteMessage (instead of TextMessage)")
+    @Managed(description = "Enables sending of events as ByteMessage (instead of TextMessage) for all topics")
     public void sendUsingBytesMessage()
     {
         connection.setUseBytesMessage(true);
     }
 
-    @Managed(description = "Enables sending of events as TextMessage (instead of ByteMessage)")
+    @Managed(description = "Enables sending of events as TextMessage (instead of ByteMessage) for all topics")
     public void sendUsingTextMessage()
     {
         connection.setUseBytesMessage(false);

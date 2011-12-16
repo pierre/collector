@@ -23,17 +23,18 @@ import com.ning.metrics.collector.realtime.EventQueueConnectionFactory;
 
 public class ActiveMQConnectionFactory implements EventQueueConnectionFactory
 {
-    private final CollectorConfig config;
+    // General configuration which does not include per-category overrides
+    private final CollectorConfig baseConfig;
 
     @Inject
-    public ActiveMQConnectionFactory(final CollectorConfig config)
+    public ActiveMQConnectionFactory(final CollectorConfig baseConfig)
     {
-        this.config = config;
+        this.baseConfig = baseConfig;
     }
 
     @Override
     public EventQueueConnection createConnection()
     {
-        return new ActiveMQConnection(config);
+        return new ActiveMQConnection(baseConfig);
     }
 }

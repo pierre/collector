@@ -33,7 +33,6 @@ class ActiveMQConnection implements EventQueueConnection
 {
     private static final Logger logger = Logger.getLogger(ActiveMQConnection.class);
 
-    private final CollectorConfig config;
     private ActiveMQConnectionFactory connectionFactory = null;
     private final Object connectionMonitor = new Object();
     private TopicConnection connection = null;
@@ -42,10 +41,13 @@ class ActiveMQConnection implements EventQueueConnection
     public ActiveMQConnection(final CollectorConfig config)
     {
         useBytesMessage = new AtomicBoolean(config.getActiveMQUseBytesMessage());
-        this.config = config;
-        if (config.getActiveMQUri() != null) {
-            this.connectionFactory = new ActiveMQConnectionFactory(config.getActiveMQUri());
-            this.connectionFactory.setUseAsyncSend(false);
+        String uri = config.getActiveMQUri();
+        if (uri != null) {
+            this.connectionFactory = new ActiveMQConnectionFactory(uri);
+            /* note: global setting, no per-category (topic) overrides; if we
+             * need those, need to use multiple connection factories
+             */
+            this.connectionFactory.setUseAsyncSend(config.getActiveMQUseAsyncSend());
         }
     }
 
@@ -97,7 +99,7 @@ class ActiveMQConnection implements EventQueueConnection
     }
 
     @Override
-    public EventQueueSession getSessionFor(final String type)
+    public EventQueueSession getSessionFor(final String type, final CollectorConfig config)
     {
         return new ActiveMQSession(config, this, type, useBytesMessage);
     }

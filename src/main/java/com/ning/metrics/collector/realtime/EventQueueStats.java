@@ -33,9 +33,13 @@ public class EventQueueStats
 
     private final Collection<Object> queue;
 
-    public EventQueueStats(final Collection<Object> queue)
+    private final long maxQueueLength;
+    
+    public EventQueueStats(final Collection<Object> queue,
+            final long maxQueueLength)
     {
         this.queue = queue;
+        this.maxQueueLength = maxQueueLength;
     }
 
     public void registerEventEnqueued()
@@ -82,12 +86,18 @@ public class EventQueueStats
         return erroredEvents.get();
     }
 
-    @Managed(description = "Size of the underlying queue")
+    @Managed(description = "Current length of the underlying queue")
     public long getQueueSize()
     {
         return queue.size();
     }
 
+    @Managed(description = "Maximum length of the underlying queue")
+    public long getMaxQueueSize()
+    {
+        return maxQueueLength;
+    }
+    
     /**
      * Unit test hook
      */

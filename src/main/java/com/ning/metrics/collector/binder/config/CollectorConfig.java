@@ -45,39 +45,45 @@ public interface CollectorConfig
     @DefaultNull
     String getActiveMQUri();
 
-    // ActiveMQ messages TTL in milliseconds, default 10 minutes
-
-    @Config("collector.activemq.messagesTTLmilliseconds")
-    @Default("600000")
-    int getMessagesTTLMilliseconds();
-
     // Events types to forward to ActiveMQ (comma delimited)
 
     @Config("collector.activemq.events")
     @DefaultNull
     String getActiveMQEventsToCollect();
 
-    // Length of the internal buffer for passing events of a specific type to activemq
+    // ActiveMQ messages TTL in milliseconds, default 5 minutes
 
-    @Config("collector.activemq.bufferLength")
+    @Config({"collector.activemq.${category}.messagesTTLmilliseconds",
+             "collector.activemq.messagesTTLmilliseconds" })
+    @Default("300000")
+    int getMessagesTTLMilliseconds();
+    
+    // Length of the internal buffer for passing events of a specific type to activemq
+    @Config({"collector.activemq.${category}.bufferLength",
+             "collector.activemq.bufferLength"})
     @Default("10000")
     int getActiveMQBufferLength();
 
-    // Number of senders per category
-
-    @Config("collector.activemq.numSendersPerCategory")
+    // Number of senders constructed for specific category; usually one
+    // is fine for low/medium volume; higher for high-volume ones (2 - 4)
+    @Config({"collector.activemq.${category}.numSendersPerCategory",
+             "collector.activemq.numSendersPerCategory"})
     @Default("1")
     int getActiveMQNumSendersPerCategory();
 
-    /* Whether we use BytesMessage (true), or TextMessage (false)
-     * when sending ActiveMQ notifications
-     */
-    @Config("collector.activemq.useBytesMessage")
+    // Whether we use BytesMessage (true), or TextMessage (false)
+    // when sending ActiveMQ notifications
+    @Config({"collector.activemq.${category}.useBytesMessage",
+             "collector.activemq.useBytesMessage" })
     @Default("false")
-    boolean getActiveMQUseBytesMessage();
-    
-    // Whether to collect scribe events
+    boolean getActiveMQUseBytesMessage();    
 
+    // Whether we are to use async send or not
+    // note: currently used in global way, thus no per-category override
+    @Config("collector.activemq.asyncSend")
+    @Default("false")
+    boolean getActiveMQUseAsyncSend();    
+    
     @Config("collector.scribe.enabled")
     @Default("true")
     boolean isScribeCollectionEnabled();

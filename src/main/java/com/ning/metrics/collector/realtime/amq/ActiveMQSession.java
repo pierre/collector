@@ -69,6 +69,8 @@ public class ActiveMQSession implements EventQueueSession
         reinit();
     }
 
+    public CollectorConfig getConfig() { return config; }
+    
     @Override
     public void close()
     {

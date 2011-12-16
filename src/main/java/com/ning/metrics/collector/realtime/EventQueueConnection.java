@@ -16,9 +16,11 @@
 
 package com.ning.metrics.collector.realtime;
 
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+
 public interface EventQueueConnection
 {
-    EventQueueSession getSessionFor(String type);
+    EventQueueSession getSessionFor(String type, CollectorConfig config);
 
     void reconnect();
 

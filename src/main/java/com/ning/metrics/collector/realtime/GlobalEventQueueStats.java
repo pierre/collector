@@ -29,9 +29,10 @@ public class GlobalEventQueueStats
     private final Map<String, EventQueueStats> stats = new ConcurrentHashMap<String, EventQueueStats>();
     private final AtomicLong ignoredEvents = new AtomicLong(0);
 
-    public EventQueueStats createLocalStats(final String eventType, final Collection<Object> queue)
+    public EventQueueStats createLocalStats(final String eventType, final Collection<Object> queue,
+            long maxQueueLength)
     {
-        final EventQueueStats localStats = new EventQueueStats(queue);
+        final EventQueueStats localStats = new EventQueueStats(queue, maxQueueLength);
         // We are guaranteed to have at most one stats object per event type (see EventQueueProcessorImpl)
         stats.put(eventType, localStats);
         return localStats;

@@ -33,9 +33,9 @@ public class TestGlobalEventQueueStats
     public void setup() throws Exception
     {
         stats = new GlobalEventQueueStats();
-        localStats1 = stats.createLocalStats("MyType1", new ArrayList<Object>());
-        localStats2 = stats.createLocalStats("MyType2", new ArrayList<Object>());
-        localStats3 = stats.createLocalStats("MyType3", new ArrayList<Object>());
+        localStats1 = stats.createLocalStats("MyType1", new ArrayList<Object>(), 10);
+        localStats2 = stats.createLocalStats("MyType2", new ArrayList<Object>(), 10);
+        localStats3 = stats.createLocalStats("MyType3", new ArrayList<Object>(), 10);
     }
 
     @Test(groups = "fast")

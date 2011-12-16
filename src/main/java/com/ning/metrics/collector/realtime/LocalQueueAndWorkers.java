@@ -18,6 +18,8 @@ package com.ning.metrics.collector.realtime;
 
 import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+
+import org.apache.log4j.Logger;
 import org.weakref.jmx.MBeanExporter;
 
 import java.lang.management.ManagementFactory;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 class LocalQueueAndWorkers
 {
+    private static final Logger logger = Logger.getLogger(LocalQueueAndWorkers.class);
     private static final MBeanExporter exporter = new MBeanExporter(ManagementFactory.getPlatformMBeanServer());
 
     private final BlockingQueue<Object> queue;
@@ -36,19 +39,30 @@ class LocalQueueAndWorkers
     private final ExecutorService executor;
     private final EventQueueStats stats;
 
-    public LocalQueueAndWorkers(final CollectorConfig config, final String type, final EventQueueSession processor, final GlobalEventQueueStats globalEventQueueStats)
+    public LocalQueueAndWorkers(final String type, final EventQueueSession processor,
+            final GlobalEventQueueStats globalEventQueueStats)
     {
-        this.queue = new LinkedBlockingQueue<Object>(config.getActiveMQBufferLength());
         this.type = type;
         this.processor = processor;
 
+        // important: MUST use config from processor, to get per-category overrides!
+        final CollectorConfig config = processor.getConfig();
+        final int queueLength = config.getActiveMQBufferLength();
+
+        this.queue = new LinkedBlockingQueue<Object>(queueLength);
+
         // Gather per-queue stats and expose them via JMX
-        stats = globalEventQueueStats.createLocalStats(type, queue);
+        stats = globalEventQueueStats.createLocalStats(type, queue, queueLength);
         // Each type is exported as a child bean of RTQueueStats
         exporter.export(getMBeanName(), stats);
 
-        this.executor = new FailsafeScheduledExecutor(config.getActiveMQNumSendersPerCategory(), type + "-workers");
-        for (int idx = 0; idx < config.getActiveMQNumSendersPerCategory(); idx++) {
+        final int senderCount = config.getActiveMQNumSendersPerCategory();
+        this.executor = new FailsafeScheduledExecutor(senderCount, type + "-workers");
+        
+        logger.info(String.format("Creating %d senders for category '%s', max queue length: %d",
+                senderCount, type, queueLength));
+        
+        for (int idx = 0; idx < senderCount; idx++) {
             executor.submit(new LocalQueueWorker(queue, processor, stats));
         }
     }
