@@ -154,12 +154,14 @@ public class EventQueueProcessorImpl implements EventQueueProcessor
     @Managed(description = "Enables sending of events as ByteMessage (instead of TextMessage) for all topics")
     public void sendUsingBytesMessage()
     {
+        log.info("Enabling 'setUseBytesMessage' (send all events as BytesMessage)");
         connection.setUseBytesMessage(true);
     }
 
     @Managed(description = "Enables sending of events as TextMessage (instead of ByteMessage) for all topics")
     public void sendUsingTextMessage()
     {
+        log.info("Disabling 'setUseBytesMessage' (send all events as TextMessage)");
         connection.setUseBytesMessage(false);
     }
     
