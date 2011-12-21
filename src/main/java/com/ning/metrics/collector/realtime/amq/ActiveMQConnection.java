@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.realtime.amq;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueConnection;
 import com.ning.metrics.collector.realtime.EventQueueSession;
@@ -31,20 +33,30 @@ class ActiveMQConnection implements EventQueueConnection
 {
     private static final Logger logger = Logger.getLogger(ActiveMQConnection.class);
 
-    private final CollectorConfig config;
     private ActiveMQConnectionFactory connectionFactory = null;
     private final Object connectionMonitor = new Object();
     private TopicConnection connection = null;
+    private final AtomicBoolean useBytesMessage;
 
-    public ActiveMQConnection(final CollectorConfig config)
+    public ActiveMQConnection(final CollectorConfig baseConfig)
     {
-        this.config = config;
-        if (config.getActiveMQUri() != null) {
-            this.connectionFactory = new ActiveMQConnectionFactory(config.getActiveMQUri());
-            this.connectionFactory.setUseAsyncSend(false);
+        // NOTE: general config, NOT per-topic:
+        useBytesMessage = new AtomicBoolean(baseConfig.getActiveMQUseBytesMessage());
+        String uri = baseConfig.getActiveMQUri();
+        if (uri != null) {
+            this.connectionFactory = new ActiveMQConnectionFactory(uri);
+            /* note: global setting, no per-category (topic) overrides; if we
+             * need those, need to use multiple connection factories
+             */
+            this.connectionFactory.setUseAsyncSend(baseConfig.getActiveMQUseAsyncSend());
         }
     }
 
+    @Override
+    public void setUseBytesMessage(boolean state) {
+        useBytesMessage.set(state);
+    }
+    
     @Override
     public void reconnect()
     {
@@ -88,9 +100,9 @@ class ActiveMQConnection implements EventQueueConnection
     }
 
     @Override
-    public EventQueueSession getSessionFor(final String type)
+    public EventQueueSession getSessionFor(final String type, final CollectorConfig config)
     {
-        return new ActiveMQSession(config, this, type);
+        return new ActiveMQSession(config, this, type, useBytesMessage);
     }
 
     TopicSession createTopicSession()

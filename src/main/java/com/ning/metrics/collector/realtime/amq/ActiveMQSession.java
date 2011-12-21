@@ -24,17 +24,22 @@ import org.apache.activemq.AlreadyClosedException;
 import org.apache.activemq.ConnectionFailedException;
 import org.apache.log4j.Logger;
 
+import javax.jms.BytesMessage;
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ActiveMQSession implements EventQueueSession
 {
     private static final Logger logger = Logger.getLogger(ActiveMQSession.class);
+    
+    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     private final TimerMetric timer;
 
@@ -42,21 +47,30 @@ public class ActiveMQSession implements EventQueueSession
     private final ActiveMQConnection connection;
     private final String topic;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
+
+    // Configuration flag that indicates we should use BytesMessage (not TextMessage)
+    // for sending notifications
+    private final AtomicBoolean useBytesMessage;
+    
     private final Object sessionMonitor = new Object();
     private TopicSession session = null;
     private TopicPublisher publisher;
 
-    public ActiveMQSession(final CollectorConfig config, final ActiveMQConnection connection, final String topic)
+    public ActiveMQSession(final CollectorConfig config, final ActiveMQConnection connection, final String topic,
+            final AtomicBoolean useBytesMessage)
     {
         this.config = config;
         this.connection = connection;
         this.topic = topic;
+        this.useBytesMessage = useBytesMessage;
 
         timer = Metrics.newTimer(ActiveMQSession.class, topic, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         reinit();
     }
 
+    public CollectorConfig getConfig() { return config; }
+    
     @Override
     public void close()
     {
@@ -123,7 +137,7 @@ public class ActiveMQSession implements EventQueueSession
         if (isRunning.get()) {
             try {
                 final long startTime = System.nanoTime();
-                publisher.send(session.createTextMessage(event.toString()));
+                publisher.send(createMessage(event));
                 timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
             }
             catch (JMSException ex) {
@@ -135,5 +149,16 @@ public class ActiveMQSession implements EventQueueSession
                 }
             }
         }
+    }
+
+    protected Message createMessage(Object event) throws JMSException
+    {
+        final String eventStr = event.toString();
+        if (useBytesMessage.get()) {
+            BytesMessage msg = session.createBytesMessage();
+            msg.writeBytes(eventStr.getBytes(UTF8));
+            return msg;
+        }
+        return session.createTextMessage(eventStr);
     }
 }

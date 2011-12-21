@@ -16,9 +16,17 @@
 
 package com.ning.metrics.collector.realtime;
 
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+
 public interface EventQueueSession
 {
     public void send(Object event);
 
     public void close();
+
+    /**
+     * Method that can be used to access fully resolved configuration
+     * information (settings can vary between sessions, based on category)
+     */
+    public CollectorConfig getConfig();
 }

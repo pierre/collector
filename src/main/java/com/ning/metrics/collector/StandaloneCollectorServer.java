@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.atmosphere.guice.GuiceManagedAtmosphereServlet;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.skife.config.ConfigurationObjectFactory;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
@@ -65,7 +66,8 @@ public class StandaloneCollectorServer
     {
         final long startTime = System.currentTimeMillis();
 
-        final CollectorConfig config = new CollectorConfigurationObjectFactory(System.getProperties()).build(CollectorConfig.class);
+        final ConfigurationObjectFactory configFactory = new CollectorConfigurationObjectFactory(System.getProperties());
+        final CollectorConfig config = configFactory.build(CollectorConfig.class);
 
         // Stage.PRODUCTION is mandatory for jmxutils
         injector = Guice.createInjector(Stage.PRODUCTION,
@@ -75,6 +77,7 @@ public class StandaloneCollectorServer
                 @Override
                 protected void configure()
                 {
+                    bind(ConfigurationObjectFactory.class).toInstance(configFactory);
                     bind(CollectorConfig.class).toInstance(config);
                     bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
 

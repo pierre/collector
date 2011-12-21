@@ -6,7 +6,10 @@ classes/*
 test-output/*
 release.properties
 pom.xml.releaseBackup
-.DS_STORE
 perfGraphs.log
 perfStats.log
+.classpath
 .diskspool
+.DS_STORE
+.project
+.settings

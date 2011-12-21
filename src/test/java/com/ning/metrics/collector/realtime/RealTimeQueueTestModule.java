@@ -18,11 +18,15 @@ package com.ning.metrics.collector.realtime;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.skife.config.ConfigurationObjectFactory;
 
 public class RealTimeQueueTestModule extends AbstractModule
 {
@@ -37,6 +41,8 @@ public class RealTimeQueueTestModule extends AbstractModule
         bind(Collection.class).annotatedWith(Names.named("sentEvents")).toInstance(sentEvents);
 
         bind(GlobalEventQueueStats.class).asEagerSingleton();
+        ConfigurationObjectFactory configFactory = new CollectorConfigurationObjectFactory(System.getProperties());
+        bind(ConfigurationObjectFactory.class).toInstance(configFactory);
 
         final EventQueueConnectionFactory factory = new EventQueueConnectionFactory()
         {
@@ -54,23 +60,26 @@ public class RealTimeQueueTestModule extends AbstractModule
     private class TestEventQueueConnection implements EventQueueConnection
     {
         @Override
-        public void reconnect()
+        public void reconnect() { }
+
+        @Override
+        public EventQueueSession getSessionFor(final String type, CollectorConfig config)
         {
+            return new TestEventQueueSession(config);
         }
 
         @Override
-        public EventQueueSession getSessionFor(final String type)
-        {
-            return new TestEventQueueSession();
-        }
-
-        @Override
-        public void close()
-        {
-        }
+        public void close() { }
 
         private class TestEventQueueSession implements EventQueueSession
         {
+            private final CollectorConfig config;
+            
+            public TestEventQueueSession(CollectorConfig config)
+            {
+                this.config = config;
+            }
+            
             @Override
             public void send(final Object event)
             {
@@ -84,9 +93,13 @@ public class RealTimeQueueTestModule extends AbstractModule
             }
 
             @Override
-            public void close()
-            {
-            }
+            public void close() { }
+
+            @Override
+            public CollectorConfig getConfig() { return config; }
         }
+
+        @Override
+        public void setUseBytesMessage(boolean state) { }
     }
 }
