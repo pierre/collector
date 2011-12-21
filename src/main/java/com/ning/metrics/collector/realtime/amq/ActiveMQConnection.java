@@ -38,16 +38,17 @@ class ActiveMQConnection implements EventQueueConnection
     private TopicConnection connection = null;
     private final AtomicBoolean useBytesMessage;
 
-    public ActiveMQConnection(final CollectorConfig config)
+    public ActiveMQConnection(final CollectorConfig baseConfig)
     {
-        useBytesMessage = new AtomicBoolean(config.getActiveMQUseBytesMessage());
-        String uri = config.getActiveMQUri();
+        // NOTE: general config, NOT per-topic:
+        useBytesMessage = new AtomicBoolean(baseConfig.getActiveMQUseBytesMessage());
+        String uri = baseConfig.getActiveMQUri();
         if (uri != null) {
             this.connectionFactory = new ActiveMQConnectionFactory(uri);
             /* note: global setting, no per-category (topic) overrides; if we
              * need those, need to use multiple connection factories
              */
-            this.connectionFactory.setUseAsyncSend(config.getActiveMQUseAsyncSend());
+            this.connectionFactory.setUseAsyncSend(baseConfig.getActiveMQUseAsyncSend());
         }
     }
 

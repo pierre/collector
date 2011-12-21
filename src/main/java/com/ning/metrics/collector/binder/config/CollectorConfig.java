@@ -73,8 +73,8 @@ public interface CollectorConfig
 
     // Whether we use BytesMessage (true), or TextMessage (false)
     // when sending ActiveMQ notifications
-    @Config({"collector.activemq.${category}.useBytesMessage",
-             "collector.activemq.useBytesMessage" })
+    // NOTE: global setting, no per-topic overrides
+    @Config("collector.activemq.useBytesMessage")
     @Default("false")
     boolean getActiveMQUseBytesMessage();    
 
