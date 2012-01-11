@@ -6,21 +6,21 @@ The Collector is the core component to Ning's Analytics data pipeline.
 
 More detailed documentation can be found {here}[http://pierre.github.com/collector.html].
 
-= Download
+== Download
 
 Self contained artifacts can be found at {Maven Central}[http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.ning%22%20AND%20a%3A%22metrics.collector%22] (look for the jar-with-dependencies.jar artifact).
 
-= To build
+== To build
 
     mvn install
 
 
-= Configuration options
+== Configuration options
 
 See {CollectorConfig.java}[https://github.com/pierre/collector/blob/master/src/main/java/com/ning/metrics/collector/binder/config/CollectorConfig.java] for configuration options.
 
 
-= Run
+== Run
 
     java -jar metrics.collector-*-jar-with-dependencies.jar
 
@@ -75,7 +75,7 @@ You can test the HTTP endpoint using curl (events will end up in /tmp/collector/
     * Closing connection #0
 
 
-= License (see LICENSE-2.0.txt file for full license)
+== License (see LICENSE-2.0.txt file for full license)
 
 Copyright 2010-2012 Ning
 
