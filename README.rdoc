@@ -10,15 +10,13 @@ More detailed documentation can be found {here}[http://pierre.github.com/collect
 
 Self contained artifacts can be found at {Maven Central}[http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.ning%22%20AND%20a%3A%22metrics.collector%22] (look for the jar-with-dependencies.jar artifact).
 
-== To build
+== Build
 
     mvn install
-
 
 == Configuration options
 
 See {CollectorConfig.java}[https://github.com/pierre/collector/blob/master/src/main/java/com/ning/metrics/collector/binder/config/CollectorConfig.java] for configuration options.
-
 
 == Run
 
