@@ -1,28 +1,26 @@
 = Collector
 
-Collector is an HDFS endpoint collecting and aggregating data flows. Clients post events (HTTP or Thrift API) to
-the server which in turn write them into HDFS. It provides additional services including data validation as well as
-bucketizing to limit the number of files the Hadoop Namenode needs to track.
+The Collector core is a Jetty service intended to receive events data flows and persist them to HDFS (Hadoop DFS). It provides additional services such as data validation as well as bucketing.
 
+The Collector is the core component to Ning's Analytics data pipeline.
 
-= Requirements
+More detailed documentation can be found {here}[http://pierre.github.com/collector.html].
 
-com.ning:metrics.serialization jar. See http://github.com/pierre/serialization.
+== Download
 
+Self contained artifacts can be found at {Maven Central}[http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.ning%22%20AND%20a%3A%22metrics.collector%22] (look for the jar-with-dependencies.jar artifact).
 
-= To build
+== Build
 
-    mvn assembly:assembly
+    mvn install
 
+== Configuration options
 
-= Configure options
+See {CollectorConfig.java}[https://github.com/pierre/collector/blob/master/src/main/java/com/ning/metrics/collector/binder/config/CollectorConfig.java] for configuration options.
 
-See com.ning.metrics.collector.binder.config for configuration options.
+== Run
 
-
-= Run
-
-    java -Dcollector.activemq.enabled=false -jar metrics.collector-*-jar-with-dependencies.jar
+    java -jar metrics.collector-*-jar-with-dependencies.jar
 
 
 You can test the Thrift endpoint by using the test_collector_thrift_endpoint.py script:
@@ -44,8 +42,8 @@ After a while, you should see events showing up in /tmp/collector/hdfs:
     00000050  70 65 01 01 2a 6f 72 67  2e 61 70 61 63 68 65 2e  |pe..*org.apache.|
     00000060  68 61 64 6f 6f 70 2e 69  6f 2e 63 6f 6d 70 72 65  |hadoop.io.compre|
     00000070  73 73 2e 44 65 66 61 75  6c 74 43 6f 64 65 63 00  |ss.DefaultCodec.|
-    00000080  00 00 00 ee 0a f7 f7 38  37 c3 a6 76 b0 1f d3 78  |...?.??87¾v?.?x|
-    00000090  99 a3 45 ff ff ff ff ee  0a f7 f7 38 37 c3 a6 76  |.?E?????.??87¾v|
+    00000080  00 00 00 ee 0a f7 f7 38  37 c3 a6 76 b0 1f d3 78  |...?.??87ï¿½v?.?x|
+    00000090  99 a3 45 ff ff ff ff ee  0a f7 f7 38 37 c3 a6 76  |.?E?????.??87ï¿½v|
     000000a0  b0 1f d3 78 99 a3 45 14  0b 78 9c 63 65 c5 04 00  |?.?x.?E..x.ce?..|
     000000b0  04 2e 00 65 10 78 9c 63  62 60 64 64 60 a2 2d 01  |...e.x.cb`dd`?-.|
     000000c0  00 10 68 00 51 0b 78 9c  53 54 c4 04 00 1b 26 02  |..h.Q.x.ST?...&.|
@@ -75,9 +73,9 @@ You can test the HTTP endpoint using curl (events will end up in /tmp/collector/
     * Closing connection #0
 
 
-= License (see LICENSE-2.0.txt file for full license)
+== License (see LICENSE-2.0.txt file for full license)
 
-Copyright 2010 Ning
+Copyright 2010-2012 Ning
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
