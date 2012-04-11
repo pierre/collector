@@ -38,6 +38,7 @@ import com.ning.nagios.FakeNagiosMonitor;
 import com.ning.nagios.ServiceCheck;
 import com.ning.nagios.ServiceMonitor;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.apache.log4j.Logger;
 import org.atmosphere.guice.GuiceManagedAtmosphereServlet;
@@ -61,6 +62,9 @@ public class StandaloneCollectorServer
 {
     private static final Logger log = Logger.getLogger(StandaloneCollectorServer.class);
     private static Injector injector = null;
+
+    static final String EVENTS_RESOURCES_PATTERN = "/[^a](.*)";
+    static final String ASYNC_RESOURCES_PATTERN = "/a(.*)";
 
     public static void main(final String... args) throws Exception
     {
@@ -116,7 +120,13 @@ public class StandaloneCollectorServer
                     bind(DefaultServlet.class).asEagerSingleton();
                     serve("/media/*").with(DefaultServlet.class);
 
-                    serve("*").with(GuiceManagedAtmosphereServlet.class, new HashMap<String, String>()
+                    serveRegex(ASYNC_RESOURCES_PATTERN).with(GuiceManagedAtmosphereServlet.class, new HashMap<String, String>()
+                    {
+                        {
+                            put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
+                        }
+                    });
+                    serveRegex(EVENTS_RESOURCES_PATTERN).with(GuiceContainer.class, new HashMap<String, String>()
                     {
                         {
                             put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");

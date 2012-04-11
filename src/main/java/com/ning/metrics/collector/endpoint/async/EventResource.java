@@ -37,7 +37,7 @@ import javax.ws.rs.QueryParam;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 
-@Path("/")
+@Path("/a")
 public class EventResource
 {
     private static final String APPLICATION_JSONP = "application/x-javascript";
@@ -59,7 +59,7 @@ public class EventResource
         return new Viewable("index.html");
     }
 
-    @Path("/async/event")
+    @Path("/event")
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_JSONP})
     public SuspendResponse subscribe(@PathParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final Broadcaster feed,

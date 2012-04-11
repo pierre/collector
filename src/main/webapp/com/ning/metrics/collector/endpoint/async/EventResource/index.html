@@ -30,10 +30,10 @@
         {
             var url;
             if (eventType === null || eventType === undefined) {
-                url = '/async/event';
+                url = '/a/event';
             }
             else {
-                url = '/async/event?type=' + eventType;
+                url = '/a/event?type=' + eventType;
             }
             $.atmosphere.subscribe(url, callback,
                     $.atmosphere.request = {
