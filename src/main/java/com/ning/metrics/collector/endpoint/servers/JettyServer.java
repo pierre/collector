@@ -16,12 +16,13 @@
 
 package com.ning.metrics.collector.endpoint.servers;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.servlet.GuiceFilter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.modules.JettyListener;
 import com.ning.metrics.collector.endpoint.setup.SetupJULBridge;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.servlet.GuiceFilter;
 import org.apache.log4j.Logger;
 import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.eclipse.jetty.jmx.MBeanContainer;
@@ -35,6 +36,7 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import javax.management.MBeanServer;
 import javax.servlet.DispatcherType;
@@ -74,6 +76,8 @@ public class JettyServer
         connector.setStatsOn(config.isJettyStatsOn());
         connector.setHost(config.getLocalIp());
         connector.setPort(config.getLocalPort());
+        connector.setLowResourceMaxIdleTime((int) config.getJettyLowResourcesMaxIdleTime().getMillis());
+        connector.setMaxIdleTime((int) config.getJettyMaxIdleTime().getMillis());
         server.addConnector(connector);
 
         if (config.isSSLEnabled()) {
@@ -83,10 +87,19 @@ public class JettyServer
             sslConnector.setKeystore(config.getSSLkeystoreLocation());
             sslConnector.setKeyPassword(config.getSSLkeystorePassword());
             sslConnector.setPassword(config.getSSLkeystorePassword());
+            sslConnector.setLowResourceMaxIdleTime((int) config.getJettyLowResourcesMaxIdleTime().getMillis());
+            sslConnector.setMaxIdleTime((int) config.getJettyMaxIdleTime().getMillis());
             server.addConnector(sslConnector);
         }
 
         server.setStopAtShutdown(true);
+
+        final QueuedThreadPool threadPool = new QueuedThreadPool();
+        threadPool.setName("jetty-threadPool");
+        threadPool.setMinThreads(config.getJettyMinThreads());
+        threadPool.setMaxThreads(config.getJettyMaxThreads());
+        threadPool.setMaxIdleTimeMs((int) config.getJettyMaxIdleTime().getMillis());
+        server.setThreadPool(threadPool);
 
         final ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         context.setContextPath("/");

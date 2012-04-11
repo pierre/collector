@@ -16,8 +16,9 @@
 
 package com.ning.metrics.collector.binder.config;
 
-import com.googlecode.jsendnsca.encryption.Encryption;
 import com.ning.metrics.serialization.writer.CompressionCodec;
+
+import com.googlecode.jsendnsca.encryption.Encryption;
 import org.skife.config.Config;
 import org.skife.config.Default;
 import org.skife.config.DefaultNull;
@@ -219,6 +220,22 @@ public interface CollectorConfig
     @Config("collector.jetty.ssl.keystore.password")
     @DefaultNull
     String getSSLkeystorePassword();
+
+    @Config("collector.jetty.minThreads")
+    @Default("200")
+    int getJettyMinThreads();
+
+    @Config("collector.jetty.maxThreads")
+    @Default("2000")
+    int getJettyMaxThreads();
+
+    @Config("collector.jetty.LowResourcesMaxIdleTime")
+    @Default("3s")
+    TimeSpan getJettyLowResourcesMaxIdleTime();
+
+    @Config("collector.jetty.maxIdleTime")
+    @Default("15s")
+    TimeSpan getJettyMaxIdleTime();
 
     @Config("collector.temporary-event-output-directory")
     @Default("/tmp/collector/hdfs/tmp")
