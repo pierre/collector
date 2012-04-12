@@ -16,11 +16,6 @@
 
 package com.ning.metrics.collector;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Stage;
-import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
@@ -37,6 +32,12 @@ import com.ning.metrics.collector.util.F5PoolMemberControl;
 import com.ning.nagios.FakeNagiosMonitor;
 import com.ning.nagios.ServiceCheck;
 import com.ning.nagios.ServiceMonitor;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Stage;
+import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.yammer.metrics.guice.InstrumentationModule;
@@ -140,6 +141,22 @@ public class StandaloneCollectorServer
         /* Start the Jetty endpoint */
         final JettyServer jetty = injector.getInstance(JettyServer.class);
         jetty.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    log.info("Shutting down the server...");
+                    jetty.stop();
+                    log.info("Server has stopped.");
+                }
+                catch (Exception ex) {
+                    log.error("Error when stopping Jetty server: " + ex.getMessage(), ex);
+                }
+            }
+        });
 
         // We need to wait for Jetty to be fully up (it will setup SLF4j). Otherwise, we may encounter a race condition:
         //SLF4J: The following loggers will not work becasue they were created
