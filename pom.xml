@@ -18,7 +18,7 @@
     <parent>
         <groupId>com.ning</groupId>
         <artifactId>metrics.base-pom</artifactId>
-        <version>0.0.15</version>
+        <version>0.0.21</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ning</groupId>
@@ -33,10 +33,6 @@
         <developerConnection>scm:git:git@github.com:pierre/collector.git</developerConnection>
         <url>http://github.com/pierre/collector/tree/master</url>
     </scm>
-    <properties>
-        <!-- The Cloudera profile is enabled by default, see below -->
-        <hadoop.version>0.20.2</hadoop.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>asm</groupId>
@@ -315,57 +311,6 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>0.7</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <useEclipseDefaultExcludes>true</useEclipseDefaultExcludes>
-                            <useIdeaDefaultExcludes>true</useIdeaDefaultExcludes>
-                            <useMavenDefaultExcludes>true</useMavenDefaultExcludes>
-                            <excludes>
-                                <!-- For some reason, useIdeaDefaultExcludes doesn't pick up .idea directory -->
-                                <exclude>.idea/**</exclude>
-                                <exclude>.git/**</exclude>
-                                <exclude>.gitignore</exclude>
-                                <exclude>README.*</exclude>
-                                <exclude>API.txt</exclude>
-                                <exclude>RELEASE.sh</exclude>
-                                <exclude>deploy.sh</exclude>
-                                <exclude>run.sh</exclude>
-                                <exclude>run-local.sh</exclude>
-                                <exclude>release-script</exclude>
-                                <exclude>doc/**</exclude>
-                                <exclude>src/site/**</exclude>
-                                <exclude>**/*.log</exclude>
-                                <!-- Exclude test data -->
-                                <exclude>**/*.json</exclude>
-                                <exclude>**/*.thrift</exclude>
-                                <exclude>**/*.csv</exclude>
-                                <exclude>**/*.txt</exclude>
-                                <!-- We have some extra dependencies in there, see license on a per file basis -->
-                                <exclude>src/utils/**</exclude>
-                                <!-- This is a straight import from the upstream libraries -->
-                                <exclude>lib/**</exclude>
-                                <!-- rat doesn't parse MIT -->
-                                <exclude>**/*.js</exclude>
-                                <!-- Ignore temporary files from shade plugin - required for multi-modules builds -->
-                                <exclude>**/dependency-reduced-pom.xml</exclude>
-                                <!-- Ignore eventtracker default spool directory -->
-                                <exclude>.diskspool/**</exclude>
-                                <exclude>dev/**</exclude>
-                                <exclude>.travis.yml</exclude>
-                            </excludes>
                         </configuration>
                     </execution>
                 </executions>

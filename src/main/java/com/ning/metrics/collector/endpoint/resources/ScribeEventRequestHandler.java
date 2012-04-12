@@ -23,7 +23,8 @@ import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftToThriftEnvelopeEvent;
-import com.yammer.metrics.guice.Timed;
+
+import com.yammer.metrics.aop.annotation.Timed;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;

@@ -23,7 +23,8 @@ import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
-import com.yammer.metrics.guice.Timed;
+
+import com.yammer.metrics.aop.annotation.Timed;
 import org.joda.time.DateTime;
 
 import javax.servlet.http.HttpServletRequest;

@@ -21,7 +21,8 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.realtime.EventListenerDispatcher;
 import com.ning.metrics.collector.util.Stats;
 import com.ning.metrics.serialization.event.Event;
-import com.yammer.metrics.guice.Metered;
+
+import com.yammer.metrics.aop.annotation.Metered;
 import org.apache.log4j.Logger;
 import org.weakref.jmx.Managed;
 
