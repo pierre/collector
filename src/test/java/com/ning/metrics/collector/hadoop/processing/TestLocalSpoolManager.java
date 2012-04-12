@@ -16,8 +16,9 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
-import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+
+import com.google.inject.Inject;
 import org.testng.Assert;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
@@ -57,5 +58,10 @@ public class TestLocalSpoolManager
         Assert.assertEquals(spoolManager.getEventName(), "Homepage");
         Assert.assertEquals(spoolManager.getSerializationType(), SerializationType.THRIFT);
         Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2011-06-23T19.57.36.124"));
+
+        spoolManager = new LocalSpoolManager(config, new File("10.18.81.236-8080-QCc6-2012-01-06T00.39.58.726.SpamDocumentClassified2.thrift"));
+        Assert.assertEquals(spoolManager.getEventName(), "SpamDocumentClassified2");
+        Assert.assertEquals(spoolManager.getSerializationType(), SerializationType.THRIFT);
+        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2012-01-06T00.39.58.726"));
     }
 }

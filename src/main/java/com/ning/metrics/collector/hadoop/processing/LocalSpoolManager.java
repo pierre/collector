@@ -44,7 +44,7 @@ class LocalSpoolManager
 {
     private static final Logger log = Logger.getLogger(LocalSpoolManager.class);
 
-    private static final Pattern filenamePattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}-\\d{1,5}-[a-zA-Z0-9]{4}-(\\d{4}-\\d{2}-\\d{2}T\\d{2}.\\d{2}.\\d{2}.\\d{3})\\.[a-zA-Z]*\\.[a-zA-Z]*");
+    private static final Pattern filenamePattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}-\\d{1,5}-[a-zA-Z0-9]{4}-(\\d{4}-\\d{2}-\\d{2}T\\d{2}.\\d{2}.\\d{2}.\\d{3})\\.[a-zA-Z0-9]*\\.[a-zA-Z]*");
 
     // Can't use : in the pattern - Hadoop chokes on it when building the .crc Path
     protected static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH.mm.ss.SSS").withZone(DateTimeZone.UTC);
