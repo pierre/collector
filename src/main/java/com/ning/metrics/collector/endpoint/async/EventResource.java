@@ -63,8 +63,7 @@ public class EventResource
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_JSONP})
     public SuspendResponse subscribe(@PathParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final Broadcaster feed,
-                                     @QueryParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final String eventType,
-                                     @DefaultValue("callback") @QueryParam("jsonp") final String callback)
+                                     @QueryParam("type") @DefaultValue(EventListenerDispatcher.NO_FILTER_KEY) final String eventType)
     {
         // Use the original one, if it exists
         Broadcaster broadcaster = feed;
@@ -72,7 +71,7 @@ public class EventResource
             broadcaster = BroadcasterFactory.getDefault().lookup(JerseySimpleBroadcaster.class, eventType);
             if (broadcaster == null) {
                 broadcaster = BroadcasterFactory.getDefault().lookup(JerseySimpleBroadcaster.class, eventType, true);
-                final NewEventListener listener = new NewEventListener(config, broadcaster, callback);
+                final NewEventListener listener = new NewEventListener(config, broadcaster);
                 dispatcher.addListener(eventType, listener);
             }
         }

@@ -30,13 +30,11 @@ public class NewEventListener
     private static final Logger log = LoggerFactory.getLogger(NewEventListener.class);
 
     private final Broadcaster broadcaster;
-    private final String callback;
     private final EventFormatter eventFormatter;
 
-    public NewEventListener(final CollectorConfig config, final Broadcaster broadcaster, final String callback)
+    public NewEventListener(final CollectorConfig config, final Broadcaster broadcaster)
     {
         this.broadcaster = broadcaster;
-        this.callback = callback;
         eventFormatter = new EventFormatter(config);
     }
 
@@ -48,15 +46,9 @@ public class NewEventListener
             eventString = String.format("%s: %s", event.getName(), eventString);
         }
 
-        final Response response = prepareResponse(eventString);
+        final Response response = Response.ok(eventString).build();
         log.debug("Broadcasting event: " + eventString);
         // This is asynchronous
         broadcaster.broadcast(response);
-    }
-
-    private Response prepareResponse(final String formattedEvent)
-    {
-        final JSONPObject jsonpObject = new JSONPObject(callback, formattedEvent);
-        return Response.ok(jsonpObject).build();
     }
 }
