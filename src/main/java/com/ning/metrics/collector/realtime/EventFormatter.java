@@ -24,6 +24,8 @@ import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
 import com.ning.metrics.serialization.thrift.item.DataItem;
+import com.ning.metrics.serialization.thrift.item.DataItemFactory;
+
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -34,7 +36,8 @@ import java.io.OutputStream;
 
 public class EventFormatter
 {
-    private final static Logger log = Logger.getLogger(EventFormatter.class);
+    private static final Logger log = Logger.getLogger(EventFormatter.class);
+    private static final DataItem EMPTY_DATA_ITEM = DataItemFactory.create("");
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final CachingGoodwillAccessor goodwillAccessor;
@@ -109,7 +112,7 @@ public class EventFormatter
                     if (goodwillSchemaField == null) {
                         throw new IOException(String.format("Unable to find schema field for %s", field));
                     }
-                    addToRoot(root, field.getDataItem(), goodwillSchemaField);
+                    addToRoot(root, field == null ? EMPTY_DATA_ITEM : field.getDataItem(), goodwillSchemaField);
                     i++;
                 }
 
