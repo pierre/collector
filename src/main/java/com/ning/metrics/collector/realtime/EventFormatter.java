@@ -112,7 +112,7 @@ public class EventFormatter
                     if (goodwillSchemaField == null) {
                         throw new IOException(String.format("Unable to find schema field for %s", field));
                     }
-                    addToRoot(root, field == null ? EMPTY_DATA_ITEM : field.getDataItem(), goodwillSchemaField);
+                    addToRoot(root, field.getDataItem() == null ? EMPTY_DATA_ITEM : field.getDataItem(), goodwillSchemaField);
                     i++;
                 }
 
