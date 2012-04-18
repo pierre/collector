@@ -1,1 +1,6 @@
 language: java
+notifications:
+  email:
+    - pierre@mouraf.org
+  irc:
+    - "irc.freenode.org#dwarf"
