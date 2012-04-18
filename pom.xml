@@ -35,6 +35,10 @@
     </scm>
     <repositories>
         <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/content/repositories/releases/</url>
+        </repository>
+        <repository>
             <id>file-based-repo-for-external-libs</id>
             <url>file://${basedir}/lib</url>
         </repository>
