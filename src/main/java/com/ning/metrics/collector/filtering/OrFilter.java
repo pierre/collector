@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,15 +14,16 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.filters;
+package com.ning.metrics.collector.filtering;
+
+import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-class OrFilter implements Filter<ExtractedAnnotation>
+public class OrFilter implements Filter<ExtractedAnnotation>
 {
     private final List<Filter> filterList;
 

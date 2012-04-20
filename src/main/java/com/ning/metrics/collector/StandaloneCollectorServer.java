@@ -19,7 +19,7 @@ package com.ning.metrics.collector;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
-import com.ning.metrics.collector.endpoint.filters.FiltersModule;
+import com.ning.metrics.collector.guice.FiltersModule;
 import com.ning.metrics.collector.endpoint.resources.ScribeModule;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.endpoint.servers.ScribeServer;

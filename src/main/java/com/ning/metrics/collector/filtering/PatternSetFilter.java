@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.filters;
+package com.ning.metrics.collector.filtering;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
-class PatternSetFilter implements Filter<ExtractedAnnotation>
+public class PatternSetFilter implements Filter<ExtractedAnnotation>
 {
     private final FieldExtractor fieldExtractor;
     private final ConcurrentMap<String, Pattern> patternMap = new ConcurrentHashMap<String, Pattern>();

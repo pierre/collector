@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,7 +14,10 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.filters;
+package com.ning.metrics.collector.guice.providers;
+
+import com.ning.metrics.collector.filtering.FieldExtractor;
+import com.ning.metrics.collector.filtering.PatternSetFilter;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -23,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-class EventFilterProvider implements Provider<PatternSetFilter>
+public class EventFilterProvider implements Provider<PatternSetFilter>
 {
     private final FieldExtractor fieldExtractor;
     private final Set<Pattern> patternSet = new HashSet<Pattern>();

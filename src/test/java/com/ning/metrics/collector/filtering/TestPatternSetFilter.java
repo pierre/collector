@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,9 +14,10 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.filters;
+package com.ning.metrics.collector.filtering;
 
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,40 +26,39 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("unchecked")
 public class TestPatternSetFilter
 {
     @Test(groups = "fast")
     public void testNullValue() throws Exception
     {
-        final Filter filter = new PatternSetFilter(createFieldExtractor(null), createPatternSet("pattern1", "pattern2"));
+        final Filter<ExtractedAnnotation> filter = new PatternSetFilter(createFieldExtractor(null), createPatternSet("pattern1", "pattern2"));
         Assert.assertEquals(filter.passesFilter(null, null), false);
     }
 
     @Test(groups = "fast")
     public void testEmptySetPatternEventRESTRequestFilter() throws Exception
     {
-        final Filter filter = new PatternSetFilter(createFieldExtractor("test-host"), Collections.<Pattern>emptySet());
+        final Filter<ExtractedAnnotation> filter = new PatternSetFilter(createFieldExtractor("test-host"), Collections.<Pattern>emptySet());
         Assert.assertEquals(filter.passesFilter(null, null), false);
     }
 
     @Test(groups = "fast")
     public void testSinglePatternEventRESTRequestFilter() throws Exception
     {
-        final Filter filterShouldMatch = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("test-host"));
+        final Filter<ExtractedAnnotation> filterShouldMatch = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("test-host"));
         Assert.assertEquals(filterShouldMatch.passesFilter(null, null), true);
 
-        final Filter filterDoesNotMatch = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("mugen"));
+        final Filter<ExtractedAnnotation> filterDoesNotMatch = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("mugen"));
         Assert.assertEquals(filterDoesNotMatch.passesFilter(null, null), false);
     }
 
     @Test(groups = "fast")
     public void testMultiplePatternEventRESTRequestFilter() throws Exception
     {
-        final Filter trueFilter = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("test-host", "nothing"));
+        final Filter<ExtractedAnnotation> trueFilter = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("test-host", "nothing"));
         Assert.assertTrue(trueFilter.passesFilter(null, null));
 
-        final Filter falseFilter = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("mugen", "nothing"));
+        final Filter<ExtractedAnnotation> falseFilter = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("mugen", "nothing"));
         Assert.assertFalse(falseFilter.passesFilter(null, null));
     }
 

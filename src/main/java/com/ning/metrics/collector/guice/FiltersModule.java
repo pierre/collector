@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.filters;
+package com.ning.metrics.collector.guice;
 
 import com.google.inject.Binder;
 import com.google.inject.Inject;
@@ -24,6 +24,11 @@ import com.google.inject.name.Names;
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.providers.ArrayListProvider;
+import com.ning.metrics.collector.guice.providers.EventFilterProvider;
+import com.ning.metrics.collector.filtering.FieldExtractors;
+import com.ning.metrics.collector.filtering.Filter;
+import com.ning.metrics.collector.filtering.OrFilter;
+
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 

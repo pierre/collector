@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,16 +14,16 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.filters;
+package com.ning.metrics.collector.filtering;
 
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-@SuppressWarnings("unchecked")
 public class TestOrFilter
 {
     private static final Filter TRUE_FILTER = new Filter<ExtractedAnnotation>()
@@ -47,27 +47,27 @@ public class TestOrFilter
     @Test(groups = "fast")
     public void testEmptySetFilterFilter() throws Exception
     {
-        final Filter filter = new OrFilter(Collections.<Filter>emptyList());
+        final Filter<ExtractedAnnotation> filter = new OrFilter(Collections.<Filter>emptyList());
         Assert.assertEquals(filter.passesFilter(null, null), false);
     }
 
     @Test(groups = "fast")
     public void testSingleFilter() throws Exception
     {
-        final Filter trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER));
+        final Filter<ExtractedAnnotation> trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER));
         Assert.assertEquals(trueFilter.passesFilter(null, null), true);
 
-        final Filter falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER));
+        final Filter<ExtractedAnnotation> falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER));
         Assert.assertEquals(falseFilter.passesFilter(null, null), false);
     }
 
     @Test(groups = "fast")
     public void testMultipleFilters() throws Exception
     {
-        final Filter trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER, FALSE_FILTER));
+        final Filter<ExtractedAnnotation> trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER, FALSE_FILTER));
         Assert.assertEquals(trueFilter.passesFilter(null, null), true);
 
-        final Filter falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER, FALSE_FILTER));
+        final Filter<ExtractedAnnotation> falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER, FALSE_FILTER));
         Assert.assertEquals(falseFilter.passesFilter(null, null), false);
     }
 }
