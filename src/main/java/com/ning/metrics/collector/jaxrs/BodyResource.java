@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.resources;
+package com.ning.metrics.collector.jaxrs;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
@@ -22,6 +22,7 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
+import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.serialization.event.Granularity;
 
 import com.yammer.metrics.aop.annotation.Timed;
@@ -49,10 +50,10 @@ public class BodyResource
     private static final String APPLICATION_JSON_SMILE = "application/json+smile";
     private static final String THRIFT = "application/thrift";
 
-    private final EventRequestHandler requestHandler;
+    private final EventDeserializerRequestHandler requestHandler;
 
     @Inject
-    public BodyResource(@InternalEventRequestHandler final EventRequestHandler requestHandler)
+    public BodyResource(@InternalEventRequestHandler final EventDeserializerRequestHandler requestHandler)
     {
         this.requestHandler = requestHandler;
     }

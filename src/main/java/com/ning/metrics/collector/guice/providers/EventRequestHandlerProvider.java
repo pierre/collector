@@ -14,19 +14,20 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.extractors;
+package com.ning.metrics.collector.guice.providers;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
+import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
+import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.collector.endpoint.resources.EventHandler;
-import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 
 import java.lang.annotation.Annotation;
 
-class EventRequestHandlerProvider implements Provider<EventRequestHandler>
+public class EventRequestHandlerProvider implements Provider<EventDeserializerRequestHandler>
 {
     private static final EventDeserializerFactory eventDeserializerFactory = new EventDeserializerFactory();
 
@@ -45,11 +46,11 @@ class EventRequestHandlerProvider implements Provider<EventRequestHandler>
     }
 
     @Override
-    public EventRequestHandler get()
+    public EventDeserializerRequestHandler get()
     {
         final EventHandler eventHandler = injector.getInstance(EventHandler.class);
         final EventEndPointStats stats = injector.getInstance(eventEndPointStatsKey);
 
-        return new EventRequestHandler(eventHandler, stats, eventDeserializerFactory);
+        return new EventDeserializerRequestHandler(eventHandler, stats, eventDeserializerFactory);
     }
 }

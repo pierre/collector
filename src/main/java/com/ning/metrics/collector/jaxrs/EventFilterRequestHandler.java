@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.resources;
+package com.ning.metrics.collector.jaxrs;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
@@ -23,6 +23,7 @@ import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import com.ning.metrics.collector.filtering.Filter;
 import com.ning.metrics.collector.hadoop.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
@@ -32,9 +33,9 @@ import org.weakref.jmx.Managed;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 
-public class EventHandlerImpl implements EventHandler
+public class EventFilterRequestHandler implements EventHandler
 {
-    private static final Logger log = Logger.getLogger(EventHandlerImpl.class);
+    private static final Logger log = Logger.getLogger(EventFilterRequestHandler.class);
 
     private final EventCollector collector;
 
@@ -44,19 +45,19 @@ public class EventHandlerImpl implements EventHandler
     private final CacheControl cacheControl;
 
     @Inject
-    public EventHandlerImpl(
-        final EventCollector collector,
-        @SuppressWarnings("unchecked") @EventEndpointRequestFilter final Filter requestFilter,
-        final CollectorConfig config
+    public EventFilterRequestHandler(
+            final EventCollector collector,
+            @SuppressWarnings("unchecked") @EventEndpointRequestFilter final Filter requestFilter,
+            final CollectorConfig config
     )
     {
         this(collector, requestFilter, config.isEventEndpointEnabled());
     }
 
-    public EventHandlerImpl(
-        final EventCollector collector,
-        @SuppressWarnings("unchecked") final Filter requestFilter,
-        final boolean enabled
+    public EventFilterRequestHandler(
+            final EventCollector collector,
+            @SuppressWarnings("unchecked") final Filter requestFilter,
+            final boolean enabled
     )
     {
         this.collector = collector;

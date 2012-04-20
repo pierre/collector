@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,13 +14,14 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.resources;
+package com.ning.metrics.collector.jaxrs;
 
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
+import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.EventDeserializer;
 import com.yammer.metrics.Metrics;
@@ -36,9 +37,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Event handler for the HTTP API (GET and POST).
  */
-public class EventRequestHandler
+public class EventDeserializerRequestHandler
 {
-    private static final Logger log = Logger.getLogger(EventRequestHandler.class);
+    private static final Logger log = Logger.getLogger(EventDeserializerRequestHandler.class);
 
     private final EventEndPointStats endPointStats;
     private final EventHandler eventHandler;
@@ -46,10 +47,10 @@ public class EventRequestHandler
     private final EventDeserializerFactory eventDeserializerFactory;
     private final Map<String, MeterMetric> metrics = new HashMap<String, MeterMetric>();
 
-    public EventRequestHandler(
-        final EventHandler eventHandler,
-        final EventEndPointStats stats,
-        final EventDeserializerFactory eventDeserializerFactory
+    public EventDeserializerRequestHandler(
+            final EventHandler eventHandler,
+            final EventEndPointStats stats,
+            final EventDeserializerFactory eventDeserializerFactory
     )
     {
         this.endPointStats = stats;
@@ -59,9 +60,9 @@ public class EventRequestHandler
         // Exposes stats per Event type
         for (final DeserializationType deserializationType : DeserializationType.values()) {
             metrics.put(getSuccessMetricsKey(deserializationType),
-                Metrics.newMeter(EventRequestHandler.class, getSuccessMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
+                Metrics.newMeter(EventDeserializerRequestHandler.class, getSuccessMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
             metrics.put(getFailureMetricsKey(deserializationType),
-                Metrics.newMeter(EventRequestHandler.class, getFailureMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
+                Metrics.newMeter(EventDeserializerRequestHandler.class, getFailureMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
         }
     }
 

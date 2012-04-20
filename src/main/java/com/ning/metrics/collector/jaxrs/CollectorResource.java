@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,14 +14,16 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.resources;
+package com.ning.metrics.collector.jaxrs;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.Base64ExternalEventRequestHandler;
+import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
 import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
+import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
+import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.serialization.event.Granularity;
 
 import com.yammer.metrics.aop.annotation.Timed;
@@ -30,30 +32,27 @@ import org.joda.time.DateTime;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * Version 2 of the collector's external API encodes numbers as in a custom base64 encoding.
+ * Version 1 of the collector's external API.
  */
-@Path("/2")
-public class Base64CollectorResource
+@Path("/1")
+public class CollectorResource
 {
-    private final EventRequestHandler requestHandler;
+    private final EventDeserializerRequestHandler requestHandler;
 
     @Inject
-    public Base64CollectorResource(@Base64ExternalEventRequestHandler final EventRequestHandler requestHandler)
+    public CollectorResource(@ExternalEventRequestHandler final EventDeserializerRequestHandler requestHandler)
     {
         this.requestHandler = requestHandler;
     }
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Timed(name = "GET_Base64_API")
+    @Timed(name = "GET_API")
     public Response get(
         @QueryParam("v") final String eventName,
         @QueryParam("date") final String eventDateTimeString,
@@ -65,7 +64,7 @@ public class Base64CollectorResource
         final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
         final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, eventDateTime,
-            eventGranularity, request.getRemoteAddr(), DeserializationType.BASE_64_QUERY);
+            eventGranularity, request.getRemoteAddr(), DeserializationType.DECIMAL_QUERY);
         return requestHandler.handleEventRequest(annotation, eventStats);
     }
 }

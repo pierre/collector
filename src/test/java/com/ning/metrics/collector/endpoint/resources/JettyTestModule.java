@@ -21,7 +21,7 @@ import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.collector.FastCollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
-import com.ning.metrics.collector.endpoint.extractors.RequestHandlersModule;
+import com.ning.metrics.collector.guice.RequestHandlersModule;
 import com.ning.metrics.collector.guice.FiltersModule;
 import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
 import com.ning.metrics.collector.hadoop.processing.MockPersistentWriterFactory;

@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.extractors;
+package com.ning.metrics.collector.guice;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -27,9 +27,10 @@ import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler
 import com.ning.metrics.collector.binder.providers.ArrayListProvider;
 import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
+import com.ning.metrics.collector.guice.providers.EventRequestHandlerProvider;
+import com.ning.metrics.collector.jaxrs.EventFilterRequestHandler;
+import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.collector.endpoint.resources.EventHandler;
-import com.ning.metrics.collector.endpoint.resources.EventHandlerImpl;
-import com.ning.metrics.collector.endpoint.resources.EventRequestHandler;
 import com.ning.metrics.collector.hadoop.processing.WriterHealthCheck;
 import com.ning.metrics.collector.hadoop.writer.HadoopHealthCheck;
 import com.ning.metrics.collector.realtime.RealtimeHealthCheck;
@@ -48,11 +49,11 @@ public class RequestHandlersModule implements Module
         final ExportBuilder builder = MBeanModule.newExporter(binder);
 
         // Base10 GET Api
-        binder.bind(EventRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
+        binder.bind(EventDeserializerRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
 
         // Base64 GET Api
-        binder.bind(EventRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
+        binder.bind(EventDeserializerRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
 
         binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
@@ -61,7 +62,7 @@ public class RequestHandlersModule implements Module
             .as("com.ning.metrics.collector:name=GETEndPointStats");
 
         // POST Api
-        binder.bind(EventRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
+        binder.bind(EventDeserializerRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
             .toProvider(new EventRequestHandlerProvider(InternalEventEndPointStats.class)).asEagerSingleton();
 
         binder.bind(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
@@ -69,8 +70,8 @@ public class RequestHandlersModule implements Module
         builder.export(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
             .as("com.ning.metrics.collector:name=POSTEndPointStats");
 
-        binder.bind(EventHandler.class).to(EventHandlerImpl.class).asEagerSingleton();
-        builder.export(EventHandlerImpl.class).as("com.ning.metrics.collector:name=HTTPEventHandler");
+        binder.bind(EventHandler.class).to(EventFilterRequestHandler.class).asEagerSingleton();
+        builder.export(EventFilterRequestHandler.class).as("com.ning.metrics.collector:name=HTTPEventHandler");
 
         // Healthchecks
         binder.bind(new TypeLiteral<List<ComponentHealthCheck>>()

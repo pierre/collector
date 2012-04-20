@@ -21,8 +21,8 @@ import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
+import com.ning.metrics.collector.jaxrs.EventFilterRequestHandler;
 import com.ning.metrics.collector.filtering.Filter;
-import com.ning.metrics.collector.endpoint.resources.EventHandlerImpl;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StubEvent;
 import org.testng.Assert;
@@ -37,7 +37,7 @@ public class TestEventHandlerImpl
     private MockEventCollector collector = null;
     private boolean filterValue = false;
     private EventEndPointStats stats = null;
-    private EventHandlerImpl eventHandler = null;
+    private EventFilterRequestHandler eventHandler = null;
     private ExtractedAnnotation annotation = null;
     private EventStats eventStats = null;
 
@@ -56,7 +56,7 @@ public class TestEventHandlerImpl
         };
         stats = new EventEndPointStats(5);
         annotation = new ParsedRequest("DummyEvent", null, null, null, null, DeserializationType.DEFAULT);
-        eventHandler = new EventHandlerImpl(collector, requestFilter, true);
+        eventHandler = new EventFilterRequestHandler(collector, requestFilter, true);
         eventStats = new EventStats();
     }
 

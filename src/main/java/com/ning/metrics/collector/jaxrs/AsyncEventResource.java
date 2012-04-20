@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Ning, Inc.
+ * Copyright 2010-2012 Ning, Inc.
  *
  * Ning licenses this file to you under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.async;
+package com.ning.metrics.collector.jaxrs;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
@@ -38,7 +38,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 
 @Path("/a")
-public class EventResource
+public class AsyncEventResource
 {
     private static final String APPLICATION_JSONP = "application/x-javascript";
 
@@ -46,7 +46,7 @@ public class EventResource
     private final EventListenerDispatcher dispatcher;
 
     @Inject
-    public EventResource(final CollectorConfig config, final EventListenerDispatcher dispatcher)
+    public AsyncEventResource(final CollectorConfig config, final EventListenerDispatcher dispatcher)
     {
         this.config = config;
         this.dispatcher = dispatcher;

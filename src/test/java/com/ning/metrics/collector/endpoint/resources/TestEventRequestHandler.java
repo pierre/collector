@@ -24,6 +24,7 @@ import com.ning.metrics.collector.endpoint.MockHttpHeaders;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
 import com.ning.metrics.collector.endpoint.extractors.MockEventDeserializer;
+import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.EventDeserializer;
 import com.ning.metrics.serialization.event.StubEvent;
@@ -40,7 +41,7 @@ public class TestEventRequestHandler
     private EventEndPointStats stats = null;
     private MockEventHandler eventHandler = null;
     private MockEventDeserializer eventDeserializer = null;
-    private EventRequestHandler eventRequestHandler = null;
+    private EventDeserializerRequestHandler eventRequestHandler = null;
     private EventStats eventStats = null;
     private MockEventDeserializerFactory eventDeserializerFactory;
 
@@ -53,7 +54,7 @@ public class TestEventRequestHandler
         eventDeserializerFactory = new MockEventDeserializerFactory();
         // Every test shares the same factory, and they all expect it to provide different types of events.
         // so the tests can't run in parallel. Hence the "synchronized" keyword everywhere.
-        eventRequestHandler = new EventRequestHandler(eventHandler, stats, eventDeserializerFactory);
+        eventRequestHandler = new EventDeserializerRequestHandler(eventHandler, stats, eventDeserializerFactory);
         eventStats = new EventStats();
     }
 
