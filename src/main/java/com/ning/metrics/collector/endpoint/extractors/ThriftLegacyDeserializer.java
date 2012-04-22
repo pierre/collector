@@ -15,7 +15,7 @@
  */
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.serialization.event.EventDeserializer;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
@@ -30,11 +30,11 @@ public class ThriftLegacyDeserializer implements EventDeserializer
 {
     // hack. returns false after one event is extracted
     private boolean hasNextEvent = true;
-    ExtractedAnnotation annotation;
+    ParsedRequest annotation;
 
-    public ThriftLegacyDeserializer(ExtractedAnnotation annotation)
+    public ThriftLegacyDeserializer(final ParsedRequest parsedRequest)
     {
-        this.annotation = annotation;
+        this.annotation = parsedRequest;
     }
 
     @Override

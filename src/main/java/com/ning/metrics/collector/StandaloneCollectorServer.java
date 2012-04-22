@@ -23,7 +23,7 @@ import com.ning.metrics.collector.guice.FiltersModule;
 import com.ning.metrics.collector.endpoint.resources.ScribeModule;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.endpoint.servers.ScribeServer;
-import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
+import com.ning.metrics.collector.guice.EventCollectorModule;
 import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.nagios.CollectorServiceCheck;
 import com.ning.metrics.collector.nagios.NagiosMonitor;
@@ -124,13 +124,13 @@ public class StandaloneCollectorServer
                     serveRegex(ASYNC_RESOURCES_PATTERN).with(GuiceManagedAtmosphereServlet.class, new HashMap<String, String>()
                     {
                         {
-                            put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
+                            put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.jaxrs");
                         }
                     });
                     serveRegex(EVENTS_RESOURCES_PATTERN).with(GuiceContainer.class, new HashMap<String, String>()
                     {
                         {
-                            put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.endpoint");
+                            put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.collector.jaxrs");
                         }
                     });
                 }

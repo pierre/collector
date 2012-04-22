@@ -20,7 +20,8 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ning.metrics.collector.MockEvent;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.endpoint.EventStats;
+import com.ning.metrics.collector.guice.EventCollectorModule;
+import com.ning.metrics.collector.processing.EventCollector;
 import com.ning.metrics.collector.realtime.EventQueueProcessor;
 import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
 import com.ning.metrics.collector.realtime.GlobalEventQueueStats;
@@ -42,7 +43,7 @@ public class TestBufferingEventCollector
     private CollectorConfig config;
 
     @Inject
-    private BufferingEventCollector collector;
+    private EventCollector collector;
 
     @Inject
     private EventSpoolDispatcher dispatcher;
@@ -69,7 +70,6 @@ public class TestBufferingEventCollector
     private Collection sentEvents;
 
     private Event event;
-    private EventStats eventStats;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
@@ -79,15 +79,14 @@ public class TestBufferingEventCollector
         stats.clear();
 
         event = new MockEvent();
-        eventStats = new EventStats();
     }
 
     @Test(groups = "slow")
     public void testAMQIntegration() throws Exception
     {
         // Message type not recognized yet
-        collector.collectEvent(event, eventStats);
-        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event);
+        collector.collectEvent(event);
         Thread.sleep(100);
         assertEquals(sentEvents.size(), 0);
         assertEquals(stats.getIgnoredEvents(), 2);
@@ -98,8 +97,8 @@ public class TestBufferingEventCollector
 
         // Message type now recognized
         ((EventQueueProcessorImpl) msgSender).addTypeToCollect(event.getName());
-        collector.collectEvent(event, eventStats);
-        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event);
+        collector.collectEvent(event);
         Thread.sleep(100);
         assertEquals(sentEvents.size(), 2);
         assertEquals(stats.getIgnoredEvents(), 2);
@@ -110,8 +109,8 @@ public class TestBufferingEventCollector
 
         // Close the firehose
         ((EventQueueProcessorImpl) msgSender).disable();
-        collector.collectEvent(event, eventStats);
-        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event);
+        collector.collectEvent(event);
         Thread.sleep(100);
         assertEquals(sentEvents.size(), 2);
         assertEquals(stats.getIgnoredEvents(), 4);
@@ -123,8 +122,8 @@ public class TestBufferingEventCollector
         // Re-open the firehose
         // The queues are re-created, hence the stats for the bar event are reset
         ((EventQueueProcessorImpl) msgSender).enable();
-        collector.collectEvent(event, eventStats);
-        collector.collectEvent(event, eventStats);
+        collector.collectEvent(event);
+        collector.collectEvent(event);
         Thread.sleep(100);
         assertEquals(sentEvents.size(), 4);
         assertEquals(stats.getIgnoredEvents(), 4);
@@ -141,7 +140,7 @@ public class TestBufferingEventCollector
         ((EventQueueProcessorImpl) msgSender).addTypeToCollect(event.getName());
 
         for (int idx = 0; idx < config.getActiveMQBufferLength(); idx++) {
-            collector.collectEvent(event, eventStats);
+            collector.collectEvent(event);
         }
         Thread.sleep(config.getActiveMQBufferLength() / 10);
         assertEquals(sentEvents.size(), config.getActiveMQBufferLength());
@@ -154,7 +153,7 @@ public class TestBufferingEventCollector
         sessionLock.lock();
         try {
             for (int idx = 0; idx < config.getActiveMQBufferLength() + config.getActiveMQBufferLength(); idx++) {
-                collector.collectEvent(event, eventStats);
+                collector.collectEvent(event);
             }
         }
         finally {

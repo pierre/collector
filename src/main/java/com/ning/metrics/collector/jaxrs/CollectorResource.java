@@ -16,16 +16,11 @@
 
 package com.ning.metrics.collector.jaxrs;
 
-import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
-import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
-import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
-import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.serialization.event.Granularity;
 
+import com.google.inject.Inject;
 import com.yammer.metrics.aop.annotation.Timed;
 import org.joda.time.DateTime;
 
@@ -46,25 +41,22 @@ public class CollectorResource
     private final EventDeserializerRequestHandler requestHandler;
 
     @Inject
-    public CollectorResource(@ExternalEventRequestHandler final EventDeserializerRequestHandler requestHandler)
+    public CollectorResource(final EventDeserializerRequestHandler requestHandler)
     {
         this.requestHandler = requestHandler;
     }
 
     @GET
     @Timed(name = "GET_API")
-    public Response get(
-        @QueryParam("v") final String eventName,
-        @QueryParam("date") final String eventDateTimeString,
-        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
-        @Context final HttpHeaders httpHeaders,
-        @Context final HttpServletRequest request
-    )
+    public Response get(@QueryParam("v") final String eventName,
+                        @QueryParam("date") final String eventDateTimeString,
+                        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
+                        @Context final HttpHeaders httpHeaders,
+                        @Context final HttpServletRequest request)
     {
-        final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, eventDateTime,
-            eventGranularity, request.getRemoteAddr(), DeserializationType.DECIMAL_QUERY);
-        return requestHandler.handleEventRequest(annotation, eventStats);
+        final ParsedRequest parsedRequest = new ParsedRequest(eventName, httpHeaders, eventDateTime,
+                                                              eventGranularity, request.getRemoteAddr(), DeserializationType.DECIMAL_QUERY);
+        return requestHandler.handleEventRequest(parsedRequest);
     }
 }

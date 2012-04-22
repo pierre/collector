@@ -16,15 +16,11 @@
 
 package com.ning.metrics.collector.jaxrs;
 
-import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
-import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
-import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.serialization.event.Granularity;
 
+import com.google.inject.Inject;
 import com.yammer.metrics.aop.annotation.Timed;
 import org.joda.time.DateTime;
 
@@ -53,72 +49,65 @@ public class BodyResource
     private final EventDeserializerRequestHandler requestHandler;
 
     @Inject
-    public BodyResource(@InternalEventRequestHandler final EventDeserializerRequestHandler requestHandler)
+    public BodyResource(final EventDeserializerRequestHandler requestHandler)
     {
         this.requestHandler = requestHandler;
     }
 
-    // legacy endpoint to fall back on, for recieving single ThriftEnvelopeEvents
+    // legacy endpoint to fall back on, for receiving single ThriftEnvelopeEvents
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     @Timed(name = "POST_ThriftLegacy_API")
-    public Response postThriftLegacy(
-        @QueryParam("name") final String eventName,
-        @QueryParam("date") final String eventDateTimeString,
-        @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
-        final byte[] content,
-        @Context final HttpHeaders httpHeaders,
-        @Context final HttpServletRequest request
-    )
+    public Response postThriftLegacy(@QueryParam("name") final String eventName,
+                                     @QueryParam("date") final String eventDateTimeString,
+                                     @QueryParam(Granularity.GRANULARITY_QUERY_PARAM) final String eventGranularity,
+                                     final byte[] content,
+                                     @Context final HttpHeaders httpHeaders,
+                                     @Context final HttpServletRequest request)
     {
-        final EventStats eventStats = new EventStats();
         final DateTime eventDateTime = new DateTime(eventDateTimeString);
-        final ExtractedAnnotation annotation = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content), eventDateTime, eventGranularity, request.getRemoteAddr(), DeserializationType.DEFAULT);
-        return requestHandler.handleEventRequest(annotation, eventStats);
+        final ParsedRequest parsedRequest = new ParsedRequest(eventName, httpHeaders, new ByteArrayInputStream(content),
+                                                              eventDateTime, eventGranularity, request.getRemoteAddr(),
+                                                              DeserializationType.DEFAULT);
+        return requestHandler.handleEventRequest(parsedRequest);
     }
 
     @POST
     @Consumes(THRIFT)
     @Produces(MediaType.TEXT_PLAIN)
     @Timed(name = "POST_Thrift_API")
-    public Response postThrift(
-        final InputStream body,
-        @Context final HttpHeaders httpHeaders,
-        @Context final HttpServletRequest request
-    )
+    public Response postThrift(final InputStream body,
+                               @Context final HttpHeaders httpHeaders,
+                               @Context final HttpServletRequest request)
     {
-        final EventStats eventStats = new EventStats();
-        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), DeserializationType.THRIFT);
-        return requestHandler.handleEventRequest(annotation, eventStats);
+        final ParsedRequest parsedRequest = new ParsedRequest(null, httpHeaders, body, null, null,
+                                                              request.getRemoteAddr(), DeserializationType.THRIFT);
+        return requestHandler.handleEventRequest(parsedRequest);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     @Timed(name = "POST_Json_API")
-    public Response postJson(
-        final InputStream body,
-        @Context final HttpHeaders httpHeaders,
-        @Context final HttpServletRequest request
-    )
+    public Response postJson(final InputStream body,
+                             @Context final HttpHeaders httpHeaders,
+                             @Context final HttpServletRequest request)
     {
-        final EventStats eventStats = new EventStats();
-        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), DeserializationType.JSON);
-        return requestHandler.handleEventRequest(annotation, eventStats);
+        final ParsedRequest parsedRequest = new ParsedRequest(null, httpHeaders, body, null, null,
+                                                              request.getRemoteAddr(), DeserializationType.JSON);
+        return requestHandler.handleEventRequest(parsedRequest);
     }
 
     @POST
     @Consumes(APPLICATION_JSON_SMILE)
     @Produces(MediaType.TEXT_PLAIN)
     @Timed(name = "POST_Smile_API")
-    public Response postSmile(
-        final InputStream body,
-        @Context final HttpHeaders httpHeaders,
-        @Context final HttpServletRequest request
-    )
+    public Response postSmile(final InputStream body,
+                              @Context final HttpHeaders httpHeaders,
+                              @Context final HttpServletRequest request)
     {
-        final EventStats eventStats = new EventStats();
-        final ExtractedAnnotation annotation = new ParsedRequest(null, httpHeaders, body, null, null, request.getRemoteAddr(), DeserializationType.SMILE);
-        return requestHandler.handleEventRequest(annotation, eventStats);
+        final ParsedRequest parsedRequest = new ParsedRequest(null, httpHeaders, body, null, null,
+                                                              request.getRemoteAddr(), DeserializationType.SMILE);
+        return requestHandler.handleEventRequest(parsedRequest);
     }
 }

@@ -21,7 +21,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
-import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
+import com.ning.metrics.collector.processing.EventCollector;
 import com.ning.metrics.collector.util.Ip;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
@@ -50,7 +50,7 @@ public class TestCollectorResource extends TestPublicAPI
     JettyServer server;
 
     @Inject
-    BufferingEventCollector incomingQueue;
+    EventCollector incomingQueue;
 
     @Inject
     MockEventWriter hdfsWriter;

@@ -34,6 +34,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,7 +78,7 @@ class LocalSpoolManager
     {
         if (!spoolDirectory.isDirectory()) {
             log.warn("Asked to find files in spool directory but [" + spoolDirectory + "] is not a directory!");
-            return null;
+            return Collections.emptyList();
         }
         return FileUtils.listFiles(spoolDirectory, FileFilterUtils.trueFileFilter(), FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("_tmp")));
     }

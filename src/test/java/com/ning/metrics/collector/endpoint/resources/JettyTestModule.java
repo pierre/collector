@@ -23,7 +23,7 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 import com.ning.metrics.collector.guice.RequestHandlersModule;
 import com.ning.metrics.collector.guice.FiltersModule;
-import com.ning.metrics.collector.hadoop.processing.EventCollectorModule;
+import com.ning.metrics.collector.guice.EventCollectorModule;
 import com.ning.metrics.collector.hadoop.processing.MockPersistentWriterFactory;
 import com.ning.metrics.collector.hadoop.processing.PersistentWriterFactory;
 import com.ning.metrics.collector.realtime.RealTimeQueueModule;

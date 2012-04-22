@@ -18,7 +18,7 @@ package com.ning.metrics.collector.endpoint.resources;
 
 import com.facebook.fb303.fb_status;
 import com.google.inject.Inject;
-import com.ning.metrics.collector.endpoint.EventStats;
+
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
@@ -38,7 +38,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,8 +46,6 @@ import java.util.Map;
 
 class ScribeEventRequestHandler implements Iface
 {
-    private static final Charset CHARSET = Charset.forName("ISO-8859-1");
-
     private static final String SERVICE_NAME = "Ning Scribed Service";
     private static final String VERSION = "0.1";
     private static final long startTime = System.currentTimeMillis();
@@ -81,8 +78,6 @@ class ScribeEventRequestHandler implements Iface
         boolean success = false;
 
         for (final LogEntry entry : logEntries) {
-            final EventStats eventStats = new EventStats();
-
             if (entry.getCategory() == null) {
                 log.info("Ignoring scribe entry with null category");
                 eventHandler.handleFailure(entry);
@@ -110,8 +105,7 @@ class ScribeEventRequestHandler implements Iface
                 success = true;
                 for (final Event event : events) {
                     if (event != null) {
-                        eventStats.recordExtracted();
-                        if (!eventHandler.processEvent(event, eventStats)) {
+                        if (!eventHandler.processEvent(event)) {
                             success = false;
                         }
                     }

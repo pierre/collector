@@ -18,6 +18,7 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.guice.EventCollectorModule;
 import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;

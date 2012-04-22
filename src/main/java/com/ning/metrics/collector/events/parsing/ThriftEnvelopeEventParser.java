@@ -17,7 +17,8 @@
 package com.ning.metrics.collector.events.parsing;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
 import com.ning.metrics.collector.events.parsing.converters.BooleanConverter;
 import com.ning.metrics.collector.events.parsing.converters.ByteConverter;
@@ -53,7 +54,7 @@ public class ThriftEnvelopeEventParser
         this.integerConverter = new IntegerConverter(numberConverter);
     }
 
-    public ThriftEnvelopeEvent parseThriftEvent(final String eventTypeName, final String input, final ExtractedAnnotation extractedAnnotation) throws EventParsingException
+    public ThriftEnvelopeEvent parseThriftEvent(final String eventTypeName, final String input, final ParsedRequest parsedRequest) throws EventParsingException
     {
         try {
             final Tokenizer tokenizer = new UrlDecodingTokenizer(new SplitTokenizer(input, TOKEN_SEPARATOR));
@@ -89,7 +90,7 @@ public class ThriftEnvelopeEventParser
                             field = ThriftField.createThriftField(token.getValue(), id);
                             break;
                         case 'x':
-                            field = getAnnotatedValue(id, token, extractedAnnotation);
+                            field = getAnnotatedValue(id, token, parsedRequest);
                             break;
                         default:
                             throw new EventParsingException(String.format("unknown type %c", token.getType()));
@@ -103,33 +104,33 @@ public class ThriftEnvelopeEventParser
 
             final ThriftEnvelope thriftEnvelope = new ThriftEnvelope(eventTypeName, payload);
 
-            return new ThriftEnvelopeEvent(extractedAnnotation.getDateTime(), thriftEnvelope, extractedAnnotation.getBucketGranularity());
+            return new ThriftEnvelopeEvent(parsedRequest.getDateTime(), thriftEnvelope, parsedRequest.getBucketGranularity());
         }
         catch (RuntimeException e) {
             throw new EventParsingException("runtime exception parsing event", e);
         }
     }
 
-    private ThriftField getAnnotatedValue(final short id, final Token token, final ExtractedAnnotation annotation)
+    private ThriftField getAnnotatedValue(final short id, final Token token, final ParsedRequest parsedRequest)
     {
         final String function = token.getValue().toLowerCase(Locale.US);
         if ("date".equals(function)) {
-            return ThriftField.createThriftField(annotation.getDateTime().getMillis(), id);
+            return ThriftField.createThriftField(parsedRequest.getDateTime().getMillis(), id);
         }
         else if ("host".equals(function)) {
-            return ThriftField.createThriftField(nullCheck(annotation.getReferrerHost()), id);
+            return ThriftField.createThriftField(nullCheck(parsedRequest.getReferrerHost()), id);
         }
         else if ("path".equals(function)) {
-            return ThriftField.createThriftField(nullCheck(annotation.getReferrerPath()), id);
+            return ThriftField.createThriftField(nullCheck(parsedRequest.getReferrerPath()), id);
         }
         else if ("ua".equals(function)) {
-            return ThriftField.createThriftField(nullCheck(annotation.getUserAgent()), id);
+            return ThriftField.createThriftField(nullCheck(parsedRequest.getUserAgent()), id);
         }
         else if ("ip".equals(function)) {
-            return ThriftField.createThriftField(Ip.ipToInt(annotation.getIpAddress()), id);
+            return ThriftField.createThriftField(Ip.ipToInt(parsedRequest.getIpAddress()), id);
         }
 
-        throw new IllegalArgumentException(String.format("invalid annotation function: %s", function));
+        throw new IllegalArgumentException(String.format("invalid parsedRequest function: %s", function));
     }
 
     private String nullCheck(final String annotation)

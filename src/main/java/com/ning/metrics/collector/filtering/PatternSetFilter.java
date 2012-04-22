@@ -16,8 +16,9 @@
 
 package com.ning.metrics.collector.filtering;
 
+import com.ning.metrics.collector.endpoint.ParsedRequest;
+
 import com.google.inject.Inject;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
 import org.weakref.jmx.Managed;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
-public class PatternSetFilter implements Filter<ExtractedAnnotation>
+public class PatternSetFilter implements Filter<ParsedRequest>
 {
     private final FieldExtractor fieldExtractor;
     private final ConcurrentMap<String, Pattern> patternMap = new ConcurrentHashMap<String, Pattern>();
@@ -42,9 +43,9 @@ public class PatternSetFilter implements Filter<ExtractedAnnotation>
     }
 
     @Override
-    public boolean passesFilter(final String name, final ExtractedAnnotation annotation)
+    public boolean passesFilter(final String name, final ParsedRequest parsedRequest)
     {
-        final String input = fieldExtractor.getField(name, annotation);
+        final String input = fieldExtractor.getField(name, parsedRequest);
 
         if (input == null) {
             return false;

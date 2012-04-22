@@ -20,7 +20,7 @@ import com.google.inject.servlet.GuiceFilter;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
-import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
+import com.ning.metrics.collector.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.MockEventWriter;
 import org.apache.log4j.Logger;
@@ -64,12 +64,12 @@ public abstract class TestPublicAPI
         new GuiceFilter().destroy();
     }
 
-    void assertCleanQueues(final BufferingEventCollector incomingQueue)
+    void assertCleanQueues(final EventCollector incomingQueue)
     {
         Assert.assertEquals(incomingQueue.getQueueSizes(), 0);
     }
 
-    Event assertEventWasWrittenToHDFS(final BufferingEventCollector incomingQueue, final MockEventWriter hdfsWriter) throws InterruptedException
+    Event assertEventWasWrittenToHDFS(final EventCollector incomingQueue, final MockEventWriter hdfsWriter) throws InterruptedException
     {
         // Give some time for the flushes
         Thread.sleep(200);

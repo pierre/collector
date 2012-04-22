@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.filtering;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -26,19 +26,19 @@ import java.util.Collections;
 
 public class TestOrFilter
 {
-    private static final Filter TRUE_FILTER = new Filter<ExtractedAnnotation>()
+    private static final Filter<ParsedRequest> TRUE_FILTER = new Filter<ParsedRequest>()
     {
         @Override
-        public boolean passesFilter(final String eventName, final ExtractedAnnotation request)
+        public boolean passesFilter(final String eventName, final ParsedRequest request)
         {
             return true;
         }
     };
 
-    private static final Filter FALSE_FILTER = new Filter<ExtractedAnnotation>()
+    private static final Filter<ParsedRequest> FALSE_FILTER = new Filter<ParsedRequest>()
     {
         @Override
-        public boolean passesFilter(final String eventName, final ExtractedAnnotation request)
+        public boolean passesFilter(final String eventName, final ParsedRequest request)
         {
             return false;
         }
@@ -47,27 +47,27 @@ public class TestOrFilter
     @Test(groups = "fast")
     public void testEmptySetFilterFilter() throws Exception
     {
-        final Filter<ExtractedAnnotation> filter = new OrFilter(Collections.<Filter>emptyList());
+        final Filter<ParsedRequest> filter = new OrFilter(Collections.<Filter<ParsedRequest>>emptyList());
         Assert.assertEquals(filter.passesFilter(null, null), false);
     }
 
     @Test(groups = "fast")
     public void testSingleFilter() throws Exception
     {
-        final Filter<ExtractedAnnotation> trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER));
+        final Filter<ParsedRequest> trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER));
         Assert.assertEquals(trueFilter.passesFilter(null, null), true);
 
-        final Filter<ExtractedAnnotation> falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER));
+        final Filter<ParsedRequest> falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER));
         Assert.assertEquals(falseFilter.passesFilter(null, null), false);
     }
 
     @Test(groups = "fast")
     public void testMultipleFilters() throws Exception
     {
-        final Filter<ExtractedAnnotation> trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER, FALSE_FILTER));
+        final Filter<ParsedRequest> trueFilter = new OrFilter(Arrays.asList(TRUE_FILTER, FALSE_FILTER));
         Assert.assertEquals(trueFilter.passesFilter(null, null), true);
 
-        final Filter<ExtractedAnnotation> falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER, FALSE_FILTER));
+        final Filter<ParsedRequest> falseFilter = new OrFilter(Arrays.asList(FALSE_FILTER, FALSE_FILTER));
         Assert.assertEquals(falseFilter.passesFilter(null, null), false);
     }
 }

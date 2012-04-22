@@ -16,28 +16,27 @@
 
 package com.ning.metrics.collector.filtering;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 
 import com.google.inject.Inject;
 
 import java.util.List;
 
-@SuppressWarnings("unchecked")
-public class OrFilter implements Filter<ExtractedAnnotation>
+public class OrFilter implements Filter<ParsedRequest>
 {
-    private final List<Filter> filterList;
+    private final List<Filter<ParsedRequest>> filterList;
 
     @Inject
-    public OrFilter(final List<Filter> filterList)
+    public OrFilter(final List<Filter<ParsedRequest>> filterList)
     {
         this.filterList = filterList;
     }
 
     @Override
-    public boolean passesFilter(final String eventName, final ExtractedAnnotation annotation)
+    public boolean passesFilter(final String eventName, final ParsedRequest parsedRequest)
     {
-        for (final Filter filter : filterList) {
-            if (filter.passesFilter(eventName, annotation)) {
+        for (final Filter<ParsedRequest> filter : filterList) {
+            if (filter.passesFilter(eventName, parsedRequest)) {
                 return true;
             }
         }

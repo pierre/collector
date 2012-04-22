@@ -16,26 +16,21 @@
 
 package com.ning.metrics.collector.endpoint;
 
-import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import com.ning.metrics.serialization.event.Event;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MockEventHandler implements EventHandler
+public class MockEventHandler
 {
-
     private boolean throwExceptionBeforeEvent = false;
     private boolean throwExceptionAfterEvent = false;
     private final List<Event> processedEventList = new ArrayList<Event>();
     private boolean handleFailureCalled = false;
 
-    @Override
-    public Response processEvent(final Event event, final ExtractedAnnotation annotation, final EventEndPointStats stats, final EventStats eventStats)
+    public Response processEvent(final Event event)
     {
-        stats.updateTotalEvents();
-
         if (throwExceptionBeforeEvent) {
             throw new RuntimeException("IGNORE - Expected exception for tests");
         }
@@ -46,17 +41,12 @@ public class MockEventHandler implements EventHandler
             throw new RuntimeException("IGNORE - Expected exception for tests");
         }
 
-        stats.updateSuccessfulEvents();
-
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @Override
-    public Response handleFailure(final Response.Status s, final EventEndPointStats stats, final Exception e)
+    public Response handleFailure(final Response.Status s, final Exception e)
     {
         handleFailureCalled = true;
-
-        stats.updateFailedEvents();
 
         return Response.status(s)
             .header("Warning", "199 " + e.toString())

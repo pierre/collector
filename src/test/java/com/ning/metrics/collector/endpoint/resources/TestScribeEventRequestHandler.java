@@ -16,7 +16,6 @@
 
 package com.ning.metrics.collector.endpoint.resources;
 
-import com.ning.metrics.collector.endpoint.EventEndPointStats;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -29,7 +28,6 @@ import java.util.List;
 
 public class TestScribeEventRequestHandler
 {
-    private EventEndPointStats stats = null;
     private MockScribeEventHandler eventHandler = null;
     private ScribeEventRequestHandler eventRequestHandler = null;
 
@@ -38,10 +36,9 @@ public class TestScribeEventRequestHandler
     private final String THRIFT_MSG = String.format("%s:msg", EVENT_DATE_TIME.getMillis());
 
     @BeforeMethod(alwaysRun = true)
-    void setup()
+    public void setup()
     {
-        stats = new EventEndPointStats(5);
-        eventHandler = new MockScribeEventHandler(stats);
+        eventHandler = new MockScribeEventHandler();
         eventRequestHandler = new ScribeEventRequestHandler(eventHandler);
     }
 
@@ -54,9 +51,6 @@ public class TestScribeEventRequestHandler
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 1);
         Assert.assertEquals(eventHandler.getProcessedEventList().get(0).getName(), EVENT_NAME);
-        Assert.assertEquals(stats.getTotalEvents(), 1);
-        Assert.assertEquals(stats.getSuccessfulParseEvents(), 1);
-        Assert.assertEquals(stats.getFailedToParseEvents(), 0);
     }
 
     @Test(groups = "fast")
@@ -67,9 +61,6 @@ public class TestScribeEventRequestHandler
         Assert.assertEquals(eventRequestHandler.Log(logEntries), ResultCode.OK);
 
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
-        Assert.assertEquals(stats.getTotalEvents(), 1);
-        Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
-        Assert.assertEquals(stats.getFailedToParseEvents(), 1);
     }
 
     @Test(groups = "fast")
@@ -82,9 +73,5 @@ public class TestScribeEventRequestHandler
 
         Assert.assertEquals(eventHandler.isHandleFailureCalled(), true);
         Assert.assertEquals(eventHandler.getProcessedEventList().size(), 0);
-        Assert.assertEquals(stats.getTotalEvents(), 1);
-        Assert.assertEquals(stats.getSuccessfulParseEvents(), 0);
-        Assert.assertEquals(stats.getFailedToParseEvents(), 1);
-        Assert.assertEquals(stats.getRejectedEvents(), 0);
     }
 }

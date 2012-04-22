@@ -18,6 +18,7 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.guice.EventCollectorModule;
 import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;
@@ -69,15 +70,13 @@ public class TestTimeThresholdEventSpoolDispatcher
         // Wait for the dequeuer to work, the threshold being two in FastCollectorConfig
         Thread.sleep(2200);
 
-        // 16-Dec-2011, tatu: Does not pass reliably -- returns 0, not 1
-//        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 1);
+        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 1);
 
         // Try again (size threshold is > 2)
         dispatcher.offer(eventA);
         Thread.sleep(2000);
         Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 2);
 
-        // 16-Dec-2011, tatu: Does not pass reliably either...
-//        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 2);
+        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 2);
     }
 }

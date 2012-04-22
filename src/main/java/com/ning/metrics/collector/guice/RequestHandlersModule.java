@@ -16,70 +16,42 @@
 
 package com.ning.metrics.collector.guice;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
-import com.ning.metrics.collector.binder.annotations.Base64ExternalEventRequestHandler;
-import com.ning.metrics.collector.binder.annotations.ExternalEventEndPointStats;
-import com.ning.metrics.collector.binder.annotations.ExternalEventRequestHandler;
-import com.ning.metrics.collector.binder.annotations.InternalEventEndPointStats;
-import com.ning.metrics.collector.binder.annotations.InternalEventRequestHandler;
 import com.ning.metrics.collector.binder.providers.ArrayListProvider;
-import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.EventEndPointStatsProvider;
-import com.ning.metrics.collector.guice.providers.EventRequestHandlerProvider;
-import com.ning.metrics.collector.jaxrs.EventFilterRequestHandler;
-import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
-import com.ning.metrics.collector.endpoint.resources.EventHandler;
+import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
 import com.ning.metrics.collector.hadoop.processing.WriterHealthCheck;
 import com.ning.metrics.collector.hadoop.writer.HadoopHealthCheck;
+import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
+import com.ning.metrics.collector.jaxrs.EventFilterRequestHandler;
 import com.ning.metrics.collector.realtime.RealtimeHealthCheck;
 import com.ning.metrics.collector.util.ComponentHealthCheck;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
 import java.util.List;
 
-public class RequestHandlersModule implements Module
+public class RequestHandlersModule extends AbstractModule
 {
     @Override
-    public void configure(final Binder binder)
+    public void configure()
     {
         // JMX exporter
-        final ExportBuilder builder = MBeanModule.newExporter(binder);
+        final ExportBuilder builder = MBeanModule.newExporter(binder());
 
-        // Base10 GET Api
-        binder.bind(EventDeserializerRequestHandler.class).annotatedWith(ExternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
+        bind(EventDeserializerFactory.class).asEagerSingleton();
 
-        // Base64 GET Api
-        binder.bind(EventDeserializerRequestHandler.class).annotatedWith(Base64ExternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(ExternalEventEndPointStats.class)).asEagerSingleton();
+        bind(EventFilterRequestHandler.class).asEagerSingleton();
 
-        binder.bind(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
-            .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
-        builder.export(EventEndPointStats.class).annotatedWith(ExternalEventEndPointStats.class)
-            .as("com.ning.metrics.collector:name=GETEndPointStats");
-
-        // POST Api
-        binder.bind(EventDeserializerRequestHandler.class).annotatedWith(InternalEventRequestHandler.class)
-            .toProvider(new EventRequestHandlerProvider(InternalEventEndPointStats.class)).asEagerSingleton();
-
-        binder.bind(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
-            .toProvider(EventEndPointStatsProvider.class).asEagerSingleton();
-        builder.export(EventEndPointStats.class).annotatedWith(InternalEventEndPointStats.class)
-            .as("com.ning.metrics.collector:name=POSTEndPointStats");
-
-        binder.bind(EventHandler.class).to(EventFilterRequestHandler.class).asEagerSingleton();
-        builder.export(EventFilterRequestHandler.class).as("com.ning.metrics.collector:name=HTTPEventHandler");
+        bind(EventDeserializerRequestHandler.class).asEagerSingleton();
+        builder.export(EventDeserializerRequestHandler.class).withGeneratedName();
 
         // Healthchecks
-        binder.bind(new TypeLiteral<List<ComponentHealthCheck>>()
-        {
-        })
-            .toProvider(new ArrayListProvider<ComponentHealthCheck>()
-                .add(WriterHealthCheck.class)
-                .add(RealtimeHealthCheck.class)
-                .add(HadoopHealthCheck.class));
+        bind(new TypeLiteral<List<ComponentHealthCheck>>() {})
+                .toProvider(new ArrayListProvider<ComponentHealthCheck>()
+                                    .add(WriterHealthCheck.class)
+                                    .add(RealtimeHealthCheck.class)
+                                    .add(HadoopHealthCheck.class));
     }
 }

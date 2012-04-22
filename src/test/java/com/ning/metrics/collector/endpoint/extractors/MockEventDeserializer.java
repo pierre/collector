@@ -44,6 +44,11 @@ public class MockEventDeserializer implements EventDeserializer
         this.throwsRuntimeException = throwsRuntimeException;
     }
 
+    public void setHasNextEvent(final boolean hasNextEvent)
+    {
+        this.hasNextEvent = hasNextEvent;
+    }
+
     @Override
     public boolean hasNextEvent()
     {

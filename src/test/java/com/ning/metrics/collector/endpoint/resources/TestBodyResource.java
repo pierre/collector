@@ -22,7 +22,7 @@ import com.ning.http.client.Response;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.OpsAlert;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
-import com.ning.metrics.collector.hadoop.processing.BufferingEventCollector;
+import com.ning.metrics.collector.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
@@ -52,7 +52,7 @@ public class TestBodyResource extends TestPublicAPI
     JettyServer server;
 
     @Inject
-    BufferingEventCollector incomingQueue;
+    EventCollector incomingQueue;
 
     @Inject
     MockEventWriter hdfsWriter;

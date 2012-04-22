@@ -15,7 +15,7 @@
  */
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
@@ -32,7 +32,7 @@ public class EventDeserializerFactory
 
     // question: why is this class not static?
     // answer: so we can replace this factory with a mock one during tests
-    public EventDeserializer getEventDeserializer(final ExtractedAnnotation annotation) throws IOException
+    public EventDeserializer getEventDeserializer(final ParsedRequest annotation) throws IOException
     {
         switch (annotation.getContentType()) {
             case SMILE:

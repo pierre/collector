@@ -16,121 +16,85 @@
 
 package com.ning.metrics.collector.jaxrs;
 
-import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.annotations.EventEndpointRequestFilter;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.endpoint.extractors.EventParsingException;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
-import com.ning.metrics.collector.endpoint.resources.EventHandler;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.filtering.Filter;
-import com.ning.metrics.collector.hadoop.processing.EventCollector;
+import com.ning.metrics.collector.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
-import org.apache.log4j.Logger;
-import org.weakref.jmx.Managed;
 
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Response;
+import com.google.inject.Inject;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MeterMetric;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class EventFilterRequestHandler implements EventHandler
+import java.util.concurrent.TimeUnit;
+
+public class EventFilterRequestHandler
 {
-    private static final Logger log = Logger.getLogger(EventFilterRequestHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(EventFilterRequestHandler.class);
+
+    private final MeterMetric receivedMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Received", "events", TimeUnit.SECONDS);
+    private final MeterMetric filteredMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Filtered", "events", TimeUnit.SECONDS);
+    private final MeterMetric succeededMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Succeeded", "events", TimeUnit.SECONDS);
+    private final MeterMetric failedMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Failed", "events", TimeUnit.SECONDS);
 
     private final EventCollector collector;
-
-    @SuppressWarnings("unchecked")
-    private final Filter requestFilter;
-    private volatile boolean collectionEnabled;
-    private final CacheControl cacheControl;
+    private final Filter<ParsedRequest> requestFilter;
 
     @Inject
-    public EventFilterRequestHandler(
-            final EventCollector collector,
-            @SuppressWarnings("unchecked") @EventEndpointRequestFilter final Filter requestFilter,
-            final CollectorConfig config
-    )
-    {
-        this(collector, requestFilter, config.isEventEndpointEnabled());
-    }
-
-    public EventFilterRequestHandler(
-            final EventCollector collector,
-            @SuppressWarnings("unchecked") final Filter requestFilter,
-            final boolean enabled
-    )
+    public EventFilterRequestHandler(final EventCollector collector, final Filter<ParsedRequest> requestFilter)
     {
         this.collector = collector;
         this.requestFilter = requestFilter;
-        this.collectionEnabled = enabled;
-
-        cacheControl = new CacheControl();
-        cacheControl.setPrivate(true);
-        cacheControl.setNoCache(true);
-        cacheControl.setProxyRevalidate(true);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    //TODO no need for stats
-    public Response processEvent(final Event event, final ExtractedAnnotation annotation, final EventEndPointStats stats, final EventStats eventStats)
+    public boolean processEvent(final Event event, final ParsedRequest parsedRequest)
     {
-        stats.updateTotalEvents();
+        receivedMeter.mark();
 
-        if (collectionEnabled) {
-            if (event == null) {
-                final String msg = "Received empty event";
-                log.info(msg);
-                return handleFailure(Response.Status.BAD_REQUEST, stats, new EventParsingException(msg));
-            }
-            else {
-                // TODO we don't actually use filtering. should we still support this?
-                if (requestFilter.passesFilter(event.getName(), annotation)) {
-                    stats.updateFilteredEvents();
-                    return Response.status(Response.Status.ACCEPTED).cacheControl(cacheControl).build();
-                }
-                else {
-                    log.debug(String.format("Receiving event of type %s", event.getName()));
-
-                    if (collector.collectEvent(event, eventStats)) {
-                        stats.updateSuccesfulEventCounters(event);
-                        return Response.status(Response.Status.ACCEPTED).cacheControl(cacheControl).build();
-                    }
-                    else {
-                        stats.updateRejectedEvents();
-                        log.warn(String.format("Event rejected: %s", event));
-                        return Response.status(Response.Status.SERVICE_UNAVAILABLE).cacheControl(cacheControl).build();
-                    }
-                }
-            }
+        final String eventName = event.getName();
+        if (requestFilter.passesFilter(eventName, parsedRequest)) {
+            filteredMeter.mark();
+            // Mark the processing as succeeded: the client doesn't need to know (and shouldn't retry) if the collector
+            // is configured to ignore such events
+            return true;
         }
         else {
-            stats.updateRejectedEvents();
+            // At this point, the event will be dispatched to the various backend modules
+            log.debug("Receiving event of type {}", eventName);
 
-            log.info(String.format("Collection disabled, rejecting event: %s", event));
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE).cacheControl(cacheControl).build();
+            if (collector.collectEvent(event)) {
+                succeededMeter.mark();
+                return true;
+            }
+            else {
+                failedMeter.mark();
+                return false;
+            }
         }
     }
 
-    @Override
-    public Response handleFailure(final Response.Status status, final EventEndPointStats stats, final Exception e)
+    //@VisibleForTesting
+    MeterMetric getReceivedMeter()
     {
-        stats.updateFailedEvents();
-        return Response.status(status)
-            .header("Warning", "199 " + e.toString())
-            .cacheControl(cacheControl)
-            .build();
+        return receivedMeter;
     }
 
-    @Managed(description = "enable/disable collection of events")
-    public void setCollectionEnabled(final boolean value)
+    //@VisibleForTesting
+    MeterMetric getFilteredMeter()
     {
-        collectionEnabled = value;
+        return filteredMeter;
     }
 
-    @Managed(description = "event collection enabled?")
-    public boolean getCollectionEnabled()
+    //@VisibleForTesting
+    MeterMetric getSucceededMeter()
     {
-        return collectionEnabled;
+        return succeededMeter;
+    }
+
+    //@VisibleForTesting
+    MeterMetric getFailedMeter()
+    {
+        return failedMeter;
     }
 }

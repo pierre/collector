@@ -49,6 +49,12 @@ public class ArrayListProvider<T> implements Provider<List<T>>
         return this;
     }
 
+    public ArrayListProvider<T> add(final Key<? extends T> toBeIncluded)
+    {
+        injectables.add(toBeIncluded);
+        return this;
+    }
+
     @Override
     public List<T> get()
     {

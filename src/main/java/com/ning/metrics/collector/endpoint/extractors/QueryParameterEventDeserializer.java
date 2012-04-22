@@ -16,7 +16,8 @@
 package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.serialization.event.EventDeserializer;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
@@ -29,14 +30,14 @@ public class QueryParameterEventDeserializer implements EventDeserializer
     private static final Logger log = Logger.getLogger(QueryParameterEventDeserializer.class);
 
     private boolean hasNextEvent;
-    private ExtractedAnnotation annotation;
+    private final ParsedRequest parsedRequest;
     private final ThriftEnvelopeEventParser thriftEventParser;
 
     @Inject
-    public QueryParameterEventDeserializer(final ThriftEnvelopeEventParser thriftEventParser, final ExtractedAnnotation annotation)
+    public QueryParameterEventDeserializer(final ThriftEnvelopeEventParser thriftEventParser, final ParsedRequest parsedRequest)
     {
         this.hasNextEvent = true;
-        this.annotation = annotation;
+        this.parsedRequest = parsedRequest;
         this.thriftEventParser = thriftEventParser;
     }
 
@@ -55,7 +56,7 @@ public class QueryParameterEventDeserializer implements EventDeserializer
         // can only extract one event
         hasNextEvent = false;
 
-        final String eventName = annotation.getEventName();
+        final String eventName = parsedRequest.getEventName();
 
         if (eventName != null) {
             log.debug(String.format("Query parameter to process: %s", eventName));
@@ -66,7 +67,7 @@ public class QueryParameterEventDeserializer implements EventDeserializer
 
             try {
                 // This API only supports sending one event at a time
-                return thriftEventParser.parseThriftEvent(type, eventTypeString, annotation);
+                return thriftEventParser.parseThriftEvent(type, eventTypeString, parsedRequest);
             }
             catch (EventParsingException e) {
                 throw new IOException("Unable to parse event from query string.", e);

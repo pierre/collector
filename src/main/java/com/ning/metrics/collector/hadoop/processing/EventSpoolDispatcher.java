@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Manager of writer queues
  */
-class EventSpoolDispatcher
+public class EventSpoolDispatcher
 {
     private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
     private static final long CUTOFF_TIME_OLD_DIRS = 3600000L; // 1 hour

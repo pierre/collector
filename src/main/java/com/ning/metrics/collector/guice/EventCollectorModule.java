@@ -14,7 +14,11 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.hadoop.processing;
+package com.ning.metrics.collector.guice;
+
+import com.ning.metrics.collector.hadoop.processing.EventSpoolDispatcher;
+import com.ning.metrics.collector.hadoop.processing.WriterStats;
+import com.ning.metrics.collector.processing.EventCollector;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -34,7 +38,7 @@ public class EventCollectorModule implements Module
         binder.bind(WriterStats.class).asEagerSingleton();
         builder.export(WriterStats.class).as("com.ning.metrics.collector:name=WriterQueueStats");
 
-        binder.bind(EventCollector.class).to(BufferingEventCollector.class).asEagerSingleton();
-        builder.export(EventCollector.class).as("com.ning.metrics.collector:name=BufferingEventCollector");
+        binder.bind(EventCollector.class).asEagerSingleton();
+        builder.export(EventCollector.class).as("com.ning.metrics.collector:name=EventCollector");
     }
 }

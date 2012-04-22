@@ -16,16 +16,14 @@
 
 package com.ning.metrics.collector.endpoint.resources;
 
-import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.EventStats;
 import com.ning.metrics.serialization.event.Event;
-import com.ning.metrics.collector.endpoint.resources.ScribeEventHandler;
+
 import scribe.thrift.LogEntry;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MockScribeEventHandler implements ScribeEventHandler
+public class MockScribeEventHandler extends ScribeEventHandler
 {
     private boolean throwExceptionBeforeEvent = false;
     private boolean throwExceptionAfterEvent = false;
@@ -33,24 +31,20 @@ public class MockScribeEventHandler implements ScribeEventHandler
     private final List<Event> processedEventList = new ArrayList<Event>();
     private boolean handleFailureCalled = false;
     private boolean fakeCollectorFailure = false;
-    private final EventEndPointStats stats;
 
-    public MockScribeEventHandler(final EventEndPointStats stats)
+    public MockScribeEventHandler()
     {
-        this.stats = stats;
+        super(null, true);
     }
 
     @Override
-    public boolean processEvent(final Event event, final EventStats eventStats)
+    public boolean processEvent(final Event event)
     {
-        stats.updateTotalEvents();
-
         if (throwExceptionBeforeEvent) {
             throw new RuntimeException();
         }
 
         if (fakeCollectorFailure) {
-            stats.updateRejectedEvents();
             return false;
         }
 
@@ -59,8 +53,6 @@ public class MockScribeEventHandler implements ScribeEventHandler
         if (throwExceptionAfterEvent) {
             throw new RuntimeException();
         }
-
-        stats.updateSuccessfulEvents();
 
         return true;
     }
@@ -73,9 +65,6 @@ public class MockScribeEventHandler implements ScribeEventHandler
         if (handleFailureThrowsException) {
             throw new RuntimeException();
         }
-
-        stats.updateTotalEvents();
-        stats.updateFailedEvents();
     }
 
     public void setThrowExceptionAfterEvent(final boolean throwExceptionAfterEvent)

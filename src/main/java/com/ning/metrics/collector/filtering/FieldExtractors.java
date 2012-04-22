@@ -16,46 +16,46 @@
 
 package com.ning.metrics.collector.filtering;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 
 public enum FieldExtractors implements FieldExtractor
 {
     HOST
             {
                 @Override
-                public String getField(final String eventName, final ExtractedAnnotation annotation)
+                public String getField(final String eventName, final ParsedRequest parsedRequest)
                 {
-                    return annotation.getReferrerHost();
+                    return parsedRequest.getReferrerHost();
                 }
             },
     IP
             {
                 @Override
-                public String getField(final String eventName, final ExtractedAnnotation annotation)
+                public String getField(final String eventName, final ParsedRequest parsedRequest)
                 {
-                    return annotation.getIpAddress();
+                    return parsedRequest.getIpAddress();
                 }
             },
     USERAGENT
             {
                 @Override
-                public String getField(final String eventName, final ExtractedAnnotation annotation)
+                public String getField(final String eventName, final ParsedRequest parsedRequest)
                 {
-                    return annotation.getUserAgent();
+                    return parsedRequest.getUserAgent();
                 }
             },
     PATH
             {
                 @Override
-                public String getField(final String eventName, final ExtractedAnnotation annotation)
+                public String getField(final String eventName, final ParsedRequest parsedRequest)
                 {
-                    return annotation.getReferrerPath();
+                    return parsedRequest.getReferrerPath();
                 }
             },
     EVENT_TYPE
             {
                 @Override
-                public String getField(final String eventName, final ExtractedAnnotation annotation)
+                public String getField(final String eventName, final ParsedRequest parsedRequest)
                 {
                     return eventName;
                 }

@@ -14,11 +14,10 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.endpoint.extractors;
+package com.ning.metrics.collector.endpoint;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
-import com.ning.metrics.collector.endpoint.MockHttpHeaders;
-import com.ning.metrics.collector.endpoint.ParsedRequest;
+import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
+
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -35,7 +34,7 @@ public class TestParsedRequest
     private String ip = null;
 
     @BeforeMethod(alwaysRun = true)
-    void setup()
+    public void setup()
     {
         host = "appname.ning.com";
         path = "/bazel/path/here";
@@ -92,7 +91,7 @@ public class TestParsedRequest
     public void testParseDateExplicit() throws Exception
     {
         final HttpHeaders httpHeaders = createDummyHeaders();
-        final ExtractedAnnotation parsedRequest = new ParsedRequest("DummyEvent", httpHeaders, new DateTime("2001-02-03"), null, null, DeserializationType.DEFAULT);
+        final ParsedRequest parsedRequest = new ParsedRequest("DummyEvent", httpHeaders, new DateTime("2001-02-03"), null, null, DeserializationType.DEFAULT);
         Assert.assertEquals(parsedRequest.getDateTime(), new DateTime("2001-02-03"));
     }
 

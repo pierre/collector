@@ -16,18 +16,22 @@
 
 package com.ning.metrics.collector.jaxrs;
 
-import com.ning.metrics.collector.endpoint.EventEndPointStats;
-import com.ning.metrics.collector.endpoint.EventStats;
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
-import com.ning.metrics.collector.endpoint.resources.EventHandler;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.EventDeserializer;
+
+import com.google.inject.Inject;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MeterMetric;
-import org.apache.log4j.Logger;
+import com.yammer.metrics.core.MetricName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.weakref.jmx.Managed;
 
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashMap;
@@ -39,77 +43,175 @@ import java.util.concurrent.TimeUnit;
  */
 public class EventDeserializerRequestHandler
 {
-    private static final Logger log = Logger.getLogger(EventDeserializerRequestHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(EventDeserializerRequestHandler.class);
+    private static final String METRICS_GROUP = EventDeserializerRequestHandler.class.getPackage().getName();
 
-    private final EventEndPointStats endPointStats;
-    private final EventHandler eventHandler;
+    final EventFilterRequestHandler filterRequestHandler;
+    final EventDeserializerFactory eventDeserializerFactory;
 
-    private final EventDeserializerFactory eventDeserializerFactory;
-    private final Map<String, MeterMetric> metrics = new HashMap<String, MeterMetric>();
+    private final CacheControl cacheControl;
 
-    public EventDeserializerRequestHandler(
-            final EventHandler eventHandler,
-            final EventEndPointStats stats,
-            final EventDeserializerFactory eventDeserializerFactory
-    )
+    // We keep two meters (success and failure) for each DeserializationType
+    private final Map<MetricName, MeterMetric> metrics = new HashMap<MetricName, MeterMetric>();
+    private final MeterMetric rejectedMeter;
+    private final MeterMetric badRequestMeter;
+
+    private volatile boolean collectionEnabled;
+
+    @Inject
+    public EventDeserializerRequestHandler(final CollectorConfig config,
+                                           final EventFilterRequestHandler filterRequestHandler,
+                                           final EventDeserializerFactory deserializerFactory)
     {
-        this.endPointStats = stats;
-        this.eventHandler = eventHandler;
-        this.eventDeserializerFactory = eventDeserializerFactory;
+        this(config.isEventEndpointEnabled(), filterRequestHandler, deserializerFactory);
+    }
+
+    //@VisibleForTesting
+    public EventDeserializerRequestHandler(final boolean isCollectionEnabled,
+                                           final EventFilterRequestHandler filterRequestHandler,
+                                           final EventDeserializerFactory deserializerFactory)
+    {
+        this.collectionEnabled = isCollectionEnabled;
+        this.filterRequestHandler = filterRequestHandler;
+        this.eventDeserializerFactory = deserializerFactory;
+
+        rejectedMeter = Metrics.newMeter(new MetricName(METRICS_GROUP, "DeserializationStats", "Rejected"), "events", TimeUnit.SECONDS);
+        badRequestMeter = Metrics.newMeter(new MetricName(METRICS_GROUP, "DeserializationStats", "BadRequest"), "events", TimeUnit.SECONDS);
 
         // Exposes stats per Event type
         for (final DeserializationType deserializationType : DeserializationType.values()) {
-            metrics.put(getSuccessMetricsKey(deserializationType),
-                Metrics.newMeter(EventDeserializerRequestHandler.class, getSuccessMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
-            metrics.put(getFailureMetricsKey(deserializationType),
-                Metrics.newMeter(EventDeserializerRequestHandler.class, getFailureMetricsKey(deserializationType), "events", TimeUnit.SECONDS));
+            final MetricName successMetricName = getSuccessMetricsKey(deserializationType);
+            final MetricName failureMetricName = getFailureMetricsKey(deserializationType);
+
+            metrics.put(successMetricName, Metrics.newMeter(successMetricName, "events", TimeUnit.SECONDS));
+            metrics.put(failureMetricName, Metrics.newMeter(failureMetricName, "events", TimeUnit.SECONDS));
         }
+
+        cacheControl = new CacheControl();
+        cacheControl.setPrivate(true);
+        cacheControl.setNoCache(true);
+        cacheControl.setProxyRevalidate(true);
     }
 
-    public Response handleEventRequest(final ExtractedAnnotation annotation, final EventStats eventStats)
+    public Response handleEventRequest(final ParsedRequest parsedRequest)
     {
-        final EventDeserializer extractor;
-        final DeserializationType type = annotation.getContentType();
+        // If collection is disabled for this collector, ignore
+        if (!collectionEnabled) {
+            log.debug("Collection disabled, rejecting request: {}", parsedRequest);
+            rejectedMeter.mark();
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                           .header("Warning", String.format("199 Collection disabled"))
+                           .cacheControl(cacheControl)
+                           .build();
+        }
 
+        // First, create a deserializer from the request
+        final EventDeserializer extractor;
         try {
-            extractor = eventDeserializerFactory.getEventDeserializer(annotation);
+            extractor = eventDeserializerFactory.getEventDeserializer(parsedRequest);
         }
         // Can occur if the deserializer fails immediately (if the stream/file doesn't begin correctly)
         // fail fast and notify the sender that their message is improperly formatted
         catch (IOException e) {
-            metrics.get(getFailureMetricsKey(type)).mark();
-            return eventHandler.handleFailure(Response.Status.BAD_REQUEST, endPointStats, e);
+            return handleDeserializationFailure(parsedRequest, 0, 0, e);
         }
 
-        int success = 0;
+        // Then, try to deserialize and process the event(s)
+        int successes = 0;
+        int failures = 0;
         try {
             while (extractor.hasNextEvent()) {
                 final Event event = extractor.getNextEvent();
-
+                if (event == null) {
+                    continue;
+                }
                 log.debug(String.format("Processing event %s", event));
-                // We ignore the Response here (see below)
-                eventHandler.processEvent(event, annotation, endPointStats, eventStats);
-                metrics.get(getSuccessMetricsKey(type)).mark();
-                success++;
+
+                final DeserializationType deserializationType = parsedRequest.getContentType();
+                if (filterRequestHandler.processEvent(event, parsedRequest)) {
+                    metrics.get(getSuccessMetricsKey(deserializationType)).mark();
+                    successes++;
+                }
+                else {
+                    metrics.get(getFailureMetricsKey(deserializationType)).mark();
+                    failures++;
+                }
             }
         }
+        // Catch IOException (getNextEvent() failed) and RuntimeExceptions
         catch (Exception e) {
-            log.warn(String.format("Exception while extracting or processing an event. [%s] %s", annotation.toString(), e.toString()));
-            metrics.get(getFailureMetricsKey(type)).mark();
-            // Send a 202, but w/ a warning message stating how many succeeded
-            return eventHandler.handleFailure(Response.Status.ACCEPTED, endPointStats, new IOException(String.format("[%d successes] %s", success, e.toString())));
+            return handleDeserializationFailure(parsedRequest, successes, failures, e);
         }
 
-        return Response.status(Response.Status.ACCEPTED).build();
+        return buildResponse(parsedRequest, successes, failures);
     }
 
-    private String getSuccessMetricsKey(final DeserializationType type)
+    private Response buildResponse(final ParsedRequest parsedRequest, final int successes, final int failures)
     {
-        return type.toString() + "_SUCCES";
+        if (failures == 0) {
+            return Response.status(Response.Status.ACCEPTED)
+                           .cacheControl(cacheControl)
+                           .build();
+        }
+        else {
+            log.warn("Some events in the request couldn't be processed: {} successes/{} failures [{}]", new Object[]{successes, failures, parsedRequest.toString()});
+            return Response.status(Response.Status.ACCEPTED)
+                           .header("Warning", String.format("199 [%d successes] [%d failures]", successes, failures))
+                           .cacheControl(cacheControl)
+                           .build();
+        }
     }
 
-    private String getFailureMetricsKey(final DeserializationType type)
+    public Response handleDeserializationFailure(final ParsedRequest parsedRequest, final int successes, final int failures, final Exception e)
     {
-        return type.toString() + "_FAILURE";
+        log.warn(String.format("Exception while extracting or processing an event. [%s] %s", parsedRequest.toString(), e.toString()));
+        badRequestMeter.mark();
+
+        return Response.status(Response.Status.BAD_REQUEST)
+                       .header("Warning", String.format("199 [%d successes] [%d failures] [%s]", successes, failures, e.toString()))
+                       .cacheControl(cacheControl)
+                       .build();
+    }
+
+    @Managed(description = "enable/disable collection of events")
+    public void setCollectionEnabled(final boolean value)
+    {
+        collectionEnabled = value;
+    }
+
+    @Managed(description = "event collection enabled?")
+    public boolean getCollectionEnabled()
+    {
+        return collectionEnabled;
+    }
+
+    //@VisibleForTesting
+    MetricName getSuccessMetricsKey(final DeserializationType type)
+    {
+        return new MetricName(METRICS_GROUP, "DeserializationStats", type.toString() + "_SUCCESS");
+    }
+
+    //@VisibleForTesting
+    MetricName getFailureMetricsKey(final DeserializationType type)
+    {
+        return new MetricName(METRICS_GROUP, "DeserializationStats", type.toString() + "_FAILURE");
+    }
+
+    //@VisibleForTesting
+    Map<MetricName, MeterMetric> getMetrics()
+    {
+        return metrics;
+    }
+
+    //@VisibleForTesting
+    MeterMetric getRejectedMeter()
+    {
+        return rejectedMeter;
+    }
+
+    //@VisibleForTesting
+    MeterMetric getBadRequestMeter()
+    {
+        return badRequestMeter;
     }
 }

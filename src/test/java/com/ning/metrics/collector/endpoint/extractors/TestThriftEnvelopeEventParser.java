@@ -16,7 +16,7 @@
 
 package com.ning.metrics.collector.endpoint.extractors;
 
-import com.ning.metrics.collector.endpoint.ExtractedAnnotation;
+import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.collector.events.parsing.converters.Base64NumberConverter;
 import com.ning.metrics.collector.events.parsing.converters.DecimalNumberConverter;
@@ -35,7 +35,7 @@ public class TestThriftEnvelopeEventParser
 {
     private ThriftEnvelopeEventParser base10Parser = null;
     private ThriftEnvelopeEventParser base64Parser = null;
-    private ExtractedAnnotation annotation = null;
+    private ParsedRequest annotation = null;
 
     @BeforeMethod(alwaysRun = true)
     void setup()
@@ -197,7 +197,7 @@ public class TestThriftEnvelopeEventParser
     @Test(groups = "fast")
     public void testFunctionParse() throws Exception
     {
-        final ExtractedAnnotation annotation = createDefaultAnnotation();
+        final ParsedRequest annotation = createDefaultAnnotation();
         final ThriftEnvelope result = parseThriftEnvelopeBase10("event-name", "xdate,xhost,xpath,xip,xua");
 
         Assert.assertEquals(result.getPayload().size(), 5);
@@ -231,13 +231,13 @@ public class TestThriftEnvelopeEventParser
         return (ThriftEnvelopeEvent) parser.parseThriftEvent(eventType, eventString, annotation);
     }
 
-    private ExtractedAnnotation createDefaultAnnotation()
+    private ParsedRequest createDefaultAnnotation()
     {
 
         return new ConcreteAnnotation(new DateTime("2009-01-01T00:00:01"), "1.2.3.4", "ref-host", "/some-path", "user-agent-EventEndpointRequestFilter");
     }
 
-    private static class ConcreteAnnotation implements ExtractedAnnotation
+    private static class ConcreteAnnotation extends ParsedRequest
     {
         private final String eventName = null;
         private final DateTime dateTime;
@@ -248,6 +248,7 @@ public class TestThriftEnvelopeEventParser
 
         private ConcreteAnnotation(final DateTime dateTime, final String ip, final String referrerHost, final String referrerPath, final String userAgent)
         {
+            super(null, null, null, null, null, null);
             this.dateTime = dateTime;
             this.ip = ip;
             this.referrerHost = referrerHost;
