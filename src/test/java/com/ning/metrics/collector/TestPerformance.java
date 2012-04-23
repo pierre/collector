@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.dataformat.smile.SmileFactory;
 import com.mogwee.executors.Executors;
 import com.ning.metrics.serialization.event.SmileEnvelopeEvent;
 import com.ning.metrics.serialization.thrift.ThriftField;
@@ -27,8 +29,6 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.smile.SmileFactory;
 import org.joda.time.DateTime;
 import scribe.thrift.LogEntry;
 import scribe.thrift.ResultCode;

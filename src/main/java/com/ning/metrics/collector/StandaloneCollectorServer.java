@@ -34,6 +34,7 @@ import com.ning.nagios.FakeNagiosMonitor;
 import com.ning.nagios.ServiceCheck;
 import com.ning.nagios.ServiceMonitor;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -43,7 +44,6 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.atmosphere.guice.GuiceManagedAtmosphereServlet;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.skife.config.ConfigurationObjectFactory;
 import org.slf4j.Logger;

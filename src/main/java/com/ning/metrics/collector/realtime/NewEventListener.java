@@ -19,7 +19,6 @@ package com.ning.metrics.collector.realtime;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import org.atmosphere.cpr.Broadcaster;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
