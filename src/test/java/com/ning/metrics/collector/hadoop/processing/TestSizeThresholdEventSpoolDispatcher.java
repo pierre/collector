@@ -16,16 +16,15 @@
 
 package com.ning.metrics.collector.hadoop.processing;
 
-import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.guice.EventCollectorModule;
 import com.ning.metrics.collector.hadoop.writer.HdfsModule;
 import com.ning.metrics.collector.realtime.RealTimeQueueTestModule;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
-import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import com.ning.metrics.serialization.thrift.ThriftEnvelope;
 import com.ning.metrics.serialization.thrift.ThriftField;
+
+import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -39,13 +38,7 @@ import java.util.List;
 public class TestSizeThresholdEventSpoolDispatcher
 {
     @Inject
-    CollectorConfig collectorConfig;
-
-    @Inject
     EventSpoolDispatcher dispatcher;
-
-    @Inject
-    FileSystemAccess hdfsAccess;
 
     @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception
@@ -81,7 +74,6 @@ public class TestSizeThresholdEventSpoolDispatcher
         Thread.sleep(2000);
         Assert.assertEquals(dispatcher.getStats().getWrittenEvents(), 3);
 
-        // 16-Dec-2011, tatu: Does not pass reliably -- returns 0, not 1
-//        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 1);
+        Assert.assertEquals(dispatcher.getStats().getHdfsFlushes(), 1);
     }
 }

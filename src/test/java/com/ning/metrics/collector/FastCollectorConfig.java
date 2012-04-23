@@ -18,6 +18,9 @@ package com.ning.metrics.collector;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 
+import org.testng.Assert;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -84,7 +87,10 @@ public abstract class FastCollectorConfig implements CollectorConfig
     @Override
     public String getSpoolDirectoryName()
     {
-        return System.getProperty("java.io.tmpdir") + "/collector-local-spool-" + START_TIME;
+        final String spoolPath = System.getProperty("java.io.tmpdir") + "/collector-local-spool-" + START_TIME;
+        // Make sure the directory exists
+        new File(spoolPath).mkdirs();
+        return spoolPath;
     }
 
 

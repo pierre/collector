@@ -39,13 +39,7 @@ import java.util.List;
 public class TestTimeThresholdEventSpoolDispatcher
 {
     @Inject
-    CollectorConfig collectorConfig;
-
-    @Inject
     EventSpoolDispatcher dispatcher;
-
-    @Inject
-    FileSystemAccess hdfsAccess;
 
     @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception

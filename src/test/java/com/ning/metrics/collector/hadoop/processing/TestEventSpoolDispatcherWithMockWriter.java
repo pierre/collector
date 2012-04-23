@@ -35,12 +35,6 @@ public class TestEventSpoolDispatcherWithMockWriter
     @Inject
     private CollectorConfig collectorConfig;
 
-    @BeforeTest(alwaysRun = true)
-    public void setUp() throws Exception
-    {
-        new File(collectorConfig.getSpoolDirectoryName()).mkdir();
-    }
-
     @AfterTest(alwaysRun = true)
     public void tearDown() throws Exception
     {
