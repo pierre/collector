@@ -25,7 +25,7 @@ import com.ning.metrics.serialization.event.EventDeserializer;
 
 import com.google.inject.Inject;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +52,9 @@ public class EventDeserializerRequestHandler
     private final CacheControl cacheControl;
 
     // We keep two meters (success and failure) for each DeserializationType
-    private final Map<MetricName, MeterMetric> metrics = new HashMap<MetricName, MeterMetric>();
-    private final MeterMetric rejectedMeter;
-    private final MeterMetric badRequestMeter;
+    private final Map<MetricName, Meter> metrics = new HashMap<MetricName, Meter>();
+    private final Meter rejectedMeter;
+    private final Meter badRequestMeter;
 
     private volatile boolean collectionEnabled;
 
@@ -198,19 +198,19 @@ public class EventDeserializerRequestHandler
     }
 
     //@VisibleForTesting
-    Map<MetricName, MeterMetric> getMetrics()
+    Map<MetricName, Meter> getMetrics()
     {
         return metrics;
     }
 
     //@VisibleForTesting
-    MeterMetric getRejectedMeter()
+    Meter getRejectedMeter()
     {
         return rejectedMeter;
     }
 
     //@VisibleForTesting
-    MeterMetric getBadRequestMeter()
+    Meter getBadRequestMeter()
     {
         return badRequestMeter;
     }

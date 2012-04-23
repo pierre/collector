@@ -49,8 +49,8 @@ public class TestEventFilterRequestHandler
     public void setup()
     {
         // Make sure to reset the registry (static...)
-        for (final MetricName metricName : Metrics.allMetrics().keySet()) {
-            Metrics.removeMetric(metricName);
+        for (final MetricName metricName : Metrics.defaultRegistry().allMetrics().keySet()) {
+            Metrics.defaultRegistry().removeMetric(metricName);
         }
 
         event = Mockito.mock(Event.class);

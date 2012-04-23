@@ -90,42 +90,55 @@
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
+            <artifactId>async-http-client</artifactId>
+	    <version>1.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ning</groupId>
             <artifactId>compress-lzf</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.goodwill-access</artifactId>
+            <version>0.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-common</artifactId>
+	    <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-common</artifactId>
             <type>test-jar</type>
+	    <version>2.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-hadoop</artifactId>
+	    <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-smile</artifactId>
+	    <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-thrift</artifactId>
+	    <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-writer</artifactId>
+	    <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-writer</artifactId>
             <type>test-jar</type>
+	    <version>2.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -148,10 +161,12 @@
         <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-core</artifactId>
+            <version>2.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-guice</artifactId>
+            <version>2.1.2</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -180,10 +195,30 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-core</artifactId>
+	    <version>0.20.205.0</version>
+            <exclusions>
+                <exclusion>
+                    <!-- Ignore transitive dependency on the older artifact, commons-beanutils:commons-beanutils-core is pulled in -->
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- commons-beanutils:commons-beanutils-core bundles commons-collections :( -->
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <!-- Ignore transitive dependency on the older artifact, commons-beanutils:commons-beanutils-core is pulled in -->
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.thrift</groupId>
@@ -259,6 +294,7 @@
         <dependency>
             <groupId>org.weakref</groupId>
             <artifactId>jmxutils</artifactId>
+            <version>1.12</version>
         </dependency>
         <!-- test -->
         <dependency>

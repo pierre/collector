@@ -18,8 +18,9 @@ package com.ning.metrics.collector.realtime.amq;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueSession;
+
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Timer;
 import org.apache.activemq.AlreadyClosedException;
 import org.apache.activemq.ConnectionFailedException;
 import org.apache.log4j.Logger;
@@ -38,10 +39,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ActiveMQSession implements EventQueueSession
 {
     private static final Logger logger = Logger.getLogger(ActiveMQSession.class);
-    
+
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
-    private final TimerMetric timer;
+    private final Timer timer;
 
     private final CollectorConfig config;
     private final ActiveMQConnection connection;
@@ -51,13 +52,13 @@ public class ActiveMQSession implements EventQueueSession
     // Configuration flag that indicates we should use BytesMessage (not TextMessage)
     // for sending notifications
     private final AtomicBoolean useBytesMessage;
-    
+
     private final Object sessionMonitor = new Object();
     private TopicSession session = null;
     private TopicPublisher publisher;
 
     public ActiveMQSession(final CollectorConfig config, final ActiveMQConnection connection, final String topic,
-            final AtomicBoolean useBytesMessage)
+                           final AtomicBoolean useBytesMessage)
     {
         this.config = config;
         this.connection = connection;
@@ -69,8 +70,11 @@ public class ActiveMQSession implements EventQueueSession
         reinit();
     }
 
-    public CollectorConfig getConfig() { return config; }
-    
+    public CollectorConfig getConfig()
+    {
+        return config;
+    }
+
     @Override
     public void close()
     {
@@ -126,9 +130,9 @@ public class ActiveMQSession implements EventQueueSession
     private boolean shouldReinit(final JMSException ex)
     {
         return ex instanceof AlreadyClosedException ||
-            ex instanceof javax.jms.IllegalStateException ||
-            ex instanceof ConnectionFailedException ||
-            ex.getCause() instanceof IOException;
+                       ex instanceof javax.jms.IllegalStateException ||
+                       ex instanceof ConnectionFailedException ||
+                       ex.getCause() instanceof IOException;
     }
 
     @Override

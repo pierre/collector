@@ -23,7 +23,7 @@ import com.ning.metrics.serialization.event.Event;
 
 import com.google.inject.Inject;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Meter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +33,10 @@ public class EventFilterRequestHandler
 {
     private static final Logger log = LoggerFactory.getLogger(EventFilterRequestHandler.class);
 
-    private final MeterMetric receivedMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Received", "events", TimeUnit.SECONDS);
-    private final MeterMetric filteredMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Filtered", "events", TimeUnit.SECONDS);
-    private final MeterMetric succeededMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Succeeded", "events", TimeUnit.SECONDS);
-    private final MeterMetric failedMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Failed", "events", TimeUnit.SECONDS);
+    private final Meter receivedMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Received", "events", TimeUnit.SECONDS);
+    private final Meter filteredMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Filtered", "events", TimeUnit.SECONDS);
+    private final Meter succeededMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Succeeded", "events", TimeUnit.SECONDS);
+    private final Meter failedMeter = Metrics.newMeter(EventFilterRequestHandler.class, "Failed", "events", TimeUnit.SECONDS);
 
     private final EventCollector collector;
     private final Filter<ParsedRequest> requestFilter;
@@ -75,25 +75,25 @@ public class EventFilterRequestHandler
     }
 
     //@VisibleForTesting
-    MeterMetric getReceivedMeter()
+    Meter getReceivedMeter()
     {
         return receivedMeter;
     }
 
     //@VisibleForTesting
-    MeterMetric getFilteredMeter()
+    Meter getFilteredMeter()
     {
         return filteredMeter;
     }
 
     //@VisibleForTesting
-    MeterMetric getSucceededMeter()
+    Meter getSucceededMeter()
     {
         return succeededMeter;
     }
 
     //@VisibleForTesting
-    MeterMetric getFailedMeter()
+    Meter getFailedMeter()
     {
         return failedMeter;
     }

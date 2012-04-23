@@ -21,7 +21,7 @@ import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
 
 import com.google.inject.Inject;
-import com.yammer.metrics.aop.annotation.Timed;
+import com.yammer.metrics.annotation.Timed;
 import org.joda.time.DateTime;
 
 import javax.servlet.http.HttpServletRequest;

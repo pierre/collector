@@ -77,8 +77,8 @@ public abstract class TestResources<T>
     protected void setUp()
     {
         // Make sure to reset the registry (static...)
-        for (final MetricName metricName : Metrics.allMetrics().keySet()) {
-            Metrics.removeMetric(metricName);
+        for (final MetricName metricName : Metrics.defaultRegistry().allMetrics().keySet()) {
+            Metrics.defaultRegistry().removeMetric(metricName);
         }
 
         httpHeaders = Mockito.mock(HttpHeaders.class);

@@ -22,7 +22,7 @@ import com.ning.metrics.serialization.event.Event;
 
 import com.google.inject.Inject;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +39,10 @@ public class ScribeEventHandler
 
     private volatile boolean scribeCollectionEnabled;
 
-    private final MeterMetric receivedMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Received"), "events", TimeUnit.SECONDS);
-    private final MeterMetric succeededMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Succeeded"), "events", TimeUnit.SECONDS);
-    private final MeterMetric rejectedMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Rejected"), "events", TimeUnit.SECONDS);
-    private final MeterMetric corruptedMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Corrupted"), "events", TimeUnit.SECONDS);
+    private final Meter receivedMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Received"), "events", TimeUnit.SECONDS);
+    private final Meter succeededMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Succeeded"), "events", TimeUnit.SECONDS);
+    private final Meter rejectedMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Rejected"), "events", TimeUnit.SECONDS);
+    private final Meter corruptedMeter = Metrics.newMeter(new MetricName(ScribeEventHandler.class.getPackage().getName(), "ScribeStats", "Corrupted"), "events", TimeUnit.SECONDS);
 
     @Inject
     public ScribeEventHandler(final EventCollector collector, final CollectorConfig config)

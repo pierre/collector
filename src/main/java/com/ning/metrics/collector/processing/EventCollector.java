@@ -22,8 +22,8 @@ import com.ning.metrics.serialization.event.Event;
 
 import com.google.inject.Inject;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.aop.annotation.Metered;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.annotation.Metered;
+import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +38,8 @@ public class EventCollector
     private final EventListenerDispatcher forwardDispatcher;
     private final EventSpoolDispatcher spoolDispatcher;
 
-    private final MeterMetric spooledMeter;
-    private final MeterMetric lostMeter;
+    private final Meter spooledMeter;
+    private final Meter lostMeter;
 
     @Inject
     public EventCollector(final EventListenerDispatcher forwardDispatcher, final EventSpoolDispatcher spoolDispatcher)

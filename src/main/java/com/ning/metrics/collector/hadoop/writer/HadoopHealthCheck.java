@@ -22,7 +22,6 @@ import com.ning.metrics.collector.util.HealthCheckStatus;
 import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FsStatus;
 
 public class HadoopHealthCheck implements ComponentHealthCheck
 {
@@ -44,14 +43,12 @@ public class HadoopHealthCheck implements ComponentHealthCheck
         try {
             final FileSystem fileSystem = fsAccess.get(0); // No exponential backoff, fail early
             final Configuration fileSystemConf = fileSystem.getConf();
-            final FsStatus fsStatus = fileSystem.getStatus();
             final StringBuilder builder = new StringBuilder();
 
             for (final String prop : HADOOP_PROPERTIES) {
                 builder.append(String.format("%s: %s, ", prop, fileSystemConf.get(prop)));
 
             }
-            builder.append(String.format("capacity: %d, used: %d, remaining: %d", fsStatus.getCapacity(), fsStatus.getUsed(), fsStatus.getRemaining()));
             message = builder.toString();
 
         }

@@ -16,15 +16,14 @@
 
 package com.ning.metrics.collector.endpoint.resources;
 
-import com.facebook.fb303.fb_status;
-import com.google.inject.Inject;
-
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.event.StringToThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
 import com.ning.metrics.serialization.event.ThriftToThriftEnvelopeEvent;
 
-import com.yammer.metrics.aop.annotation.Timed;
+import com.facebook.fb303.fb_status;
+import com.google.inject.Inject;
+import com.yammer.metrics.annotation.Timed;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -58,9 +57,7 @@ class ScribeEventRequestHandler implements Iface
     private final ScribeEventHandler eventHandler;
 
     @Inject
-    public ScribeEventRequestHandler(
-        final ScribeEventHandler eventHandler
-    )
+    public ScribeEventRequestHandler(final ScribeEventHandler eventHandler)
     {
         this.eventHandler = eventHandler;
     }
