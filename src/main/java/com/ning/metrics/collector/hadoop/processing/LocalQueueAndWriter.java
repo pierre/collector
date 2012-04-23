@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Writer manager for a specific queue
  */
-class LocalQueueAndWriter
+public class LocalQueueAndWriter
 {
     private final Logger log = Logger.getLogger(LocalQueueAndWriter.class);
 

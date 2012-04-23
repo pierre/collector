@@ -14,16 +14,21 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.hadoop.processing;
+package com.ning.metrics.collector.healthchecks;
+
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+import com.ning.metrics.collector.hadoop.processing.EventSpoolDispatcher;
+import com.ning.metrics.collector.hadoop.processing.HadoopWriterFactory;
+import com.ning.metrics.collector.hadoop.processing.LocalQueueAndWriter;
+import com.ning.metrics.collector.hadoop.processing.PersistentWriterFactory;
+import com.ning.metrics.collector.hadoop.processing.WriterStats;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.ComponentHealthCheck;
-import com.ning.metrics.collector.util.HealthCheckStatus;
+import com.yammer.metrics.core.HealthCheck;
 
 import java.util.Set;
 
-public class WriterHealthCheck implements ComponentHealthCheck
+public class WriterHealthCheck extends HealthCheck
 {
     private final EventSpoolDispatcher processor;
     private final WriterStats stats;
@@ -33,6 +38,7 @@ public class WriterHealthCheck implements ComponentHealthCheck
     @Inject
     public WriterHealthCheck(final EventSpoolDispatcher processor, final PersistentWriterFactory factory, final WriterStats stats, final CollectorConfig config)
     {
+        super(WriterHealthCheck.class.getName());
         this.processor = processor;
         this.factory = factory;
         this.stats = stats;
@@ -40,11 +46,8 @@ public class WriterHealthCheck implements ComponentHealthCheck
     }
 
     @Override
-    public HealthCheckStatus check()
+    public Result check()
     {
-        HealthCheckStatus.Code status = HealthCheckStatus.Code.OK;
-        String message;
-
         try {
             final StringBuilder builder = new StringBuilder();
 
@@ -77,17 +80,16 @@ public class WriterHealthCheck implements ComponentHealthCheck
             }
             builder.append(String.format("flushes: %s", stats.getHdfsFlushes())); // HDFS flushes
 
-            message = builder.toString();
-
+            final String message = builder.toString();
             if (!processor.isRunning()) {
-                status = HealthCheckStatus.Code.ERROR;
+                return Result.unhealthy(message);
+            }
+            else {
+                return Result.healthy(message);
             }
         }
         catch (Exception e) {
-            status = HealthCheckStatus.Code.ERROR;
-            message = "Exception when trying to access writer subsystem";
+            return Result.unhealthy("Exception when trying to access writer subsystem");
         }
-
-        return new HealthCheckStatus("WriterHealthCheck", status, message);
     }
 }

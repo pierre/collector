@@ -16,21 +16,13 @@
 
 package com.ning.metrics.collector.guice;
 
-import com.ning.metrics.collector.binder.providers.ArrayListProvider;
 import com.ning.metrics.collector.endpoint.extractors.EventDeserializerFactory;
-import com.ning.metrics.collector.hadoop.processing.WriterHealthCheck;
-import com.ning.metrics.collector.hadoop.writer.HadoopHealthCheck;
 import com.ning.metrics.collector.jaxrs.EventDeserializerRequestHandler;
 import com.ning.metrics.collector.jaxrs.EventFilterRequestHandler;
-import com.ning.metrics.collector.realtime.RealtimeHealthCheck;
-import com.ning.metrics.collector.util.ComponentHealthCheck;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
-
-import java.util.List;
 
 public class RequestHandlersModule extends AbstractModule
 {
@@ -46,12 +38,5 @@ public class RequestHandlersModule extends AbstractModule
 
         bind(EventDeserializerRequestHandler.class).asEagerSingleton();
         builder.export(EventDeserializerRequestHandler.class).withGeneratedName();
-
-        // Healthchecks
-        bind(new TypeLiteral<List<ComponentHealthCheck>>() {})
-                .toProvider(new ArrayListProvider<ComponentHealthCheck>()
-                                    .add(WriterHealthCheck.class)
-                                    .add(RealtimeHealthCheck.class)
-                                    .add(HadoopHealthCheck.class));
     }
 }

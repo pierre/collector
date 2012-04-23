@@ -14,16 +14,16 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.hadoop.writer;
+package com.ning.metrics.collector.healthchecks;
+
+import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.util.ComponentHealthCheck;
-import com.ning.metrics.collector.util.HealthCheckStatus;
-import com.ning.metrics.serialization.hadoop.FileSystemAccess;
+import com.yammer.metrics.core.HealthCheck;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 
-public class HadoopHealthCheck implements ComponentHealthCheck
+public class HadoopHealthCheck extends HealthCheck
 {
     private static final String[] HADOOP_PROPERTIES = new String[]{"fs.default.name", "io.serializations", "io.compression.codecs"};
     private final FileSystemAccess fsAccess;
@@ -31,15 +31,13 @@ public class HadoopHealthCheck implements ComponentHealthCheck
     @Inject
     public HadoopHealthCheck(final FileSystemAccess fsAccess)
     {
+        super(HadoopHealthCheck.class.getName());
         this.fsAccess = fsAccess;
     }
 
     @Override
-    public HealthCheckStatus check()
+    public Result check()
     {
-        HealthCheckStatus.Code status = HealthCheckStatus.Code.OK;
-        String message;
-
         try {
             final FileSystem fileSystem = fsAccess.get(0); // No exponential backoff, fail early
             final Configuration fileSystemConf = fileSystem.getConf();
@@ -49,14 +47,11 @@ public class HadoopHealthCheck implements ComponentHealthCheck
                 builder.append(String.format("%s: %s, ", prop, fileSystemConf.get(prop)));
 
             }
-            message = builder.toString();
 
+            return Result.healthy(builder.toString());
         }
         catch (Exception e) {
-            status = HealthCheckStatus.Code.ERROR;
-            message = "Exception when trying to access Hadoop";
+            return Result.healthy("Exception when trying to access Hadoop");
         }
-
-        return new HealthCheckStatus("HadoopHealthCheck", status, message);
     }
 }

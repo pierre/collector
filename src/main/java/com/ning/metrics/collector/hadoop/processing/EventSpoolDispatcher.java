@@ -160,12 +160,7 @@ public class EventSpoolDispatcher
         return map;
     }
 
-    /**
-     * Unit test hook
-     *
-     * @return underlying map
-     */
-    Map<String, LocalQueueAndWriter> getQueuesPerPath()
+    public Map<String, LocalQueueAndWriter> getQueuesPerPath()
     {
         return queuesPerPath;
     }

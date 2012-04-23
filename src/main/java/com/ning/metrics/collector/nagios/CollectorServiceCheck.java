@@ -16,30 +16,22 @@
 
 package com.ning.metrics.collector.nagios;
 
-import com.google.inject.Inject;
-import com.ning.metrics.collector.util.HealthCheck;
-import com.ning.metrics.collector.util.HealthCheckStatus;
 import com.ning.nagios.ServiceCheck;
 
-import java.util.List;
+import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.core.HealthCheck;
+
+import java.util.Map;
 
 public class CollectorServiceCheck implements ServiceCheck
 {
-    private final HealthCheck healthChecker;
-
-    @Inject
-    public CollectorServiceCheck(final HealthCheck healthChecker)
-    {
-        this.healthChecker = healthChecker;
-    }
-
     @Override
     public Status checkServiceStatus()
     {
-        final List<HealthCheckStatus> checks = healthChecker.check();
-        for (final HealthCheckStatus status : checks) {
-            if (status.getCode() != HealthCheckStatus.Code.OK) {
-                return Status.criticalf("[%s] %s: %s", status.getCode(), status.getType(), status.getMessage());
+        for (final Map.Entry<String, HealthCheck.Result> entry : HealthChecks.defaultRegistry().runHealthChecks().entrySet()) {
+            final HealthCheck.Result result = entry.getValue();
+            if (!result.isHealthy()) {
+                return Status.criticalf("[%s] %s: %s", entry.getKey(), result.getError(), result.getMessage());
             }
         }
 

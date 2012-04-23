@@ -18,6 +18,7 @@ package com.ning.metrics.collector;
 
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
+import com.ning.metrics.collector.guice.HealthChecksModule;
 import com.ning.metrics.collector.guice.RequestHandlersModule;
 import com.ning.metrics.collector.guice.FiltersModule;
 import com.ning.metrics.collector.endpoint.resources.ScribeModule;
@@ -107,6 +108,7 @@ public class StandaloneCollectorServer
                 }
             },
             new InstrumentationModule(),     /* Provide metrics */
+            new HealthChecksModule(),        /* Setup healthchecks */
             new RequestHandlersModule(),
             new HdfsModule(),                /* Wiring for Hadoop */
             new EventCollectorModule(),      /* Required, wire up the event processor and the writer */

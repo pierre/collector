@@ -14,33 +14,31 @@
  * under the License.
  */
 
-package com.ning.metrics.collector.realtime;
+package com.ning.metrics.collector.healthchecks;
+
+import com.ning.metrics.collector.realtime.EventQueueProcessor;
+import com.ning.metrics.collector.realtime.EventQueueProcessorImpl;
+import com.ning.metrics.collector.realtime.GlobalEventQueueStats;
 
 import com.google.inject.Inject;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
-import com.ning.metrics.collector.util.ComponentHealthCheck;
-import com.ning.metrics.collector.util.HealthCheckStatus;
+import com.yammer.metrics.core.HealthCheck;
 
-public class RealtimeHealthCheck implements ComponentHealthCheck
+public class RealtimeHealthCheck extends HealthCheck
 {
     private final EventQueueProcessorImpl processor;
     private final GlobalEventQueueStats stats;
-    private final CollectorConfig config;
 
     @Inject
-    public RealtimeHealthCheck(final EventQueueProcessor processor, final GlobalEventQueueStats stats, final CollectorConfig config)
+    public RealtimeHealthCheck(final EventQueueProcessor processor, final GlobalEventQueueStats stats)
     {
+        super(RealtimeHealthCheck.class.getName());
         this.processor = (EventQueueProcessorImpl) processor;
         this.stats = stats;
-        this.config = config;
     }
 
     @Override
-    public HealthCheckStatus check()
+    public Result check()
     {
-        HealthCheckStatus.Code status = HealthCheckStatus.Code.OK;
-        String message;
-
         try {
             final StringBuilder builder = new StringBuilder();
 
@@ -54,17 +52,17 @@ public class RealtimeHealthCheck implements ComponentHealthCheck
             builder.append(String.format("errored: %s, ", stats.getErroredEvents())); // AMQ error
             builder.append(String.format("ignored: %s", stats.getIgnoredEvents())); // system disabled
 
-            message = builder.toString();
+            final String message = builder.toString();
 
             if (processor.isEnabled() && !processor.isRunning()) {
-                status = HealthCheckStatus.Code.ERROR;
+                return Result.unhealthy(message);
+            }
+            else {
+                return Result.healthy(message);
             }
         }
         catch (Exception e) {
-            status = HealthCheckStatus.Code.ERROR;
-            message = "Exception when trying to access realtime subsystem";
+            return Result.unhealthy("Exception when trying to access realtime subsystem");
         }
-
-        return new HealthCheckStatus("RealtimeHealthCheck", status, message);
     }
 }
