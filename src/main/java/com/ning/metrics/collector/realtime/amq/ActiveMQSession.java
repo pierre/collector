@@ -23,7 +23,8 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import org.apache.activemq.AlreadyClosedException;
 import org.apache.activemq.ConnectionFailedException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.BytesMessage;
 import javax.jms.DeliveryMode;
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ActiveMQSession implements EventQueueSession
 {
-    private static final Logger logger = Logger.getLogger(ActiveMQSession.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActiveMQSession.class);
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 

@@ -19,8 +19,9 @@ package com.ning.metrics.collector.endpoint;
 import com.ning.metrics.collector.endpoint.extractors.DeserializationType;
 import com.ning.metrics.serialization.event.Granularity;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -29,7 +30,7 @@ import java.io.InputStream;
 
 public class ParsedRequest
 {
-    private static final Logger log = Logger.getLogger(ParsedRequest.class);
+    private static final Logger log = LoggerFactory.getLogger(ParsedRequest.class);
     private static final EventExtractorUtil eventExtractorUtil = new EventExtractorUtil();
 
     private final String eventName;

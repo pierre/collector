@@ -16,18 +16,19 @@
 package com.ning.metrics.collector.endpoint.extractors;
 
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.events.parsing.ThriftEnvelopeEventParser;
 import com.ning.metrics.serialization.event.EventDeserializer;
 import com.ning.metrics.serialization.event.ThriftEnvelopeEvent;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 public class QueryParameterEventDeserializer implements EventDeserializer
 {
-    private static final Logger log = Logger.getLogger(QueryParameterEventDeserializer.class);
+    private static final Logger log = LoggerFactory.getLogger(QueryParameterEventDeserializer.class);
 
     private boolean hasNextEvent;
     private final ParsedRequest parsedRequest;

@@ -17,6 +17,7 @@
 package com.ning.metrics.collector.endpoint.setup;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.servlet.ServletContextEvent;
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
  */
 public class SetupJULBridge implements ServletContextListener
 {
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SetupJULBridge.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(SetupJULBridge.class);
 
     @Override
     public void contextInitialized(final ServletContextEvent event)

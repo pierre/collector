@@ -20,8 +20,9 @@ import com.google.inject.Inject;
 import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
-import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.weakref.jmx.Managed;
 
 import java.util.Arrays;
@@ -35,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class EventQueueProcessorImpl implements EventQueueProcessor
 {
-    private final static Logger log = Logger.getLogger(EventQueueProcessorImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(EventQueueProcessorImpl.class);
 
     private final ConfigurationObjectFactory configFactory;
     private final EventQueueConnection connection;

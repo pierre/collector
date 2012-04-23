@@ -42,11 +42,12 @@ import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.yammer.metrics.guice.InstrumentationModule;
-import org.apache.log4j.Logger;
 import org.atmosphere.guice.GuiceManagedAtmosphereServlet;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.skife.config.ConfigurationObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.weakref.jmx.guice.ExportBuilder;
 import org.weakref.jmx.guice.MBeanModule;
 
@@ -62,7 +63,7 @@ import java.util.HashMap;
  */
 public class StandaloneCollectorServer
 {
-    private static final Logger log = Logger.getLogger(StandaloneCollectorServer.class);
+    private static final Logger log = LoggerFactory.getLogger(StandaloneCollectorServer.class);
     private static Injector injector = null;
 
     static final String EVENTS_RESOURCES_PATTERN = "/[^a](.*)";

@@ -26,17 +26,18 @@ import com.ning.metrics.serialization.thrift.ThriftField;
 import com.ning.metrics.serialization.thrift.item.DataItem;
 import com.ning.metrics.serialization.thrift.item.DataItemFactory;
 
-import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class EventFormatter
 {
-    private static final Logger log = Logger.getLogger(EventFormatter.class);
+    private static final Logger log = LoggerFactory.getLogger(EventFormatter.class);
     private static final DataItem EMPTY_DATA_ITEM = DataItemFactory.create("");
 
     private final ObjectMapper jsonMapper = new ObjectMapper();

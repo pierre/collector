@@ -18,7 +18,9 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.EventWriter;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -27,7 +29,7 @@ import java.util.concurrent.BlockingQueue;
  */
 class LocalQueueWorker implements Runnable
 {
-    private static final Logger logger = Logger.getLogger(LocalQueueWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocalQueueWorker.class);
 
     private final BlockingQueue<Event> eventQueue;
     private final EventWriter processor;

@@ -20,7 +20,9 @@ import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
 import com.ning.metrics.serialization.writer.EventWriter;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
@@ -33,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class LocalQueueAndWriter
 {
-    private final Logger log = Logger.getLogger(LocalQueueAndWriter.class);
+    private final Logger log = LoggerFactory.getLogger(LocalQueueAndWriter.class);
 
     private final BlockingQueue<Event> queue;
     private final EventWriter eventWriter;

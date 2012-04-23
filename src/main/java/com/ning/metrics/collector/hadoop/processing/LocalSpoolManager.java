@@ -23,13 +23,14 @@ import org.apache.axis.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.ReadableDateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -43,7 +44,7 @@ import java.util.regex.Pattern;
  */
 class LocalSpoolManager
 {
-    private static final Logger log = Logger.getLogger(LocalSpoolManager.class);
+    private static final Logger log = LoggerFactory.getLogger(LocalSpoolManager.class);
 
     private static final Pattern filenamePattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}-\\d{1,5}-[a-zA-Z0-9]{4}-(\\d{4}-\\d{2}-\\d{2}T\\d{2}.\\d{2}.\\d{2}.\\d{3})\\.[a-zA-Z0-9]*\\.[a-zA-Z]*");
 

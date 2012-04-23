@@ -26,15 +26,16 @@ import com.ning.nagios.JsendnscaService;
 import com.ning.nagios.MonitoredService;
 import com.ning.nagios.ServiceCheck;
 import com.ning.nagios.ServiceMonitor;
-import org.apache.log4j.Logger;
 import org.skife.config.TimeSpan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class NagiosMonitor implements ServiceMonitor
 {
-    private static final Logger log = Logger.getLogger(NagiosMonitor.class);
+    private static final Logger log = LoggerFactory.getLogger(NagiosMonitor.class);
 
     private final ConcurrentMap<String, MonitoredService> services = new ConcurrentHashMap<String, MonitoredService>();
     private final PassiveCheckSender sender;

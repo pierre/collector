@@ -23,7 +23,6 @@ import com.ning.metrics.collector.endpoint.setup.SetupJULBridge;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
-import org.apache.log4j.Logger;
 import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
@@ -37,6 +36,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.MBeanServer;
 import javax.servlet.DispatcherType;
@@ -46,7 +47,7 @@ import java.util.EventListener;
 @Singleton
 public class JettyServer
 {
-    private static final Logger log = Logger.getLogger(JettyServer.class);
+    private static final Logger log = LoggerFactory.getLogger(JettyServer.class);
 
     private final CollectorConfig config;
     private final MBeanServer mbeanServer;

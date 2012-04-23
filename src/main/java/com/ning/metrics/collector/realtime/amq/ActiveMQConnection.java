@@ -22,7 +22,8 @@ import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventQueueConnection;
 import com.ning.metrics.collector.realtime.EventQueueSession;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.JMSException;
 import javax.jms.Session;
@@ -31,7 +32,7 @@ import javax.jms.TopicSession;
 
 class ActiveMQConnection implements EventQueueConnection
 {
-    private static final Logger logger = Logger.getLogger(ActiveMQConnection.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActiveMQConnection.class);
 
     private ActiveMQConnectionFactory connectionFactory = null;
     private final Object connectionMonitor = new Object();

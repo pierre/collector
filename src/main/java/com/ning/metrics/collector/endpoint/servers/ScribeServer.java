@@ -19,13 +19,14 @@ package com.ning.metrics.collector.endpoint.servers;
 import com.google.inject.Inject;
 import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
-import org.apache.log4j.Logger;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TNonblockingServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TNonblockingServerTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scribe.thrift.scribe.Iface;
 import scribe.thrift.scribe.Processor;
 
@@ -36,7 +37,7 @@ import java.util.concurrent.Executor;
  */
 public class ScribeServer
 {
-    private static final Logger log = Logger.getLogger(ScribeServer.class);
+    private static final Logger log = LoggerFactory.getLogger(ScribeServer.class);
 
     private final Iface eventRequestHandler;
     private final CollectorConfig config;

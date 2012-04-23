@@ -19,7 +19,8 @@ package com.ning.metrics.collector.realtime;
 import com.mogwee.executors.FailsafeScheduledExecutor;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.weakref.jmx.MBeanExporter;
 
 import java.lang.management.ManagementFactory;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 class LocalQueueAndWorkers
 {
-    private static final Logger logger = Logger.getLogger(LocalQueueAndWorkers.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocalQueueAndWorkers.class);
     private static final MBeanExporter exporter = new MBeanExporter(ManagementFactory.getPlatformMBeanServer());
 
     private final BlockingQueue<Object> queue;

@@ -27,7 +27,8 @@ import com.ning.metrics.serialization.writer.EventWriter;
 import com.ning.metrics.serialization.writer.SyncType;
 import com.ning.metrics.serialization.writer.ThresholdEventWriter;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.weakref.jmx.Managed;
 
 import java.io.File;
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HadoopWriterFactory implements PersistentWriterFactory
 {
-    private static final Logger log = Logger.getLogger(HadoopWriterFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(HadoopWriterFactory.class);
 
     private final CollectorConfig config;
     private final FileSystemAccess hdfsAccess;

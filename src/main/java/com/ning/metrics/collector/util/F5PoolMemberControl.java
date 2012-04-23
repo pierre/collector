@@ -32,7 +32,8 @@ import iControl.LocalLBPoolMemberMemberStatisticEntry;
 import iControl.LocalLBPoolMemberMemberStatistics;
 import org.apache.axis.AxisFault;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.weakref.jmx.Managed;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ import java.util.ArrayList;
  */
 public class F5PoolMemberControl
 {
-    private static final Logger log = Logger.getLogger(F5PoolMemberControl.class);
+    private static final Logger log = LoggerFactory.getLogger(F5PoolMemberControl.class);
 
     private final String hostname;
     private final String username;

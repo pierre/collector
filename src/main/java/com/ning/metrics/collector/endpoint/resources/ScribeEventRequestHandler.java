@@ -26,9 +26,10 @@ import com.google.inject.Inject;
 import com.yammer.metrics.annotation.Timed;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scribe.thrift.LogEntry;
 import scribe.thrift.ResultCode;
 import scribe.thrift.scribe.Iface;
@@ -45,14 +46,14 @@ import java.util.Map;
 
 class ScribeEventRequestHandler implements Iface
 {
+    private static final Logger log = LoggerFactory.getLogger(ScribeEventRequestHandler.class);
+
     private static final String SERVICE_NAME = "Ning Scribed Service";
     private static final String VERSION = "0.1";
     private static final long startTime = System.currentTimeMillis();
 
     private final Map<String, String> options = new HashMap<String, String>();
     private final Map<String, Long> counters = new HashMap<String, Long>();
-
-    private static final Logger log = Logger.getLogger(ScribeEventRequestHandler.class);
 
     private final ScribeEventHandler eventHandler;
 

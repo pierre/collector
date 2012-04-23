@@ -18,9 +18,11 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.mogwee.executors.FailsafeScheduledExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.event.Event;
-import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class EventSpoolDispatcher
 {
-    private final Logger log = Logger.getLogger(EventSpoolDispatcher.class);
+    private final Logger log = LoggerFactory.getLogger(EventSpoolDispatcher.class);
     private static final long CUTOFF_TIME_OLD_DIRS = 3600000L; // 1 hour
 
     private final PersistentWriterFactory factory;
