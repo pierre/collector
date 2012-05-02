@@ -19,7 +19,6 @@ package com.ning.metrics.collector.jaxrs;
 import com.google.inject.Inject;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.realtime.EventListenerDispatcher;
-import com.ning.metrics.collector.realtime.EventsLogger;
 import com.ning.metrics.collector.realtime.NewEventListener;
 import com.sun.jersey.api.view.Viewable;
 import org.atmosphere.cpr.Broadcaster;
@@ -80,7 +79,6 @@ public class AsyncEventResource
             .broadcaster(broadcaster)
             .resumeOnBroadcast(false)
             .outputComments(true)
-            .addListener(new EventsLogger())
             .build();
     }
 }
