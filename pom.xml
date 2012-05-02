@@ -18,7 +18,7 @@
     <parent>
         <groupId>com.ning</groupId>
         <artifactId>metrics.base-pom</artifactId>
-        <version>0.1.10</version>
+        <version>0.1.11</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ning</groupId>
@@ -278,12 +278,6 @@
         <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-jersey</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.atmosphere</groupId>
-                    <artifactId>atmosphere-ping</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- Set the jackson version for transitive dependencies -->
         <dependency>
@@ -311,6 +305,10 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-websocket</artifactId>
         </dependency>
         <dependency>
             <groupId>org.skife.config</groupId>
