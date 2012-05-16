@@ -21,6 +21,7 @@ import com.ning.metrics.collector.binder.modules.JettyListener;
 import com.ning.metrics.collector.endpoint.setup.SetupJULBridge;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
 import org.apache.shiro.web.servlet.IniShiroFilter;
@@ -51,14 +52,16 @@ public class JettyServer
 
     private final CollectorConfig config;
     private final MBeanServer mbeanServer;
+    private final Injector injector;
     private boolean initialized = false;
     private Server server;
 
     @Inject
-    public JettyServer(final CollectorConfig config, final MBeanServer mbeanServer)
+    public JettyServer(final CollectorConfig config, final MBeanServer mbeanServer, final Injector injector)
     {
         this.config = config;
         this.mbeanServer = mbeanServer;
+        this.injector = injector;
     }
 
     public void start() throws Exception
@@ -107,7 +110,7 @@ public class JettyServer
         // Required! See ContextHandler#getResource and http://docs.codehaus.org/display/JETTY/Embedding+Jetty
         final String webapp = this.getClass().getClassLoader().getResource("webapp").toExternalForm();
         context.setResourceBase(webapp);
-        context.addEventListener(new JettyListener());
+        context.addEventListener(new JettyListener(injector));
 
         // Jersey insists on using java.util.logging (JUL)
         final EventListener listener = new SetupJULBridge();

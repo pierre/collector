@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.ning.metrics.collector;
+package com.ning.metrics.collector.guice;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -26,7 +26,7 @@ public class TestStandaloneCollectorServer
     @Test(groups = "fast")
     public void testResourcesRegex() throws Exception
     {
-        final Pattern pattern = Pattern.compile(StandaloneCollectorServer.EVENTS_RESOURCES_PATTERN);
+        final Pattern pattern = Pattern.compile(ServerModule.EVENTS_RESOURCES_PATTERN);
         Assert.assertFalse(pattern.matcher("/a").matches());
         Assert.assertFalse(pattern.matcher("/a/event").matches());
         Assert.assertTrue(pattern.matcher("/1?v=Hello,sWorld").matches());
@@ -38,7 +38,7 @@ public class TestStandaloneCollectorServer
     @Test(groups = "fast")
     public void testAsyncRegex() throws Exception
     {
-        final Pattern pattern = Pattern.compile(StandaloneCollectorServer.ASYNC_RESOURCES_PATTERN);
+        final Pattern pattern = Pattern.compile(ServerModule.ASYNC_RESOURCES_PATTERN);
         Assert.assertTrue(pattern.matcher("/a").matches());
         Assert.assertTrue(pattern.matcher("/a/event").matches());
         Assert.assertFalse(pattern.matcher("/1?v=Hello,sWorld").matches());

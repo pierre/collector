@@ -18,14 +18,20 @@ package com.ning.metrics.collector.binder.modules;
 
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
-import com.ning.metrics.collector.StandaloneCollectorServer;
 
 
 public class JettyListener extends GuiceServletContextListener
 {
+    private final Injector injector;
+
+    public JettyListener(final Injector injector)
+    {
+        this.injector = injector;
+    }
+
     @Override
     protected Injector getInjector()
     {
-        return StandaloneCollectorServer.getInjector();
+        return injector;
     }
 }

@@ -49,31 +49,6 @@ public class ScribeServer
     {
         this.eventRequestHandler = eventRequestHandler;
         this.config = config;
-
-        final Executor executor = new FailsafeScheduledExecutor(1, "ScribeServer");
-        executor.execute(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    start();
-
-                    Runtime.getRuntime().addShutdownHook(new Thread()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            shutdown();
-                        }
-                    });
-                }
-                catch (TTransportException e) {
-                    log.warn("Unable to start the Scribe server", e);
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
     }
 
     /**
@@ -81,7 +56,7 @@ public class ScribeServer
      *
      * @throws TTransportException if the TNonblockingServerSocket cannot be instantiated
      */
-    private void start() throws TTransportException
+    public void start() throws TTransportException
     {
         final TNonblockingServerTransport socket = new TNonblockingServerSocket(config.getScribePort());
         final TProcessor processor = new Processor(eventRequestHandler);
@@ -94,7 +69,7 @@ public class ScribeServer
     /**
      * Stop the terminal Scribe server
      */
-    private void shutdown()
+    public void stop()
     {
         if (server != null) {
             server.stop();
