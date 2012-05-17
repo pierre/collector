@@ -63,5 +63,10 @@ public class TestLocalSpoolManager
         Assert.assertEquals(spoolManager.getEventName(), "SpamDocumentClassified2");
         Assert.assertEquals(spoolManager.getSerializationType(), SerializationType.THRIFT);
         Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2012-01-06T00.39.58.726"));
+
+        spoolManager = new LocalSpoolManager(config, new File("10.18.81.236-8080-I3wp-2012-03-23T01.08.32.469.aaa-bbb-ccc.thrift"));
+        Assert.assertEquals(spoolManager.getEventName(), "aaa-bbb-ccc");
+        Assert.assertEquals(spoolManager.getSerializationType(), SerializationType.THRIFT);
+        Assert.assertEquals(spoolManager.getTimeStamp(), LocalSpoolManager.dateFormatter.parseDateTime("2012-03-23T01.08.32.469"));
     }
 }
