@@ -16,9 +16,10 @@
 
 package com.ning.metrics.collector.endpoint.servers;
 
+import com.ning.metrics.collector.binder.config.CollectorConfig;
+
 import com.google.inject.Inject;
 import com.mogwee.executors.FailsafeScheduledExecutor;
-import com.ning.metrics.collector.binder.config.CollectorConfig;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TNonblockingServer;
@@ -58,12 +59,26 @@ public class ScribeServer
      */
     public void start() throws TTransportException
     {
-        final TNonblockingServerTransport socket = new TNonblockingServerSocket(config.getScribePort());
-        final TProcessor processor = new Processor(eventRequestHandler);
+        final Executor executor = new FailsafeScheduledExecutor(1, "ScribeServer");
+        executor.execute(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    final TNonblockingServerTransport socket = new TNonblockingServerSocket(config.getScribePort());
+                    final TProcessor processor = new Processor(eventRequestHandler);
 
-        server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
-        log.info(String.format("Starting terminal Scribe server on port %d", config.getScribePort()));
-        server.serve();
+                    server = new TNonblockingServer(new TNonblockingServer.Args(socket).processor(processor).protocolFactory(new TBinaryProtocol.Factory()));
+                    log.info(String.format("Starting terminal Scribe server on port %d", config.getScribePort()));
+                    server.serve();
+                }
+                catch (TTransportException e) {
+                    log.warn("Unable to start the Scribe server", e);
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
     }
 
     /**
