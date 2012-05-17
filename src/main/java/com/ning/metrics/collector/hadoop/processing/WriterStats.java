@@ -32,7 +32,8 @@ package com.ning.metrics.collector.hadoop.processing;
  * under the License.
  */
 
-import org.weakref.jmx.Managed;
+import com.ning.arecibo.jmx.Monitored;
+import com.ning.arecibo.jmx.MonitoringType;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -80,37 +81,37 @@ public class WriterStats
         hdfsFlushes.incrementAndGet();
     }
 
-    @Managed(description = "Number of ignored events")
+    @Monitored(description = "Number of ignored events", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getIgnoredEvents()
     {
         return ignoredEvents.get();
     }
 
-    @Managed(description = "Number of locally enqueued events")
+    @Monitored(description = "Number of locally enqueued events", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getEnqueuedEvents()
     {
         return enqueuedEvents.get();
     }
 
-    @Managed(description = "Number of dropped events - queues being full")
+    @Monitored(description = "Number of dropped events - queues being full", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getDroppedEvents()
     {
         return droppedEvents.get();
     }
 
-    @Managed(description = "Number of successfully written events")
+    @Monitored(description = "Number of successfully written events", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getWrittenEvents()
     {
         return writtenEvents.get();
     }
 
-    @Managed(description = "Number of events that could not be written due to an I/O error")
+    @Monitored(description = "Number of events that could not be written due to an I/O error", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getErroredEvents()
     {
         return erroredEvents.get();
     }
 
-    @Managed(description = "Number of files written to Hadoop")
+    @Monitored(description = "Number of files written to Hadoop", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getHdfsFlushes()
     {
         return hdfsFlushes.get();

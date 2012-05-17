@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector;
 
+import com.ning.arecibo.jmx.AreciboProfile;
+import com.ning.arecibo.metrics.AreciboMetricsReporter;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.servers.JettyServer;
 import com.ning.metrics.collector.endpoint.servers.ScribeServer;
@@ -39,19 +41,22 @@ public class StandaloneCollectorServer
     private final ScribeServer scribeServer;
     private final ServiceCheck serviceCheck;
     private final ServiceMonitor serviceMonitor;
+    private final AreciboProfile areciboProfile;
 
     @Inject
     public StandaloneCollectorServer(final CollectorConfig config,
                                      final JettyServer jettyServer,
                                      final ScribeServer scribeServer,
                                      final ServiceCheck serviceCheck,
-                                     final ServiceMonitor serviceMonitor)
+                                     final ServiceMonitor serviceMonitor,
+                                     final AreciboProfile areciboProfile)
     {
         this.config = config;
         this.jettyServer = jettyServer;
         this.scribeServer = scribeServer;
         this.serviceCheck = serviceCheck;
         this.serviceMonitor = serviceMonitor;
+        this.areciboProfile = areciboProfile;
     }
 
     private void start()
@@ -71,6 +76,9 @@ public class StandaloneCollectorServer
 
         // Talk to Nagios
         serviceMonitor.registerServiceCheck(config.getNagiosServiceName(), serviceCheck);
+
+        // Report metrics to Arecibo
+        AreciboMetricsReporter.enable(areciboProfile);
     }
 
     private void stop()

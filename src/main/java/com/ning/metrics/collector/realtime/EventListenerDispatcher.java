@@ -17,10 +17,11 @@
 package com.ning.metrics.collector.realtime;
 
 import com.google.inject.Inject;
+
+import com.ning.arecibo.jmx.Monitored;
 import com.ning.metrics.serialization.event.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.weakref.jmx.Managed;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,7 +75,7 @@ public class EventListenerDispatcher
         }
     }
 
-    @Managed
+    @Monitored
     public int getNbOfListeners()
     {
         return listeners.size();

@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.processing;
 
+import com.ning.arecibo.jmx.Monitored;
+import com.ning.arecibo.jmx.MonitoringType;
 import com.ning.metrics.collector.hadoop.processing.EventSpoolDispatcher;
 import com.ning.metrics.collector.realtime.EventListenerDispatcher;
 import com.ning.metrics.serialization.event.Event;
@@ -27,7 +29,6 @@ import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.weakref.jmx.Managed;
 
 import java.util.concurrent.TimeUnit;
 
@@ -102,7 +103,7 @@ public class EventCollector
         }
     }
 
-    @Managed(description = "Number of events in memory (spool queue)")
+    @Monitored(description = "Number of events in memory (spool queue)", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public int getQueueSizes()
     {
         int length = 0;

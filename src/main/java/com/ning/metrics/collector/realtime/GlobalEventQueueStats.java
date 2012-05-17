@@ -16,7 +16,8 @@
 
 package com.ning.metrics.collector.realtime;
 
-import org.weakref.jmx.Managed;
+import com.ning.arecibo.jmx.Monitored;
+import com.ning.arecibo.jmx.MonitoringType;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,8 +30,7 @@ public class GlobalEventQueueStats
     private final Map<String, EventQueueStats> stats = new ConcurrentHashMap<String, EventQueueStats>();
     private final AtomicLong ignoredEvents = new AtomicLong(0);
 
-    public EventQueueStats createLocalStats(final String eventType, final Collection<Object> queue,
-            long maxQueueLength)
+    public EventQueueStats createLocalStats(final String eventType, final Collection<Object> queue, final long maxQueueLength)
     {
         final EventQueueStats localStats = new EventQueueStats(queue, maxQueueLength);
         // We are guaranteed to have at most one stats object per event type (see EventQueueProcessorImpl)
@@ -46,13 +46,13 @@ public class GlobalEventQueueStats
         ignoredEvents.incrementAndGet();
     }
 
-    @Managed(description = "Number of ignored events (type not enabled)")
+    @Monitored(description = "Number of ignored events (type not enabled)", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getIgnoredEvents()
     {
         return ignoredEvents.get();
     }
 
-    @Managed(description = "Number of enqueued events")
+    @Monitored(description = "Number of enqueued events", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getEnqueuedEvents()
     {
         long enqueuedEvents = 0;
@@ -62,7 +62,7 @@ public class GlobalEventQueueStats
         return enqueuedEvents;
     }
 
-    @Managed(description = "Number of dropped events")
+    @Monitored(description = "Number of dropped events", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getDroppedEvents()
     {
         long droppedEvents = 0;
@@ -72,7 +72,7 @@ public class GlobalEventQueueStats
         return droppedEvents;
     }
 
-    @Managed(description = "Number of successfully sent events")
+    @Monitored(description = "Number of successfully sent events", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getSentEvents()
     {
         long sentEvents = 0;
@@ -82,7 +82,7 @@ public class GlobalEventQueueStats
         return sentEvents;
     }
 
-    @Managed(description = "Number of events that could not be sent due to an error")
+    @Monitored(description = "Number of events that could not be sent due to an error", monitoringType = {MonitoringType.VALUE, MonitoringType.RATE})
     public long getErroredEvents()
     {
         long erroredEvents = 0;

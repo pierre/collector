@@ -16,7 +16,8 @@
 
 package com.ning.metrics.collector.realtime;
 
-import org.weakref.jmx.Managed;
+import com.ning.arecibo.jmx.Monitored;
+import com.ning.arecibo.jmx.MonitoringType;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
@@ -34,9 +35,9 @@ public class EventQueueStats
     private final Collection<Object> queue;
 
     private final long maxQueueLength;
-    
+
     public EventQueueStats(final Collection<Object> queue,
-            final long maxQueueLength)
+                           final long maxQueueLength)
     {
         this.queue = queue;
         this.maxQueueLength = maxQueueLength;
@@ -62,42 +63,31 @@ public class EventQueueStats
         erroredEvents.incrementAndGet();
     }
 
-    @Managed(description = "Number of locally enqueued events")
     public long getEnqueuedEvents()
     {
         return enqueuedEvents.get();
     }
 
-    @Managed(description = "Number of dropped events")
     public long getDroppedEvents()
     {
         return droppedEvents.get();
     }
 
-    @Managed(description = "Number of successfully sent events")
     public long getSentEvents()
     {
         return sentEvents.get();
     }
 
-    @Managed(description = "Number of events that could not be sent due to an error")
     public long getErroredEvents()
     {
         return erroredEvents.get();
     }
 
-    @Managed(description = "Current length of the underlying queue")
     public long getQueueSize()
     {
         return queue.size();
     }
 
-    @Managed(description = "Maximum length of the underlying queue")
-    public long getMaxQueueSize()
-    {
-        return maxQueueLength;
-    }
-    
     /**
      * Unit test hook
      */

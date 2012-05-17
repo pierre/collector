@@ -170,6 +170,14 @@
             <artifactId>nagios</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.ning.arecibo</groupId>
+            <artifactId>arecibo-jmx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ning.arecibo</groupId>
+            <artifactId>arecibo-metrics</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
         </dependency>

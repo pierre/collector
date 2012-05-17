@@ -18,6 +18,8 @@ package com.ning.metrics.collector.hadoop.processing;
 
 import com.google.inject.Inject;
 import com.mogwee.executors.FailsafeScheduledExecutor;
+
+import com.ning.arecibo.jmx.Monitored;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.serialization.hadoop.FileSystemAccess;
 import com.ning.metrics.serialization.writer.CallbackHandler;
@@ -200,7 +202,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
      *
      * @return cutoff time in milliseconds
      */
-    @Managed(description = "Cutoff time for files to be sent to HDFS")
+    @Monitored(description = "Cutoff time for files to be sent to HDFS")
     public long getCutoffTime()
     {
         return cutoffTime;
@@ -230,7 +232,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
         flushEnabled.set(false);
     }
 
-    @Managed(description = "Number of local files not yet pushed to HDFS")
+    @Monitored(description = "Number of local files not yet pushed to HDFS")
     public int nbLocalFiles()
     {
         return LocalSpoolManager.findFilesInSpoolDirectory(new File(config.getSpoolDirectoryName())).size();

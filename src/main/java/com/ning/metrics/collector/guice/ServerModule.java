@@ -16,6 +16,8 @@
 
 package com.ning.metrics.collector.guice;
 
+import com.ning.arecibo.jmx.AreciboMonitoringModule;
+import com.ning.arecibo.metrics.guice.AreciboMetricsModule;
 import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.binder.config.CollectorConfigurationObjectFactory;
 import com.ning.metrics.collector.endpoint.resources.ScribeModule;
@@ -59,6 +61,7 @@ public class ServerModule extends ServletModule
         installStats();
         installHealthChecks();
         installJMX();
+        installArecibo(config);
         installNagios(config);
         installF5();
         installJaxrsSupport(config);
@@ -101,6 +104,13 @@ public class ServerModule extends ServletModule
         install(new MBeanModule());
     }
 
+    protected void installArecibo(final CollectorConfig config)
+    {
+        install(new AreciboMonitoringModule(config.getAreciboProfile()));
+        // Expose metrics objects to Arecibo
+        install(new AreciboMetricsModule());
+    }
+
     protected void installNagios(final CollectorConfig config)
     {
         bind(ServiceCheck.class).to(CollectorServiceCheck.class).asEagerSingleton();
@@ -111,7 +121,6 @@ public class ServerModule extends ServletModule
             final ServiceMonitor monitor = new FakeNagiosMonitor(config.getNagiosCheckRate());
             bind(ServiceMonitor.class).toInstance(monitor);
         }
-
     }
 
     protected void installF5()

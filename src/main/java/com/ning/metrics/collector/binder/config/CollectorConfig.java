@@ -392,4 +392,8 @@ public interface CollectorConfig
     @Config("collector.shiro.configPath")
     @DefaultNull
     String getShiroConfigPath();
+
+    @Config("collector.arecibo.profile")
+    @Default("com.ning.arecibo.jmx:name=AreciboProfile")
+    String getAreciboProfile();
 }
