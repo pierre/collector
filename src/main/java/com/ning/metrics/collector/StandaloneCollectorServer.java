@@ -78,7 +78,9 @@ public class StandaloneCollectorServer
         serviceMonitor.registerServiceCheck(config.getNagiosServiceName(), serviceCheck);
 
         // Report metrics to Arecibo
-        AreciboMetricsReporter.enable(areciboProfile);
+        if (config.isAreciboEnabled()) {
+            AreciboMetricsReporter.enable(areciboProfile);
+        }
     }
 
     private void stop()
