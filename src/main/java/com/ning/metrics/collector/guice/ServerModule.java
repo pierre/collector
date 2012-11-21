@@ -106,9 +106,13 @@ public class ServerModule extends ServletModule
 
     protected void installArecibo(final CollectorConfig config)
     {
-        install(new AreciboMonitoringModule(config.getAreciboProfile()));
-        // Expose metrics objects to Arecibo
-        install(new AreciboMetricsModule());
+        if (config.isAreciboEnabled()) {
+            install(new AreciboMonitoringModule(config.getAreciboProfile()));
+            // Expose metrics objects to Arecibo
+            // TODO There is a leak in arecibo-metrics. The AreciboMetricsReporter doesn't unregister
+            // removed metrics from the registry
+            install(new AreciboMetricsModule());
+        }
     }
 
     protected void installNagios(final CollectorConfig config)

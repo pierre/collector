@@ -393,6 +393,10 @@ public interface CollectorConfig
     @DefaultNull
     String getShiroConfigPath();
 
+    @Config("collector.arecibo.enabled")
+    @Default("false")
+    boolean isAreciboEnabled();
+
     @Config("collector.arecibo.profile")
     @Default("com.ning.arecibo.jmx:name=AreciboProfile")
     String getAreciboProfile();
