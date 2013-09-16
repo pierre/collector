@@ -16,18 +16,25 @@
 
 package com.ning.metrics.collector.jaxrs;
 
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.filtering.Filter;
 import com.ning.metrics.collector.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
-
 import com.google.inject.Inject;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class EventFilterRequestHandler
 {
@@ -40,12 +47,17 @@ public class EventFilterRequestHandler
 
     private final EventCollector collector;
     private final Filter<ParsedRequest> requestFilter;
+    private final Set<String> eventsToCollect;
 
     @Inject
-    public EventFilterRequestHandler(final EventCollector collector, final Filter<ParsedRequest> requestFilter)
+    public EventFilterRequestHandler(final EventCollector collector, final Filter<ParsedRequest> requestFilter, final CollectorConfig baseConfig)
     {
         this.collector = collector;
         this.requestFilter = requestFilter;
+        
+        final String filterEventTypeStr = baseConfig.getFiltersEventType();
+        this.eventsToCollect = (filterEventTypeStr == null) ? new HashSet<String>() : new HashSet<String>(Arrays.asList(StringUtils.split(filterEventTypeStr, baseConfig.getFilters())));
+
     }
 
     public boolean processEvent(final Event event, final ParsedRequest parsedRequest)
@@ -53,13 +65,10 @@ public class EventFilterRequestHandler
         receivedMeter.mark();
 
         final String eventName = event.getName();
-        if (requestFilter.passesFilter(eventName, parsedRequest)) {
-            filteredMeter.mark();
-            // Mark the processing as succeeded: the client doesn't need to know (and shouldn't retry) if the collector
-            // is configured to ignore such events
-            return true;
+        if (CollectionUtils.isEmpty(eventsToCollect) && requestFilter.passesFilter(eventName, parsedRequest)) {
+            return markRequestFiltered();
         }
-        else {
+        else if(CollectionUtils.isEmpty(eventsToCollect) || eventsToCollect.contains(eventName)){
             // At this point, the event will be dispatched to the various backend modules
             log.debug("Receiving event of type {}", eventName);
 
@@ -72,6 +81,18 @@ public class EventFilterRequestHandler
                 return false;
             }
         }
+        else
+        {
+            return markRequestFiltered();
+        }
+    }
+
+    private boolean markRequestFiltered()
+    {
+        filteredMeter.mark();
+        // Mark the processing as succeeded: the client doesn't need to know (and shouldn't retry) if the collector
+        // is configured to ignore such events
+        return true;
     }
 
     //@VisibleForTesting

@@ -16,16 +16,20 @@
 
 package com.ning.metrics.collector.jaxrs;
 
+import com.google.inject.Inject;
+import com.ning.metrics.collector.binder.config.CollectorConfig;
 import com.ning.metrics.collector.endpoint.ParsedRequest;
 import com.ning.metrics.collector.filtering.Filter;
+import com.ning.metrics.collector.hadoop.processing.ConfigTestModule;
 import com.ning.metrics.collector.processing.EventCollector;
 import com.ning.metrics.serialization.event.Event;
-
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricName;
+
 import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 /**
@@ -35,6 +39,7 @@ import org.testng.annotations.Test;
  * as it might make the client retransmit the payload. This should only happen
  * if the EventCollector rejects the event (e.g. under high load).
  */
+@Guice(modules = {ConfigTestModule.class})
 public class TestEventFilterRequestHandler
 {
     private abstract static class ParsedRequestFilter implements Filter<ParsedRequest> {}
@@ -44,7 +49,9 @@ public class TestEventFilterRequestHandler
     private EventCollector collector;
     private Filter<ParsedRequest> requestFilter;
     private EventFilterRequestHandler eventHandler;
-
+    @Inject
+    private CollectorConfig config;
+    
     @BeforeMethod(alwaysRun = true)
     public void setup()
     {
@@ -57,11 +64,13 @@ public class TestEventFilterRequestHandler
         parsedRequest = Mockito.mock(ParsedRequest.class);
         collector = Mockito.mock(EventCollector.class);
         requestFilter = Mockito.mock(ParsedRequestFilter.class);
-        eventHandler = new EventFilterRequestHandler(collector, requestFilter);
+        config = Mockito.mock(CollectorConfig.class);
+        
+        eventHandler = new EventFilterRequestHandler(collector, requestFilter,config);
 
         Mockito.verifyZeroInteractions(event, parsedRequest, collector, requestFilter);
     }
-
+    
     @Test(groups = "fast")
     public void testEventPass() throws Exception
     {
@@ -103,6 +112,42 @@ public class TestEventFilterRequestHandler
         Mockito.verifyNoMoreInteractions(event, requestFilter);
         Mockito.verifyZeroInteractions(parsedRequest, collector);
     }
+    
+    @Test(groups = "fast")
+    public void testEventsToCollectFilter() throws Exception
+    {
+        Mockito.when(event.getName()).thenReturn("FrontDoorVisit");
+        Mockito.when(config.getFiltersEventType()).thenReturn("FrontDoorVisit");
+        Mockito.when(collector.collectEvent(Mockito.<Event>any())).thenReturn(true);
+        eventHandler = new EventFilterRequestHandler(collector, requestFilter,config);
+        
+        Assert.assertTrue(eventHandler.processEvent(event, parsedRequest));
+        checkStats(1, 0, 1, 0);
+
+        Mockito.verify(event, Mockito.times(1)).getName();
+        Mockito.verify(requestFilter, Mockito.times(0)).passesFilter(Mockito.<String>any(), Mockito.<ParsedRequest>any());
+        Mockito.verify(collector, Mockito.times(1)).collectEvent(Mockito.<Event>any());
+        Mockito.verifyNoMoreInteractions(event, requestFilter, collector);
+        Mockito.verifyZeroInteractions(parsedRequest);
+    }
+    
+    @Test(groups = "fast")
+    public void testSkippedEvents() throws Exception
+    {
+        Mockito.when(event.getName()).thenReturn("RIExternalServices");
+        Mockito.when(config.getFiltersEventType()).thenReturn("FrontDoorVisit");
+        eventHandler = new EventFilterRequestHandler(collector, requestFilter,config);
+        
+        Assert.assertTrue(eventHandler.processEvent(event, parsedRequest));
+        checkStats(1, 1, 0, 0);
+
+        Mockito.verify(event, Mockito.times(1)).getName();
+        Mockito.verify(requestFilter, Mockito.times(0)).passesFilter(Mockito.<String>any(), Mockito.<ParsedRequest>any());
+        Mockito.verify(collector, Mockito.times(0)).collectEvent(Mockito.<Event>any());
+        Mockito.verifyNoMoreInteractions(event, requestFilter, collector);
+        Mockito.verifyZeroInteractions(parsedRequest);
+    }
+    
 
     private void checkStats(final int received, final int filtered, final int succeeded, final int failed)
     {
