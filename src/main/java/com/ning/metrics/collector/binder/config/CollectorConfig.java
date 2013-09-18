@@ -285,7 +285,7 @@ public interface CollectorConfig
      * If true, events specified in collector.filters.event-type 
      * will only be included else excluded
      *
-     * @return whether to send events buffered locally
+     * @return whether to include or exclude the event types
      */
     @Config("collector.filters.event-type.included")
     @Default("false")
