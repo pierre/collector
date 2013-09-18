@@ -16,9 +16,9 @@
 
 package com.ning.metrics.collector.guice.providers;
 
+import com.ning.metrics.collector.filtering.EventInclusionFilter;
 import com.ning.metrics.collector.filtering.FieldExtractor;
 import com.ning.metrics.collector.filtering.PatternSetFilter;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -30,11 +30,13 @@ public class EventFilterProvider implements Provider<PatternSetFilter>
 {
     private final FieldExtractor fieldExtractor;
     private final Set<Pattern> patternSet = new HashSet<Pattern>();
+    private final boolean isEventInclusionFilter;
 
     @Inject
-    public EventFilterProvider(final FieldExtractor fieldExtractor, final String patternListString, final String delimiter)
+    public EventFilterProvider(final FieldExtractor fieldExtractor, final String patternListString, final String delimiter, final boolean isEventInclusionFilter)
     {
         this.fieldExtractor = fieldExtractor;
+        this.isEventInclusionFilter = isEventInclusionFilter;
 
         if (patternListString != null && !patternListString.isEmpty()) {
             for (final String str : patternListString.split(delimiter)) {
@@ -45,7 +47,7 @@ public class EventFilterProvider implements Provider<PatternSetFilter>
 
     @Override
     public PatternSetFilter get()
-    {
-        return new PatternSetFilter(fieldExtractor, patternSet);
+    {   
+        return isEventInclusionFilter ? new EventInclusionFilter(fieldExtractor, patternSet) : new PatternSetFilter(fieldExtractor, patternSet);
     }
 }

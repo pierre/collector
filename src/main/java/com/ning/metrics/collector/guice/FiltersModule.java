@@ -60,23 +60,23 @@ public class FiltersModule implements Module
         binder.bind(filterTypeLiteral).to(OrFilter.class).asEagerSingleton();
 
         binder.bind(filterTypeLiteral).annotatedWith(Names.named("host"))
-              .toProvider(new EventFilterProvider(FieldExtractors.HOST, config.getFiltersHost(), filterListDelimiter)).asEagerSingleton();
+              .toProvider(new EventFilterProvider(FieldExtractors.HOST, config.getFiltersHost(), filterListDelimiter, false)).asEagerSingleton();
         builder.export(Key.get(filterTypeLiteral, Names.named("host"))).as("com.ning.metrics.collector.filters:name=Host");
 
         binder.bind(filterTypeLiteral).annotatedWith(Names.named("ip"))
-              .toProvider(new EventFilterProvider(FieldExtractors.IP, config.getFiltersIp(), filterListDelimiter)).asEagerSingleton();
+              .toProvider(new EventFilterProvider(FieldExtractors.IP, config.getFiltersIp(), filterListDelimiter, false)).asEagerSingleton();
         builder.export(Key.get(filterTypeLiteral, Names.named("ip"))).as("com.ning.metrics.collector.filters:name=IP");
 
         binder.bind(filterTypeLiteral).annotatedWith(Names.named("user-agent"))
-              .toProvider(new EventFilterProvider(FieldExtractors.USERAGENT, config.getFiltersUserAgent(), filterListDelimiter)).asEagerSingleton();
+              .toProvider(new EventFilterProvider(FieldExtractors.USERAGENT, config.getFiltersUserAgent(), filterListDelimiter, false)).asEagerSingleton();
         builder.export(Key.get(filterTypeLiteral, Names.named("user-agent"))).as("com.ning.metrics.collector.filters:name=UserAgent");
 
         binder.bind(filterTypeLiteral).annotatedWith(Names.named("path"))
-              .toProvider(new EventFilterProvider(FieldExtractors.PATH, config.getFiltersPath(), filterListDelimiter)).asEagerSingleton();
+              .toProvider(new EventFilterProvider(FieldExtractors.PATH, config.getFiltersPath(), filterListDelimiter, false)).asEagerSingleton();
         builder.export(Key.get(filterTypeLiteral, Names.named("path"))).as("com.ning.metrics.collector.filters:name=Path");
 
         binder.bind(filterTypeLiteral).annotatedWith(Names.named("event-type"))
-              .toProvider(new EventFilterProvider(FieldExtractors.EVENT_TYPE, config.getFiltersEventType(), filterListDelimiter)).asEagerSingleton();
+              .toProvider(new EventFilterProvider(FieldExtractors.EVENT_TYPE, config.getFiltersEventType(), filterListDelimiter, config.isFilteredEventTypeIncluded())).asEagerSingleton();
         builder.export(Key.get(filterTypeLiteral, Names.named("event-type"))).as("com.ning.metrics.collector.filters:name=EventType");
 
         final ArrayListProvider<Filter<ParsedRequest>> filterListProvider = new ArrayListProvider<Filter<ParsedRequest>>()

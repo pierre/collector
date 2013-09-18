@@ -61,6 +61,16 @@ public class TestPatternSetFilter
         final Filter<ParsedRequest> falseFilter = new PatternSetFilter(createFieldExtractor("test-host"), createPatternSet("mugen", "nothing"));
         Assert.assertFalse(falseFilter.passesFilter(null, null));
     }
+    
+    @Test(groups = "fast")
+    public void testSinglePatternEventInclusionFilter() throws Exception
+    {
+        final Filter<ParsedRequest> filterShouldMatch = new EventInclusionFilter(createFieldExtractor("test-host"), createPatternSet("test-host"));
+        Assert.assertEquals(filterShouldMatch.passesFilter(null, null), false);
+
+        final Filter<ParsedRequest> filterDoesNotMatch = new EventInclusionFilter(createFieldExtractor("test-host"), createPatternSet("mugen"));
+        Assert.assertEquals(filterDoesNotMatch.passesFilter(null, null), true);
+    }
 
     private Set<Pattern> createPatternSet(final String... patterns)
     {

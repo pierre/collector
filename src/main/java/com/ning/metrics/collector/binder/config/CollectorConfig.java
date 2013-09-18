@@ -280,6 +280,16 @@ public interface CollectorConfig
     @Config("collector.filters.event-type")
     @DefaultNull
     String getFiltersEventType();
+    
+    /**
+     * If true, events specified in collector.filters.event-type 
+     * will only be included else excluded
+     *
+     * @return whether to send events buffered locally
+     */
+    @Config("collector.filters.event-type.included")
+    @Default("false")
+    boolean isFilteredEventTypeIncluded();
 
     /**
      * Default hostname to use when connecting to the load balancer

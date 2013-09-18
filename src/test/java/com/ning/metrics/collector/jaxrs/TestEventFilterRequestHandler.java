@@ -39,7 +39,6 @@ import org.testng.annotations.Test;
  * as it might make the client retransmit the payload. This should only happen
  * if the EventCollector rejects the event (e.g. under high load).
  */
-@Guice(modules = {ConfigTestModule.class})
 public class TestEventFilterRequestHandler
 {
     private abstract static class ParsedRequestFilter implements Filter<ParsedRequest> {}
@@ -49,7 +48,6 @@ public class TestEventFilterRequestHandler
     private EventCollector collector;
     private Filter<ParsedRequest> requestFilter;
     private EventFilterRequestHandler eventHandler;
-    @Inject
     private CollectorConfig config;
     
     @BeforeMethod(alwaysRun = true)
@@ -118,6 +116,8 @@ public class TestEventFilterRequestHandler
     {
         Mockito.when(event.getName()).thenReturn("FrontDoorVisit");
         Mockito.when(config.getFiltersEventType()).thenReturn("FrontDoorVisit");
+        Mockito.when(config.getFilters()).thenReturn(",");
+        Mockito.when(config.isFilteredEventTypeIncluded()).thenReturn(true);
         Mockito.when(collector.collectEvent(Mockito.<Event>any())).thenReturn(true);
         eventHandler = new EventFilterRequestHandler(collector, requestFilter,config);
         
@@ -125,7 +125,7 @@ public class TestEventFilterRequestHandler
         checkStats(1, 0, 1, 0);
 
         Mockito.verify(event, Mockito.times(1)).getName();
-        Mockito.verify(requestFilter, Mockito.times(0)).passesFilter(Mockito.<String>any(), Mockito.<ParsedRequest>any());
+        Mockito.verify(requestFilter, Mockito.times(1)).passesFilter(Mockito.<String>any(), Mockito.<ParsedRequest>any());
         Mockito.verify(collector, Mockito.times(1)).collectEvent(Mockito.<Event>any());
         Mockito.verifyNoMoreInteractions(event, requestFilter, collector);
         Mockito.verifyZeroInteractions(parsedRequest);
@@ -136,13 +136,16 @@ public class TestEventFilterRequestHandler
     {
         Mockito.when(event.getName()).thenReturn("RIExternalServices");
         Mockito.when(config.getFiltersEventType()).thenReturn("FrontDoorVisit");
+        Mockito.when(config.isFilteredEventTypeIncluded()).thenReturn(true);
+        Mockito.when(config.getFilters()).thenReturn(",");
+        Mockito.when(requestFilter.passesFilter(Mockito.<String>any(), Mockito.<ParsedRequest>any())).thenReturn(true);
         eventHandler = new EventFilterRequestHandler(collector, requestFilter,config);
         
         Assert.assertTrue(eventHandler.processEvent(event, parsedRequest));
         checkStats(1, 1, 0, 0);
 
         Mockito.verify(event, Mockito.times(1)).getName();
-        Mockito.verify(requestFilter, Mockito.times(0)).passesFilter(Mockito.<String>any(), Mockito.<ParsedRequest>any());
+        Mockito.verify(requestFilter, Mockito.times(1)).passesFilter(Mockito.<String>any(), Mockito.<ParsedRequest>any());
         Mockito.verify(collector, Mockito.times(0)).collectEvent(Mockito.<Event>any());
         Mockito.verifyNoMoreInteractions(event, requestFilter, collector);
         Mockito.verifyZeroInteractions(parsedRequest);

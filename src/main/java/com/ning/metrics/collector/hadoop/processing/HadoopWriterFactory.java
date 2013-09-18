@@ -45,7 +45,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
 
     private final CollectorConfig config;
     private final FileSystemAccess hdfsAccess;
-    private final AtomicBoolean flushEnabled = new AtomicBoolean(true);
+    private final AtomicBoolean flushEnabled;
     private long cutoffTime = 7200000L;
 
     @Inject
@@ -53,6 +53,7 @@ public class HadoopWriterFactory implements PersistentWriterFactory
     {
         this.hdfsAccess = hdfsAccess;
         this.config = config;
+        this.flushEnabled = new AtomicBoolean(config.isFlushEnabled());
     }
 
     @Override
